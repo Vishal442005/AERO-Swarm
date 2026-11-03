@@ -1,0 +1,123 @@
+Governing Strategic Dynamics: Equilibrium
+Stabilization via Divergence-Driven Control
+
+arXiv:2506.23734v2 [cs.NE] 28 Jan 2026
+
+Hao Shi1 , Fangfang Xie1 , Xi Li1,∗
+Shijiazhuang Campus, Army Engineering University, No. 97 Heping West Road, Xinhua
+District, Shijiazhuang, 061000, Hebei, China
+
+Abstract
+Black-box coevolution in mixed-motive games is often undermined by opponentdrift non-stationarity and noisy rollouts, which distort progress signals and
+can induce cycling, Red-Queen dynamics, and detachment. We propose the
+Marker Gene Method (MGM), a curriculum-inspired governance mechanism
+that stabilizes selection by anchoring evaluation to cross-generational marker
+individuals, together with DWAM and conservative marker-update rules to
+reduce spurious updates. We also introduce NGD-Div, which adapts the key
+update threshold using a divergence proxy and natural-gradient optimization.
+We provide theoretical analysis in strictly competitive settings and evaluate
+MGM integrated with evolution strategies (MGM-E-NES) on coordination
+games and a resource-depletion Markov game. MGM-E-NES reliably recovers target coordination in Stag Hunt and Battle of the Sexes, achieving final
+cooperation probabilities close to (1, 1) (e.g., 0.991 ± 0.01/1.00 ± 0.00 and
+0.97 ± 0.00/0.97 ± 0.00 for the two players). In the Markov resource game,
+it maintains high and stable state-conditioned cooperation across 30 seeds,
+with final cooperation of ≈ 0.954/0.980/0.916 in Rich/Poor/Collapsed
+(both players; small standard deviations), indicating welfare-aligned and
+state-dependent behavior. Overall, MGM-E-NES transfers across tasks with
+minimal hyperparameter changes and yields consistently stable training dynamics, showing that top-level governance can substantially improve the robustness of black-box coevolution in dynamic environments.
+Keywords: Coevolution, Mixed-motive games, Markov games, Black-box
+∗
+
+Corresponding author.
+Email address: lixi@aeu.edu.cn (Xi Li)
+
+optimization, Natural Evolution Strategies, Non-stationary evaluation,
+Robust learning dynamics, Equilibrium stabilization
+1. Introduction
+A central difficulty in co-evolutionary learning is the non-stationarity
+of evaluation: an individual’s measured fitness—and even its relative ranking—can change drastically as the opponent population drifts. This makes
+selection pressure unreliable, often leading to cycling, forgetting, or training collapse, especially in non-transitive or multi-equilibrium games where
+within-generation “progress” can be misleading.
+We address this by introducing the Marker Gene Method (MGM), a
+core control mechanism for mixed-motive coevolution inspired by curriculum learning. Our key insight is that many coevolutionary pathologies (e.g.,
+intransitive cycles, Red Queen dynamics, and detachment) stem from the
+lack of a stable yet continually improving evaluation reference: as the opponent population drifts, the fitness scale itself changes, making selection
+signals unreliable. MGM therefore anchors evaluation with a marker gene
+that is assessed every generation as a persistent reference, while avoiding
+stagnation by adaptively updating this anchor. Concretely, MGM couples (i)
+a conservative marker-gene update mechanism with (ii) a dynamic-weighting
+criterion (DWAM) that regulates when the anchor should advance, balancing specialization against the current marker with generalization against the
+opponent population—effectively implementing a curriculum of “specialize,
+generalize, then update”. For the NES instantiation studied in this paper, we
+additionally maintain a bounded FIFO archive of past markers (size H) to
+support batched evaluation and bookkeeping under stochastic rollouts; the
+MGM core update commits to a new marker once the update criteria are met
+rather than relying on rollback as a primary control signal. Together, these
+components turn cross-generational progress into a more reliable signal under
+opponent drift, improving the stability of selection in black-box coevolution.
+However, a practical obstacle remains: a key MGM hyperparameter—the
+DWAM threshold l—depends on game scale and equilibrium structure, which
+are typically unknown a priori and may vary across tasks. To reduce manual
+tuning, we propose NGD-Div, a lightweight governance controller that adapts
+l online using a computable proxy signal. NGD-Div does not estimate an
+exact game-theoretic quantity; instead, it regulates a single scalar to keep
+learning in a stable regime.
+2
+
+We package MGM together with NGD-Div as MGM-E, a modular governance framework that can be instantiated with different evolutionary actuators. In this work we adopt Natural Evolution Strategies (NES) as a
+differentiability-free actuator for concreteness; importantly, MGM and NGDDiv are actuator-agnostic components.
+Empirically, MGM-E yields more stable learning dynamics across representative non-transitive games and coordination settings, and often improves solution quality in Markov games, including more reliable selection of
+Pareto-efficient equilibria in coordination benchmarks and higher cooperation
+rates in mixed-motive environments. We further compare against representative alternatives such as PSRO and stabilized gradient-based methods (e.g.,
+OGDA), highlighting complementary strengths and failure modes.
+Contributions.
+• We propose MGM, a marker-gene-based cross-generational anchoring
+mechanism with a bounded-archive rollback rule for stabilizing coevolutionary evaluation.
+• We provide a theoretical analysis of the MGM core mechanism. Under bounded payoffs, finite-sample evaluation, and weak-dependence
+assumptions, we establish a separation-of-time-scales result: entering
+a Nash-equilibrium neighborhood occurs on a much shorter time scale
+than leaving it, and under small stochastic perturbations the expected
+escape time from the neighborhood grows exponentially in the inverse
+perturbation scale.
+• We propose NGD-Div, a governance controller that adaptively tunes
+the DWAM threshold l via a proxy-driven natural-gradient update,
+adding only a constant-factor overhead on top of the underlying actuator.
+• We instantiate the framework with NES (MGM-E-NES) and validate it
+on non-transitive, coordination, and Markov games, including extensive
+ablations and comparisons against PSRO/OGDA-style baselines.
+2. Related Works and Backgrounds
+This section reviews two complementary perspectives. We first summarize three well-documented pathologies in population-based coevolution that
+3
+
+jointly hinder stable learning dynamics. We then survey major algorithmic lines of work for learning in games and multi-agent settings, highlighting
+their typical assumptions and limitations in mixed-motive and non-transitive
+environments.
+2.1. Pathologies in Population Coevolution
+2.1.1. Intransitivity
+Intransitivity is prevalent in population coevolution. Jong characterizes
+intransitivity via a relation R in which aRb ∧ bRc does not imply aRc [1].
+In coevolutionary settings, such non-transitive dominance often manifests as
+rock–paper–scissors-like cycles, which can trap the search process in persistent oscillations and impede convergence to stable solutions [2]. At the same
+time, intransitivity can sometimes be beneficial by maintaining diversity and
+preventing premature concentration on a single strategy [3]. Fully eliminating intransitivity is difficult, especially in games with more than three
+strategies and in high-dimensional strategy spaces [4, 5].
+From an evolutionary game theory viewpoint, under strictly competitive interactions and without dissipative terms, intransitive systems can
+exhibit Hamiltonian-like behavior with heteroclinic cycles, preventing volume contraction in the strategy-frequency simplex and leading to persistent
+cycling [5]. Consequently, population states may drift along the simplex
+rather than contracting toward a (mixed) Nash equilibrium; the classic rock–
+paper–scissors model is a canonical example [2]. With finite populations and
+stochastic mutation, dynamics deviate from ideal Hamiltonian systems, yet
+cyclic phenomena often persist as damped or sustained oscillations [6]. Such
+oscillations can distort fitness evaluation: strong strategies may be misjudged
+as weak when assessed at unfavorable phases of the cycle, thereby biasing
+selection and slowing progress [7].
+A broad class of coevolutionary algorithms therefore introduces additional
+mechanisms to cope with intransitivity. Examples include runtime-oriented
+approaches that explicitly archive equilibrium-like solutions to prevent “forgetting” [8], distribution-estimation methods whose success depends on reliable frequency estimates under sufficient diversity [9], and methods that impose explicit structural information or preference protocols to enforce a more
+stable search direction [10, 11]. Hall-of-Fame style archives are widely used
+to preserve elites, though their long-term influence can extend over many
+generations and may not be fully captured by purely current-fitness-based
+criteria [12].
+4
+
+

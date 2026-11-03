@@ -1,0 +1,424 @@
+B. Quantitative Reliability Analysis
+To demonstrate compliance with the Hazardous safety target
+(< 10−7 per flight hour for H-02), we model the system
+dynamics using a Continuous Time Markov Chain (CTMC).
+Unlike static Fault Trees, this model explicitly captures the
+architecture’s dependence on the Safety Monitor’s diagnostic
+coverage (Cmonitor ). The state space, in Fig. 6, consists of:
+• State 0 (Nominal): All systems functional. The Swarm
+Coordinator (DAL D) manages the mission.
+• State 1 (Degraded/Safe): A hardware fault occurred,
+but the Safety Monitor (FMU) detected it and enforced
+a contingency (e.g., Hex-to-Quad control allocation or
+RTB). This represents a fail-operational state, as the system maintains controlled flight and swarm coordination.
+• State 2 (Hazardous): Uncontrolled crash. This occurs if
+the Monitor fails to cover the fault (Lack of Coverage)
+or if the hardware fails without redundancy.
+Safe/Degraded
+
+Nominal
+
+start
+
+S0
+
+λF C · Cmonitor
+
+λF C (1 − Cmonitor )
+
+S1
+
+λsaf e
+
+SHaz
+Hazardous
+Fig. 6. Markov Chain model of the architecture. S0 : Nominal operation. S1 :
+Successfully contained fault (Fail-Operational). SHaz : Uncontained failure.
+System safety depends on Monitor Coverage (Cmonitor ). λsaf e is the
+secondary failure rate from degraded state S1 . During short RTB recovery,
+this transition is dominated by λF C and bounded as described in the text.
+
+The probability of a Hazardous state is dominated by the
+Coverage Factor (Cmonitor ) of the Safety Monitor. The flight
+computer operates in a Command/Monitor (CMD/MON) configuration, so the CMD channel generates actuator commands
+while the MON channel verifies their correctness in parallel.
+An undetected hazardous failure requires the CMD to produce
+an error that propagates to the actuators, the rate of which
+is captured by λF C , rather than either channel independently
+failing. Using a first-order approximation for rare events, the
+steady-state hazard rate λhaz is formulated as:
+λhaz ≈ λF C · (1 − Cmonitor ) + λmonitor hw
+
+(9)
+
+Where:
+−4
+• λF C ≈ 10
+/hr is adopted as a conservative parametric
+estimate for a single-channel flight computer. This value
+is consistent with failure rate ranges for aerospace-grade
+embedded processors [23] and is used here as a bounding
+assumption. The sensitivity of the compliance result to
+this parameter is analyzed in Table V.
+−8
+• λmonitor hw ≈ 10
+/hr represents the undetected hardware failure rate for the FMU under its DAL B assignment. A hazardous FMU failure requires both a
+hardware fault in the FMU and a failure of the internal
+CMD/MON monitor to detect it. This value corresponds
+
+to the integrity target achievable with a CMD/MON
+processor architecture [24], and is treated here as a design
+requirement rather than a measured value.
+The transition from the degraded state S1 to the hazardous
+state SHaz via secondary failure (λsaf e ) is omitted from the
+bounding approximation, justified as follows: upon entering
+S1 , the FMU enforces the Safety Contract, restricting the
+agent to a reduced velocity envelope and initiating a Returnto-Base maneuver. The exposure time in S1 is bounded by
+the RTB maneuver duration tRT B , which for SAR platforms
+operating at SAIL IV distances is on the order of minutes.
+The probability of a secondary hazardous failure during this
+window is bounded by λF C · tRT B . For λF C = 10−4 /hr and
+tRT B ≤ 10 min = 1/6 hr, this yields Psecondary ≤ 1.7×10−5 ,
+which is below the Hazardous threshold and confirms the
+omission does not affect the bounding result.
+Communication failure is architecturally bounded by the
+Ccomm contract (Section III-C), which enforces a deterministic
+Return-to-Base maneuver upon link degradation, preventing
+communication loss from directly inducing an uncontrolled
+crash (H-02). For the overall hazard rate to remain dominated
+by Cmonitor rather than λcomm , the redundant communication
+subsystem must satisfy the design requirement λcomm ≪
+λF C = 10−4 /hr. This is a system-level specification to be
+verified during hardware selection and is consistent with
+the reliability targets achievable by redundant mesh radio
+architectures in the UAV domain.
+Rather than assuming a coverage value, we solve for the
+minimum required coverage to satisfy the Hazardous failurecondition target (Pf ail < 10−7 ). Solving Eq. 9 for Cmonitor :
+10−4 · (1 − Cmonitor ) + 10−8 < 10−7 ⇒ Cmonitor > 0.9991
+
+(10)
+
+TABLE V
+S ENSITIVITY OF R EQUIRED S AFETY M ONITOR C OVERAGE TO F LIGHT
+C OMPUTER FAILURE R ATE λF C
+λF C (per flight hour)
+10−3
+10−4
+10−5
+
+Required Cmonitor
+> 0.99991
+> 0.9991
+> 0.991
+
+10−6
+
+> 0.91
+
+Achievable Implementation
+DAL A CMD/MON architecture
+DAL B CMD/MON architecture
+DAL C architecture (e.g. lockstep
+strategy for detecting random faults)
+Software monitor sufficient
+
+Table V demonstrates that the architecture remains compliant across a range of flight computer reliability assumptions.
+For the baseline assumption of λF C = 10−4 /hr, a DAL B
+CMD/MON implementation of the FMU satisfies the coverage requirement. If higher-integrity flight computers are used
+(λF C ≤ 10−5 /hr), the coverage requirement relaxes, permitting less costly monitoring implementations. By enforcing this
+requirement through strict hardware isolation, the architecture
+derives its safety assurance from verifiable physical properties
+rather than probabilistic software behavior.
+C. Comparative Analysis
+Table VI compares our framework against both traditional
+fault-tolerant control and modern RTA standards.
+The comparison shows that while ASTM F3269 provides
+the safety monitor concept, it lacks the mechanism to propagate the cause of the switch to the swarm. Our architecture fills
+
+TABLE VI
+C OMPARATIVE A NALYSIS OF A RCHITECTURES
+Criterion
+Scope
+Safety Mechanism
+
+Single-Agent FTC [11]
+Single Drone Only
+Algorithmic Redundancy
+(Kalman Filters)
+Adjust Control Laws (Local)
+No (All software is critical)
+Low (any platform)
+
+Response to Fault
+Mixed-Criticality
+SWaP & Scope
+
+Std. RTA (ASTM F3269)
+Single Drone Only
+Simplex Monitor (Switch
+to Safe Controller)
+Terminate / Loiter (Local)
+Yes (Monitor vs. Complex)
+Low-Medium (any platform)
+
+Proposed Architecture
+Swarm & Agent
+Hardware Monitor + Swarm Reconfiguration
+Propagate
+Health
+Vector
+Hi (t) → Global Replan
+Yes (DAL B Monitor / DAL C
+Flight Core / DAL D Swarm)
+High - targets > 10 kg MTOW;
+excludes micro-UAVs
+
+this gap by turning the RTA monitor into a source of health
+data for the collective. This architectural cost is a design tradeoff: the SWaP (Size, Weight, and Power) overhead of hardware
+isolation and redundancy is the mechanism by which DAL B
+integrity is achieved without software-only assurance.
+D. ConOps Verification: Actuator Degradation
+Figure 7 illustrates the sequence during a runtime fault. The
+specific timing and signal propagation of a partial motor failure
+event are traced to verify compliance with the SSRs.
+tO
+
+Nominal Operation
+
+Search Area
+
+t1
+
+Fault Detection & Isolation
+
+Agent A
+
+Agent C
+
+Agent A
+
+Agent B
+
+Agent D
+
+Agent B
+
+Agent C
+
+t2
+
+Fail-Operational Reconfiguration
+Agent A
+
+Agent C
+
+Agent B
+
+Agent D
+
+Shield A
+
+High-Agility Search
+
+Agent D
+
+Fault! Safety Contract Health Vector
+Enforced (v<Vsafe)
+Broadcast
+
+Cost Function Update:
+Neighbors Re-allocate Task
+
+Fig. 7. Operational Sequence of the Verifiable Health-Aware Framework.
+(t0) Nominal operation: Swarm executes search under AI control. (t1) Fault
+Detection: Upon hardware fault detection (e.g., motor loss), the Safety Monitor
+isolates the Agent D into a safety envelope (v ≤ vsaf e ) and broadcasts
+a degraded Health Vector HD (t). ’Shield’ denotes the enforcement of the
+Safety Contract by the FMU. (t2) Reconfiguration: The swarm updates the
+distributed Cost Function (Eq. 7), penalizing Agent D and re-allocating its
+search sectors to healthy neighbors (e.g., Agents A and C).
+
+1) Fault Onset (t = 0): Motor 5 on Agent D suffers a
+winding short, reducing thrust by 40%.
+2) Detection (t ≤ 50 ms): Based on the vehicle’s timeto-divergence (see τmax derivation in Section III-C),
+the FMU correlates the yaw rate divergence (FCS) and
+current spike (BMS) within 50 ms.
+3) Isolation (t ≤ 100 ms): The FMU enforces the Propulsion Contract (Cprop ). It commands the FCS to switch
+to the ”Hex-to-Quad” degraded control allocation matrix
+and enforces the velocity restriction (v ≤ vsaf e ). It
+updates the Agent Health Vector:
+HD (t) = ⟨NOMINAL, DEGRADED, NOMINAL⟩.
+This sequence satisfies the timing constraint of Eq. 2:
+τdetect + τenf orce = 50 + 50 = 100 ms ≤ τmax .
+4) Propagation (t ≤ 200 ms): The SCM reads the updated
+Health Vector HD (t) via the Safety Monitor Interface
+(SMI) and broadcasts it to the swarm mesh network.
+5) Transient Kinematic Safety (200 ≤ t < 500 ms):
+During replanning, inter-UAS spacing is maintained by
+the Reactive OD&CAS layer of trailing agents, operating independently of the global swarm planner. Satisfies the design requirement: the detection-to-avoidance
+
+latency τOD must be less than the time-to-collision
+tT T C at minimum operational separation, i.e., τOD ≪
+dmin /vrel max , where dmin is the minimum interagent separation distance and vrel max is the maximum
+relative approach velocity at the onset of fault. This
+requirement is a platform-level specification that must
+be verified during integration and flight testing.
+6) Decentralized Reallocation (t ≤ 500 ms): The Swarm
+Coordination Modules on neighbor drones (Agents
+A, B, C) receive the vector HD (t). Executing a decentralized consensus algorithm, they identify that Agent D
+can no longer hold its precise search trajectory in high
+wind due to its degraded propulsion state.
+7) Mission Adaptation (t > 500 ms): Healthy neighbors
+adjust their flight paths (indicated by blue arrows in
+Fig. 7) to cover the operational gap. Agent D transitions
+to a static relay node role.
+Altitude deconfliction during simultaneous RTB is handled by the pre-allocated corridor strategy described in Section IV-B. This trace illustrates how the Safety Monitor
+Interface couples hardware faults (millisecond-scale) with
+mission adaptation (second-scale), supporting SSR-MSN-02
+while maintaining DAL C functional isolation.
+VI. D ISCUSSION
+The presented approach maps hazards to architectural mitigations to establish a verifiable basis for design assurance. The
+hierarchical fault management framework enables the swarm
+to reallocate tasks to degraded resources rather than treating
+a partially failed drone as a complete loss. This reallocation
+executes graceful degradation during autonomous operations.
+The architecture partitions subsystems by criticality. The
+DAL B Safety Monitor provides the highest integrity layer
+to enforce hardware-isolated containment of DAL D failures.
+Flight-critical modules (PM, NAV, FCS) at DAL C utilize
+hardware redundancy, whereas the mission-critical SCM operates within a monitored-simplex design at DAL D. The
+integration of a physically isolated FMU, dual-redundant flight
+computers, and redundant data buses introduces a measurable payload penalty. Consequently, this architecture targets
+payload-capable UAVs (e.g., platforms > 10 kg MTOW)
+operating in SAIL IV environments. Strict SWaP constraints
+preclude hardware replication in micro-UAV swarms. In the
+event of an SCM failure, the FMU enforces safe state transitions independent of mission objectives.
+A. Design Assumptions and Limitations
+This work acknowledges limitations based on its current
+Technology Readiness Level (TRL). First, the quantitative
+reliability results (Section V-B) are model-based. The evaluation that the Hazardous failure-condition target is theoretically
+achievable for our SAIL IV scenario relies on the assumption
+that the Safety Monitor achieves a diagnostic coverage of
+Cmonitor > 0.9991. While this metric aligns with DAL A/B
+CMD/MON hardware implementations, verifying this coverage in practice requires targeted fault injection campaigns
+outside the scope of this architectural proposal.
+
+Second, the model assumes independence between the
+Safety Monitor and the Mission Computer. In a physical implementation, shared resources (such as power buses or clock
+lines) introduce the potential for Common Cause Failures
+(CCF). To transition this theoretical framework into a practical
+Proof-of-Concept (PoC), future work targets the Hardware-inthe-Loop (HIL) verification of the FMU using representative
+FPGA hardware to verify the timing guarantees of the Safety
+Monitor Interface (SMI) under saturation conditions.
+Finally, while this framework defines the formal interface
+(the Cost Function) between agent health and swarm logic,
+the effectiveness of the reconfiguration depends on the convergence speed of the distributed planner. The verification and
+validation (V&V) of non-deterministic replanning algorithms
+remains an open research challenge [25].
+VII. C ONCLUSION
+This paper introduced a verifiable health-aware architectural framework for autonomous swarms. Applying the
+ARP4754/ARP4761 framework derived a mixed-criticality architecture where a hardware-isolated Safety Monitor (DAL B)
+enforces formal safety contracts on non-deterministic swarm
+logic (DAL D). Integrating Run-Time Assurance (RTA) with
+swarm reconfiguration links flight-critical component reliability (DAL C) to multi-agent resilience. Markov analysis establishes that the Hazardous failure-condition target (Pf ail <
+10−7 /hr) is theoretically achievable for our SAIL IV scenario if
+the Safety Monitor achieves Cmonitor > 0.9991. This requirement is consistent with DAL B hardware architectures, such as
+CMD/MON architectures (∼ 10−7 /hr). By defining boundaries
+between flight-critical systems and complex swarm algorithms,
+the framework supports the certification of autonomous operations. Future work targets Hardware-in-the-Loop verification
+of the Safety Monitor using representative FPGA hardware.
+This verification focuses on the timing guarantees of the
+Safety Monitor Interface (SMI) and the fault injection response
+relative to Safety Contract bounds.
+ACKNOWLEDGMENT
+
+This research was funded by the Horizon Europe research
+and innovation program of the European Union and the Chips
+Joint Venture under GA No. 101194287, NexTArc (Next
+Generation Open Innovations in Trustworthy Embedded AI
+Architectures for Smart Cities, Mobility, and Logistics).
+R EFERENCES
+[1] S.-J. Chung, A. Paranjape, P. Dames, S. Shen, and V. Kumar, “A survey
+on aerial swarm robotics,” IEEE Transactions on Robotics, vol. 34, no. 4,
+pp. 837–855, 2018.
+[2] L. Giacomossi, F. Souza, R. G. Cortes, H. Mirko Montecinos Cortez,
+C. Ferreira, C. A. C. Marcondes, D. S. Loubach, E. F. Sbruzzi, F. A. N.
+Verri, J. C. Marques, L. A. Pereira, M. R. O. A. Maximo, and V. V.
+Curtis, “Autonomous and collective intelligence for uav swarm in target
+search scenario,” in 2021 Latin American Robotics Symposium (LARS),
+2021, pp. 72–77.
+[3] L. Giacomossi, M. R. O. A. Maximo, N. Sundelius, P. Funk, J. F. B.
+Brancalion, and R. Sohlberg, “Cooperative search and rescue with drone
+swarm,” in International Congress and Workshop on Industrial AI and
+eMaintenance 2023, U. Kumar, R. Karim, D. Galar, and R. Kour, Eds.
+Cham: Springer Nature Switzerland, 2024, pp. 381–393.
+
+[4] Joint Authorities for Rulemaking on Unmanned Systems, “JARUS
+guidelines on Specific Operations Risk Assessment (SORA),” JARUS,
+Guidelines JAR-DEL-SRM-SORA-MB-2.5, May 2024, version 2.5.
+[5] B. Johnson, “ Fault-Tolerant Microprocessor-Based Systems ,” IEEE
+Micro, vol. 4, no. 06, pp. 6–21, Nov. 1984. [Online]. Available:
+https://doi.ieeecomputersociety.org/10.1109/MM.1984.291277
+[6] X. Zhang and X. Zhao, “Architecture design of distributed redundant
+flight control computer based on time-triggered buses for uavs,” IEEE
+Sensors Journal, vol. 21, no. 3, pp. 3944–3954, 2021.
+[7] J. Zhao, C. Yang, G. Liu, W. Wang, T. Qie, C. Xiang, and H. Liu, “A
+flight-fault-aware path planning strategy for vtol intelligent air-ground
+vehicle using game learning approach,” IEEE Transactions on Intelligent
+Vehicles, 2024.
+[8] K. G. Alamdar and T. Petrovic, “Decentralized battery-aware connectivity maintenance for multi-uav missions,” IEEE Access, 2025.
+[9] ASTM International, ASTM F3269-17: Standard Practice for Methods to
+Safely Bound Flight Behavior of Unmanned Aircraft Systems containing
+Complex Functions, ASTM International Std., 2017.
+[10] C. H. Wu, T. J. Chen, T. Y. Hsu, S. H. Tsai, and H. P. Chang,
+“Design of applying flexray-bus to federated archiectecture for triple
+redundant reliable uav flight control system,” in 2017 IEEE International
+Conference on Dependable, Autonomic and Secure Computing (DASC),
+2017, pp. 73–78.
+[11] N. P. Nguyen, N. X. Mung, and S. K. Hong, “Actuator fault detection
+and fault-tolerant control for hexacopter,” Sensors, vol. 19, no. 21, 2019.
+[12] M. W. Mueller and R. D’Andrea, “Stability and control of a quadrocopter despite the complete loss of one, two, or three propellers,” in
+IEEE International Conference on Robotics and Automation (ICRA),
+2014, pp. 45–52.
+[13] Q. Gao, T. Lei, W. Yao, X. Zhang, and X. Zhang, “A health-aware
+energy management strategy for fuel cell hybrid electric uavs based on
+safe reinforcement learning,” Energy, vol. 283, p. 129092, 2023.
+[14] A. Caregnato-Neto, M. R. Maximo, and R. J. Afonso, “Resilient robust
+connectivity for multiagent systems with line of sight using mixedinteger programming,” Journal of Control, Automation and Electrical
+Systems, vol. 33, no. 1, pp. 129–140, 2022.
+[15] L. Giacomossi, A. Haglund, C. Namatovu, E. Zainali, E. Målqvist,
+Y. M. Beyene, I. Tomasic, B. Çürüklü, and H. Forsberg, “Market-based
+replanning for safety-critical uav swarms in search and rescue missions,”
+2026. [Online]. Available: https://arxiv.org/abs/2606.01970
+[16] V. Varadharajan, D. St-Onge, B. Adams, and G. Beltrame, “Swarm relays: Distributed self-healing ground-and-air connectivity chains,” IEEE
+Robotics and Automation Letters, vol. 5, no. 4, pp. 5347–5354, 2020.
+[17] C. Torens, P. Nagarajan, S. Schirmer, J. Dauer, J. E. Baumeister, F. Kohn,
+B. Finkbeiner, G. Manfredi, and F. Löhr, “Certification aspects of
+runtime assurance for urban air mobility,” in AIAA SciTech 2024 Forum,
+2024, p. 1464.
+[18] J. G. Rivera, A. A. Danylyszyn, C. B. Weinstock, L. R. Sha, and M. J.
+Gagliardi, “An architectural description of the simplex architecture,”
+Software Engineering Institute, Carnegie Mellon University, Pittsburgh,
+PA, Tech. Rep. CMU/SEI-96-TR-006, March 1996, eSC-TR-96-006.
+[19] S. Bak, D. Chivukula, O. Adekunle, M. Sun, M. Caccamo, and L. Sha,
+“The system-level simplex architecture for improved real-time embedded
+system safety,” 04 2009, pp. 99–107.
+[20] SAE International, “ARP4761A, Guidelines and Methods for Conducting the Safety Assessment Process on Civil Airborne Systems and
+Equipment,” SAE Intern., Aerospace Recommended Practice, 2023.
+[21] S-18 Aircraft and Sys Dev and Safety Assessment Committee,
+ARP4754B: Guidelines for Development of Civil Aircraft and Systems.
+SAE International, 2023, sAE Aerospace Recommended Practice
+(ARP). [Online]. Available: https://doi.org/10.4271/ARP4754B
+[22] A. Benveniste, B. Caillaud, D. Nickovic, R. Passerone, J.-B. Raclet,
+P. Reinkemeier, A. Sangiovanni-Vincentelli, W. Damm, T. A. Henzinger,
+K. G. Larsen et al., “Contracts for system design,” Foundations and
+Trends® in Electronic Design Automation, vol. 12, pp. 124–400, 2018.
+[23] Department of Defense, MIL-HDBK-217F: Reliability Prediction of
+Electronic Equipment. Washington, DC, 1991.
+[24] Texas Instruments, TMS570LS31x/21x 16/32-Bit RISC Flash Microcontroller Safety Manual, 2018, literature Number: SPNU511D.
+[25] H. Forsberg, J. Lindén, J. Hjorth, T. Månefjord, and M. Daneshtalab,
+“Challenges in using neural networks in safety-critical applications,”
+in Proceedings of the 2020 AIAA/IEEE 39th Digital Avionics Systems
+Conference (DASC). IEEE, 2020, pp. 1–7.
+
+

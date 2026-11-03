@@ -1,0 +1,1112 @@
+8
+
+Fig. 1. The GRF-based stochastic optimal control framework for pattern-oriented swarms. The multi-robot system is modeled as a Gibbs Random Field (GRF),
+where inter-robot interactions and spatial constraints are encoded through clique potentials. The associated Gibbs energy is mapped to a probability distribution,
+effectively casting the optimal swarm control problem as a Bayesian inference task. Environmental stochasticity is managed via Unscented Kalman Filter
+(UKF)-based trajectory prediction, where safety margins are dynamically derived from the propagated state covariance to ensure uncertainty- and risk-aware
+collision avoidance.
+
+The mean-field approximation facilitates the factorization of
+the joint posterior in (14) into decoupled local distributions,
+expressed as
+P (X0:T |U0:T −1 )PU (U0:T −1 )
+Y
+≈
+P̃i (Xi,0:T |Ui,0:T −1 )Pi,U (Ui,0:T −1 )
+
+(17)
+
+Given that the single-step marginal P̃i (Xi,t ) follows the Gibbs
+form exp{−Hi (Xi,t )/λ} from (15), each independent local
+trajectory distribution is constructed by compounding these
+time-indexed marginals over the horizon T .
+
+t=0
+
+Si (Ui,0:T −1 ) =
+
+T
+X
+
+Hi (Xi,t )
+
+(20)
+
+t=0
+
+i∈V
+
+P̃i (Xi,0:T |Ui,0:T −1 )Pi,U (Ui,0:T −1 )
+TY
+−1 h
+i
+=
+P̃i (Xi,t+1 |Xi,t , Ui,t )Pi,U (Ui,t )
+
+sequence Ui,0:T −1 through the system dynamics (4), the
+trajectory-level Gibbs energy can be expressed as a function
+of the control sequence. Hence, one has
+
+(18)
+
+( P
+)
+T
+t=0 Hi (Xi,t )
+∝ exp −
+Pi,U (Ui,0:T −1 )
+λ
+
+A straightforward approach to determining the optimal
+control sequence is minimizing the expected trajectory cost.
+min EQi,U [Si (Ui,0:T −1 )]
+
+Qi,U
+
+(21)
+
+However, the optimal solution to this unconstrained problem
+degenerates to a point mass distribution concentrated at the
+∗
+single best trajectory Ui,0:T
+−1 = arg min Si , which precludes
+effective sampling-based optimization.
+To prevent this degeneracy, a KL-divergence regularization
+term is introduced to penalize deviations of the sampling distribution Qi,U (Ui,0:T −1 ) from the control prior Pi,U (Ui,0:T −1 ),
+yielding the regularized optimization:
+n
+o
+min EQi,U [Si ] + λDKL (Qi,U ||Pi,U )
+(22)
+Q
+
+The formulation in (18) transforms the centralized optimization in (14) into a set of decoupled local subprobi,U
+lems. Consequently, the global swarm objective is reduced where the temperature parameter λ governs the explorationto the parallel maximization of each marginal distribution exploitation trade-off: larger λ encourages broader exploration
+P̃i (Xi,0:T |Ui,0:T −1 )Pi,U (Ui,0:T −1 ). This factorized structure by keeping Q
+i,U close to the prior Pi,U , while smaller λ
+enables a fully distributed solution, where each robot indepen- produces more greedy distributions concentrated on low-cost
+dently optimizes its local trajectory probability to achieve the trajectories.
+collective swarm objective.
+Applying calculus of variations to solve this optimization
+2) Optimal Sampling Distribution: To enable sampling- problem, we take the functional derivative with respect to Q
+i,U
+based optimization, the control sequence Ui,0:T −1 is param- and set it to zero.
+
+
+
+eterized as the sum of a nominal control sequence Ūi,0:T −1
+δ
+Qi,U
+and a stochastic perturbation.
+EQi,U [Si ] + λEQi,U log
+=0
+(23)
+δQi,U
+Pi,U
+Ui,0:T −1 = Ūi,0:T −1 + ϵi,0:T −1
+(19) which yields the optimality condition.
+where ϵi,0:T −1 ∼ N (0, ΣU ). Since the state trajectory Xi,0:T
+is uniquely determined by the initial state Xi,0 and the control
+
+Si + λ log
+
+Qi,U (Ui,0:T −1 )
++λ=0
+Pi,U (Ui,0:T −1 )
+
+(24)
+
+9
+
+The optimal sampling distribution Q∗i,U is given by
+
+
+1
+Si
+∗
+Qi,U (Ui,0:T −1 ) = Pi,U (Ui,0:T −1 ) exp −
+(25)
+η
+λ
+P
+where η = Ui,0:T −1 Pi,U (Ui,0:T
+P −1 ) exp(−Si /λ) is the normalization constant ensuring Ui,0:T −1 Q∗i,U (Ui,0:T −1 ) = 1.
+This result demonstrates that the optimal distribution Q∗i,U
+reweights the base distribution Pi,U (Ui,0:T −1 ) according to
+the negative log-likelihood of each trajectory, assigning higher
+probability to trajectories with lower costs. The temperature Fig. 2. Illustration of the MPPI trajectory optimization process. K trajectory
+parameter λ controls the sharpness of this reweighting: smaller samples are generated from the control distribution Q, with covariance
+propagation capturing state uncertainty over the prediction horizon. Trajectories
+λ produces distributions sharply concentrated on low-cost passing through dynamic obstacles receive low importance weights w̃, while
+trajectories, while larger λ encourages broader exploration. the optimal trajectory U ∗ is computed as the weighted combination of sampled
+While Equation (25) provides the theoretical form of the control sequences.
+optimal distribution, direct sampling from Q∗i,U is intractable.
+The following section develops an importance sampling scheme
+Consequently, the optimal control input is computed as the
+to efficiently compute the optimal control through Monte Carlo
+weighted average of sampled control perturbations:
+estimation.
+3) Importance Sampling and Monte Carlo Estimation:
+u∗t = EQi,U [w(Ui,0:T −1 )ut ]
+(32)
+Following the path integral control framework, the optimal
+control input at each time step is obtained as the expectation
+It should be noted that Equation (32) yields the globally
+under the optimal distribution Q∗i,U .
+optimal control under the assumption that the expectation can
+u∗t = EQ∗i,U [ut ], t = 0, 1, . . . , T − 1
+(26) be evaluated exactly. In practice, a Monte Carlo approximation
+is employed, where K trajectory samples are drawn from Qi,U ,
+To evaluate this expectation without direct access to Q∗i,U , an and the optimal control is estimated as
+importance sampling scheme is employed.
+K
+(k)
+X
+X
+exp(−Si /λ)
+(k)
+EQ∗i,U [ut ] =
+Q∗i,U (Ui,0:T −1 )ut
+u∗t ≈
+w̃(k) ut , w̃(k) = PK
+(33)
+(k′ )
+/λ)
+Ui,0:T −1
+k=1
+k′ =1 exp(−Si
+(27)
+X Q∗i,U (Ui,0:T −1 )
+where w̃(k) represents the normalized importance weight for the
+=
+Qi,U (Ui,0:T −1 )ut
+(k)
+Qi,U (Ui,0:T −1 )
+k-th sampled trajectory, and Si denotes the trajectory energy
+Ui,0:T −1
+of the k-th sample. This formulation establishes the foundation
+⊤
+⊤
+⊤
+where Ui,0:T −1 = [u⊤
+represents the com0 , u1 , . . . , uT −1 ]
+for integrating the GRF model with the MPPI framework,
+plete sequence of perturbed control inputs over the horizon.
+enabling distributed and scalable swarm control.
+The summation in Equation (27) can be reformulated as an
+expectation under the sampling distribution Qi,U .
+B. Uncertainty-Aware Collision Avoidance
+Q∗i,U (Ui,0:T −1 )
+EQi,U [w(Ui,0:T −1 )ut ], w(Ui,0:T −1 ) =
+In real-world robotic navigation, obstacle states are inherently
+Qi,U (Ui,0:T −1 )
+(28) subject to uncertainty stemming from sensing noise and
+where w(Ui,0:T −1 ) is the importance sampling weight. This environmental stochasticity. Deterministic collision avoidance
+formulation enables the computation of expectations with strategies, which assume perfect state information, often fail
+respect to Q∗i,U by sampling trajectories from the more tractable to provide sufficient safety margins in such non-deterministic
+distribution Qi,U . The weighting term can be decomposed using regimes. To address this, we propose a unified uncertaintythe base distribution Pi,U (Ui,0:T −1 ).
+aware collision avoidance framework integrated within the
+
+
+ ∗
+Gibbs energy formulation. This framework facilitates two
+Qi,U (Ui,0:T −1 )
+Pi,U (Ui,0:T −1 )
+w(Ui,0:T −1 ) =
+distinct representations for handling collision constraints under
+Pi,U (Ui,0:T −1 )
+Qi,U (Ui,0:T −1 )
+(29) uncertainty: (1) a chance-constrained formulation, which pro
+
+
+vides explicit probabilistic safety guarantees through formal
+1
+Si
+Pi,U (Ui,0:T −1 )
+= exp −
+(30) constraint specification; and (2) a risk-sensitive formulation
+η
+λ
+Qi,U (Ui,0:T −1 )
+based on Conditional Value-at-Risk (CVaR), which encodes the
+where Si denotes the trajectory energy defined in Equation (20), same safety principles via a risk-sensitive cost functional. The
+λ is the temperature parameter, and η is a normalization following sections detail the mathematical derivation of these
+constant.
+two constraint types and their integration into the proposed
+When the sampling distribution coincides with the base distri- GRF-MPPI framework.
+bution, i.e., Pi,U (Ui,0:T −1 ) = Qi,U (Ui,0:T −1 ), the importance
+1) Uncertainty Modeling and Propagation: The fundamenweight simplifies to
+tal premise of uncertainty-aware collision avoidance is the
+
+
+treatment of all collision-relevant entities as stochastic objects
+1
+Si
+w(Ui,0:T −1 ) = exp −
+(31) with uncertain future trajectories. This unified treatment enables
+η
+λ
+
+10
+
+a consistent probabilistic framework for collision avoidance
+𝒫𝑟 𝑐𝑜𝑙𝑙𝑖𝑠𝑖𝑜𝑛 ≤ α Worst (1 - α) High Risk
+across all interaction types.
+samples
+Let o denote an entity, such as a neighboring robot or
+𝑑safe
+an obstacle. Its estimated position is given by p̂o , with
+𝑟ref Covanraince
+the associated spatial uncertainty modeled by a Gaussian
+Constrain
+Ellipse
+𝑟ref
+Violation
+distribution po ∼ N (p̂o , Σo ). Here, the covariance matrix
+Σo encapsulates the cumulative uncertainty stemming from
+Monte Corlo
+stochastic sensing noise and motion prediction inaccuracies.
+Sampling
+Low Risk
+To evaluate collision risk across the planning horizon, it is
+−1
+CVaR α 𝑍 = 𝔼 𝑍 𝑍 ≥ VaR α (𝑍)]
+imperative to generate predictive trajectories characterized by 𝑑safe = 𝑟ref + erf (1 − 2𝛼) 2𝒂𝑇 Σ𝑜 𝒂
+(a) Chance Constrain Method
+(b) Conditional Value at Risk Method
+rigorous uncertainty quantification for all relevant entities.
+The Unscented Kalman Filter (UKF) is utilized to propagate
+these stochastic states, as it captures the mean and covariance Fig. 3. Comparison of uncertainty-aware collision avoidance methods. (a)
+Chance Constraint method: the safety distance dsafe is expanded based on the
+of the nonlinear dynamics more accurately than first-order uncertainty covariance to satisfy the probabilistic constraint
+Pr(collision) ≤ α.
+approximations, without the computational burden of explicit (b) CVaR method: Monte Carlo samples are drawn from the uncertainty
+distribution, and the expected cost conditioned on the worst (1 − α) samples
+Jacobian derivations.
+is minimized, providing tail-risk sensitivity.
+For neighboring robots in the swarm, the predictive trajectory
+is obtained through a two-step process. First, the predicted
+trajectory X̂j = {x̂j,t }t=0,...,T −1 from the previous planning where C := {x | ∥p − p ∥ ≤ r } denotes the collision
+io
+i
+i
+o
+ref
+cycle is received via inter-robot communication. This trajectory region between robot i and entity o, O is the set of environrepresents neighbor j’s intended motion plan. Second, a single- mental obstacles, N is the set of neighboring robots, and r
+i
+ref
+step UKF prediction is performed to update the trajectory is the reference radius.
+estimate and propagate the associated uncertainty.
+The pairwise safety violation measure between robot i and
+(x̂j,t+1 , Σj,t+1 ) = UKFpredict (x̂j,t , Σj,t , fj )
+(34) entity o is defined as
+where fj denotes the dynamics model of neighbor j, and
+gio (xi , po ) = rref − ∥pi − po ∥
+(38)
+(x̂j,t , Σj,t ) represents the mean and covariance of the predicted
+state at time t. The single-step UKF prediction accounts for where gio > 0 indicates collision with entity o. Due to the
+the temporal lag between communication cycles and captures stochastic nature of po , the collision event gio > 0 becomes a
+probabilistic event. Following Equation (5), the safety constraint
+the growth of uncertainty over the prediction horizon.
+For environmental obstacles, the complete predictive tra- is specified through the risk measure.
+jectory is generated using UKF-based state estimation and
+R[gio (xi , po )] ≤ 0, ∀o ∈ O ∪ Ni
+(39)
+prediction.
+The risk measure R[·] can be instantiated in two ways,
+each offering distinct advantages for different application
+where fo represents the obstacle motion model, which may
+requirements. The conceptual comparison between these two
+range from simple constant-velocity models to more sophistiapproaches is illustrated in Fig. 3. The chance constraint
+cated learned predictors depending on the application scenario.
+method (left) computes an expanded safety distance dsafe
+The UKF prediction step employs the unscented transform
+based on the uncertainty distribution to bound the collision
+described in Section III. For a state estimate (x̂, Σ), sigma
+probability below a specified threshold. The CVaR method
+i 2nx
+points {χ }i=0 are generated and propagated through the
+(right) focuses on the worst (1 − α) fraction of Monte Carlo
+following dynamics.
+samples, optimizing against high-risk scenarios represented by
+χit+1 = f (χit ), i = 0, 1, . . . , 2nx
+(36) the covariance ellipse.
+Within our framework, the risk constraint R[gio ] ≤ 0 is
+The predicted mean and covariance are then reconstructed from
+enforced
+through potential energy functions rather than explicit
+the propagated sigma points using the weighted combination
+hard
+constraints.
+Trajectories violating the risk constraint
+defined in Section III. This unified UKF-based prediction framereceive
+higher
+potential
+energy, resulting in lower importance
+work ensures that all collision-relevant entities are represented
+weights
+during
+the
+sampling-based
+optimization. The collision
+with consistent uncertainty quantification over the planning
+avoidance
+potential
+for
+robot
+i
+aggregates
+contributions from
+horizon.
+2) Risk Constraint Formulation: With predictive trajectories all collision-relevant entities.
+X
+X
+and associated uncertainties available for all entities, the
+ψicol (Xi,t ) =
+ψij (Xi,t , Xj,t ) +
+ψio (Xi,t , Xo,t )
+collision avoidance problem can be formulated as a riskj∈Ni
+o∈O
+constrained optimization. Following the unified framework
+(40)
+established in Section III, the occupied space for robot i is where ψij and ψio represent the pairwise collision avoidance
+defined as the union of all collision regions.
+potentials. The specific functional form of these potentials
+[
+Co,i =
+Cio
+(37) depends on the choice of risk measure instantiation, as detailed
+in the following sections.
+o∈O∪Ni
+(x̂o,t+1 , Σo,t+1 ) = UKFpredict (x̂o,t , Σo,t , fo )
+
+(35)
+
+11
+
+3) Chance Constraints: The first instantiation of the risk
+measure R[·] is the chance-constrained formulation, where
+safety is specified by bounding the probability of constraint
+violation. Following the unified framework in Equation (5), the
+risk measure is defined as
+RCC [gio ] = Pr(gio > 0) − α
+
+(41)
+
+where α ∈ (0, 1) represents the maximum allowable collision
+probability. The constraint RCC [gio ] ≤ 0 is equivalent to the
+explicit probabilistic specification.
+Pr(xi ∈
+/ Cio ) ≥ 1 − α,
+
+∀o ∈ O ∪ Ni
+
+(42)
+
+CVaR possesses several desirable properties for robotic
+motion planning: coherence that satisfies subadditivity and
+positive homogeneity, convexity enabling efficient optimization,
+and sensitivity to tail risks providing conservative behavior in
+dangerous scenarios.
+The distance violation with respect to the safety constraint
+is defined as
+V (pi , po ) = rref − ∥pi − po ∥
+
+(48)
+
+where positive values indicate safety constraint violation. For
+Monte Carlo-based CVaR estimation, N obstacle positions are
+(k)
+sampled from the uncertainty distribution po ∼ N (p̂o , Σo )
+for k = 1, . . . , N . The collision cost for each sample is
+computed as
+(
+κ1 V (k) + κ2 (V (k) )2 , if V (k) > 0
+c(k) =
+(49)
+0,
+otherwise
+
+This formulation directly controls the likelihood of safety
+violations, making it particularly suitable for applications with
+strict safety requirements.
+For Gaussian-distributed obstacle positions, the chance
+constraint can be reformulated into a deterministic equivalent.
+Consider a linear approximation of the collision constraint where V (k) = V (pi , p(k)
+o ), and κ1 , κ2 are linear and quadratic
+along the direction a = (p̂o − pi )/∥p̂o − pi ∥. A tightened cost weights respectively.
+collision constraint set is defined as
+The CVaR cost is then computed by averaging the top (1−α)
+fraction
+of sampled costs.
+T
+C˜io := {xi | a (po − pi ) ≤ rref }
+(43)
+⌈N (1−α)⌉
+X
+1
+Under the Gaussian assumption, the chance constraint can
+c(k)
+(50)
+CVaRα =
+⌈N (1 − α)⌉
+be transformed into
+k=1
+p
+(44) where c(1) ≥ c(2) ≥ · · · ≥ c(N ) are the sorted costs in
+aT (p̂o − pi ) − rref ≥ erf −1 (1 − 2α) 2aT Σo a
+descending order.
+where erf −1 (·) is the inverse Gaussian error function. The rightThe CVaR-based obstacle potential is directly incorporated
+hand side of Equation (44) represents an uncertainty-dependent into the Gibbs energy.
+safety margin that expands with increasing position uncertainty
+CVaR
+ψio
+(Xi,t , Xo,t ) = κcvar · CVaRα (V (pi , po ))
+(51)
+Σo and decreasing risk tolerance α.
+The chance constraint is incorporated into the Gibbs energy where κcvar is a scaling coefficient.
+framework through a barrier-type potential function.
+(
+2
+C. Density-Guided Swarm Pattern Control
+κcc · dCC
+, if dio < dCC
+CC
+safe − dio
+safe
+ψio (Xi,t , Xo,t ) =
+Traditional pattern control methods, typically reliant on
+0,
+otherwise
+fixed target assignments or rigid geometric constraints, face
+(45)
+significant challenges when navigating complex spatial topolowhere dio = ∥pi − p̂o ∥ is the distancep
+to the estimated obstacle
+gies, non-convex regions, or time-varying swarm populations.
+−1
+position, dCC
+(1 − 2α) 2aT Σo a is the chance- To overcome these limitations, we propose a density-guided
+safe = rref + erf
+constraint-adjusted safety distance, and κcc is a penalty weight. approach formulated within the GRF framework established
+4) Conditional Value at Risk: The second instantiation of in Section III-A. By encoding desired spatial distributions as
+the risk measure R[·] is the CVaR-based formulation, which potential energy functions, the pattern objectives are seamlessly
+captures tail-risk sensitivity through a coherent risk measure. integrated into the global Gibbs energy H(X). This ensures
+Following the unified framework in Equation (5), the risk that the geometric pattern behavior emerges as a consistent
+measure is defined as
+probabilistic inference of the swarm control.
+Recall that the Gibbs energy of the swarm consists of
+RCVaR [gio ] = CVaRα (gio ) − ϵ
+(46)
+unary potentials ψi (Xi,t ) capturing individual agent costs
+where ϵ ≥ 0 is the admissible CVaR threshold. The constraint and pairwise potentials ψi,j (Xi,t , Xj,t ) encoding inter-agent
+RCVaR [gio ] ≤ 0 ensures that the expected severity of violations interactions. The density-guided pattern control introduces an
+in the worst (1 − α) quantile does not exceed ϵ.
+additional potential energy term Hform (X) given by
+X
+X
+For a random variable Z representing the collision cost and
+form
+Hform (X) =
+ψiform (Xi,t ) +
+ψi,j
+(Xi,t , Xj,t ) (52)
+a confidence level α ∈ (0, 1), CVaR is defined as
+i∈V
+
+CVaRα (Z) = E[Z | Z ≥ VaRα (Z)]
+
+(47)
+
+where VaRα (Z) = inf{z : Pr(Z ≤ z) ≥ α} is the Value at
+Risk at level α. Intuitively, CVaR represents the expected cost
+conditioned on being in the (1 − α) worst-case quantile of
+outcomes.
+
+{i,j}∈E
+
+where ψiform represents the pattern-related unary potential for
+form
+agent i, and ψi,j
+denotes the pattern-related pairwise potential
+between neighboring agents i and j. This formulation ensures
+that the pattern control seamlessly integrates with the existing
+GRF-based MPPI framework.
+
+12
+
+   
+
+   
+
+   
+
+ 1 R U P D O L ] H G  ' H Q V L W \
+
+   
+
+   
+
+   
+
+  D   2 X W  R I  3 D W W H U Q  $ W W U D F W L R Q
+
+  E   1 H L J K E R U  5 H S X O V L R Q
+
+  F   8 Q R F F X S L H G  5 H J L R Q  $ W W U D F W L R Q
+
+Fig. 4. Visualization of three complementary density-guided mechanisms for swarm pattern control on an L-shaped target region. (a) Out-of-Pattern Attraction:
+when an agent (orange) lies outside the pattern, the boundary potential ϕb = max(0, Φ + ϵ) induces an attractive gradient that pulls the agent back toward the
+pattern region. (b) Neighbor Repulsion: the Mean Shift vector mi computed over neighboring robots (blue) drives the target agent (orange) away from crowded
+regions, where h denotes the Gaussian kernel bandwidth. (c) Unoccupied Region Attraction: the Mean Shift vector ai steers the agent toward unoccupied grid
+points, where roccupy is the occupation radius used to classify unoccupied cells. Color intensity encodes normalized density and orange arrows indicate the
+resulting displacement direction.
+
+1) Signed Distance Function for Pattern Representation:
+The target pattern region R is implicitly represented using a
+Signed Distance Function (SDF) given by
+(
+−d(p, ∂R), p ∈ R
+Φ(p) =
+(53)
++d(p, ∂R), p ∈
+/R
+where d(p, ∂R) = minq∈∂R ∥p − q∥ is the minimum distance
+to the boundary ∂R. We introduce the notation Φ to represent
+the signed distance field , thereby distinguishing it from the
+clique potential ϕc defined in Equation (1).
+For composite patterns consisting of multiple sub-regions
+R1 , . . . , Rm , the SDF is computed as
+Φunion = min Φj ,
+j
+
+Φintersection = max Φj
+j
+
+(54)
+
+2) Boundary Potential Energy: The boundary potential
+energy penalizes agents located outside the target pattern. As
+illustrated in Fig. 4(a), it generates an attractive gradient that
+pulls out-of-pattern agents back into the pattern region. This
+is formulated as a unary potential since it depends solely on
+the individual agent’s position relative to the pattern boundary.
+ψiboundary (Xi,t ) = κb ϕ2b + λb ϕb ,
+
+ϕb = max(0, Φ(pi ) + ϵ)
+(55)
+where κb and λb are quadratic and linear penalty weights
+respectively, and ϵ is a small margin creating a soft transition
+zone near the boundary. The corresponding clique potential is
+ϕboundary
+= exp{−ψiboundary }, which assigns higher probability
+i
+to states where the agent remains within the pattern region.
+3) Density Potential Energy: Beyond confining robots within
+the pattern boundary, achieving uniform spatial distribution
+requires active density control. To this end, a Mean Shift-based
+mechanism is introduced that guides each robot based on local
+density gradients, as illustrated in Fig. 4(b,c).
+The core idea of Mean Shift is to compute a kernel-weighted
+displacement vector toward the centroid of a given set of
+2
+reference points, where a Gaussian kernel K(u) = e−u /2
+
+with bandwidth h is adopted. The magnitude of the resulting
+vector reflects the degree of spatial imbalance between the
+robot and the reference distribution. By selecting different
+reference point sets, this mechanism yields two complementary
+density control strategies.
+Neighbor Repulsion.: The first strategy computes the
+Mean Shift vector over neighboring robot positions. For robot
+i, the displacement vector is given by
+
+
+∥pi −pj ∥
+K
+pj
+j∈Ni
+h
+
+ − pi
+P
+∥pi −pj ∥
+j∈Ni K
+h
+
+P
+mi =
+
+(56)
+
+points toward the local density maximum of neighboring robots.
+A small ∥mi ∥ indicates that robot i is already near the density
+peak, i.e., in a crowded region. Conversely, a large ∥mi ∥
+suggests that the robot is far from the cluster center, occupying
+a relatively sparse area. The corresponding potential energy is
+defined as
+ψirepul (Xi,t ) = −γr ∥mi ∥
+
+(57)
+
+where γr > 0 is a weighting factor. Since larger ∥mi ∥ yields
+lower energy, this potential favors spatially sparse configurations and penalizes crowded ones within the Gibbs distribution.
+As shown in Fig. 4(b), the density field concentrates around
+clustered robots, and the resulting Mean Shift vector drives
+the target agent away from the local density peak.
+Unoccupied Region Attraction.: The second strategy
+computes the Mean Shift vector over unoccupied grid points
+within the target pattern, rather than over neighboring robots.
+Candidate points {gk } are first sampled within the pattern
+region where Φ(gk ) < 0. A grid point gk is classified as
+unoccupied if no robot lies within an occupation radius roccupy :
+min ∥gk − pj ∥ > roccupy
+
+j∈N
+
+(58)
+
+13
+
+Algorithm 1 GRF-based Pattern-Oriented Swarm Control with
+Uncertainty-Aware Collision Avoidance
+1: Input: Initial state x̄0 , covariance Σ0
+2: Parameters: K samples, horizon T , risk tolerance α
+3: (x̄0 , Σ0 ) ←StateEstimator()
+4: ▷ Receive and predict neighbor trajectories
+5: Receive neighbors’ trajectory X̂j = {x̂j,t , Σj,t }t=0,...,T −1
+which points toward the kernel-weighted centroid of nearby
+6: for each neighbor j ∈ Ni do
+unoccupied regions. Unlike the neighbor repulsion strategy
+7:
+(x̂j,t , Σj,t ) ← UKFpredict (x̂j,t−1 , Σj,t−1 , fj ) ▷ Singlewhere the Mean Shift direction is undesirable, here ai directly
+step UKF
+indicates where the robot should move. The attraction potential
+8: end for
+energy is formulated as
+9: ▷ Predict obstacle trajectories via UKF
+10:
+for each obstacle o ∈ O do
+ψiattract (Xi,t ) = γa ∥ai ∥
+(60)
+11:
+for t = 0 to T − 1 do
+12:
+(x̂o,t+1 , Σo,t+1 ) ← UKFpredict (x̂o,t , Σo,t , fo )
+where γa > 0 is a weighting factor. Since larger ∥ai ∥ yields
+13:
+end for
+higher energy, this potential penalizes states where the robot
+14: end for
+is far from unoccupied regions, actively guiding it toward
+15: ComputeUnoccupiedRegions(Φ, {pj }) ▷ Grid sampling
+under-populated areas. This explicit spatial targeting makes
+for pattern
+the strategy particularly effective for complex non-convex
+16: for k ← 0 to K − 1 do
+geometries where passive repulsion alone may fail to achieve
+17:
+Sample noise sequence Y k = {γ0k , γ1k , ..., γTk −1 }
+adequate coverage. As depicted in Fig. 4(c), the density field
+18:
+S k ← 0 ▷ Initialize trajectory cost
+highlights unoccupied areas within the pattern and the resulting
+19:
+for t = 0 to T − 1 do
+Mean Shift vector points toward the kernel-weighted centroid
+20:
+ut = ūt + γtk
+of these regions.
+21:
+x̄t+1 = f (x̄t , ut )
+4) Total Pattern Potential Energy: The complete pattern- 22:
+▷ Uncertainty-aware collision avoidance
+related Gibbs energy integrates the boundary potential with the 23:
+ComputeCollisionPotential(x̄t ,
+ψicol
+←
+selected density estimation strategy. The unary pattern potential
+{x̂e,t , Σe,t }e∈Ni ∪O )
+for agent i takes the general form.
+24:
+▷ Density field pattern potentials
+25:
+Φt ← ComputeSDF(x̄t )
+ψiform (Xi,t ) = wb ψiboundary + ψidensity
+(61) 26:
+ψiboundary ← Equation (55)
+27:
+ψidensity ← ComputeDensityPotential(x̄t , {pj }j∈Ni )
+where ψidensity represents the density-based potential from either
+28:
+ψiform ← wb ψiboundary + ψidensity
+the neighbor repulsion strategy (using ψirepul ) or the unoccupied
+29:
+S k ← S k + ψicol + ψiform
+region attraction strategy (using ψiattract ), depending on the
+30:
+end for
+application requirements. The weighting coefficient wb balances
+31: end for
+the relative importance of boundary enforcement versus density
+32: ▷ Compute optimal control via importance sampling
+P
+uniformity.
+k′
+33: w k ← exp(−S k /λ)/
+k′ exp(−S /λ)
+P
+When the neighbor repulsion strategy is selected, an addi- 34: u∗ ←
+k k
+w γt , ∀t
+t
+tional pairwise pattern potential between neighboring agents 35: Return: k{u∗ }T −1
+t t=0
+may be included, which is given by
+The reference point set is then defined as S = {gk :
+gk is unoccupied}, and the corresponding Mean Shift vector
+becomes
+P
+k K(∥pi − gk ∥/h) · gk · ⊮unocc (gk )
+ai = P
+− pi
+(59)
+k K(∥pi − gk ∥/h) · ⊮unocc (gk )
+
+density
+form
+ψi,j
+(Xi,t , Xj,t ) = wd ψi,j
+
+(62)
+
+The total Gibbs energy, including both the basic swarm
+potentials and the pattern potentials, is expressed as
+"
+T
+
+X
+X
+H(X) =
+ψi (Xi,t ) + ψiform (Xi,t )
+t=0
+
++
+
+X 
+{i,j}∈E
+
+i∈V
+
+
+form
+ψi,j (Xi,t , Xj,t ) + ψi,j
+(Xi,t , Xj,t )
+
+#
+
+(63)
+
+5) Dynamic Pattern Adaptation: The density field framework naturally supports dynamic geometric patterns through
+time-varying SDF.
+Φt (p) = Φ(p − ct − vf · t · ∆t)
+
+(64)
+
+where ct is the time-varying pattern center and vf is the pattern
+velocity.
+For adaptive sizing based on swarm population N , a scale
+factor s adjusts the geometric pattern.
+
+This unified energy function maintains the Gibbs distribution
+Φs (p) = s · Φ(p/s)
+(65)
+structure established in Equation (2), where lower total energy
+corresponds to higher probability configurations that simultap
+neously achieve collision avoidance, velocity alignment, and where s = N/Nref maintains consistent robot density across
+pattern maintenance.
+different swarm sizes.
+
+14
+
+D. Performance Metrics
+
+|{i : Φ(pi ) < 0}|
+Spattern =
+(66)
+N
+The uniformity score Sunif quantifies the evenness of robot
+distribution based on the coefficient of variation of nearestneighbor distances.
+Sunif =
+
+1
+1 + CVnn
+
+(67)
+
+The coverage ratio Scover evaluates how well the robots cover
+the pattern region.
+Scover =
+
+|{gk ∈ Gin : mini ∥gk − pi ∥ < rcover }|
+|Gin |
+
+(68)
+
+The composite formation score Sform combines all three
+metrics as a weighted sum.
+Sform = αs Spattern + αu Sunif + αc Scover
+
+(69)
+
+where αs + αu + αc = 1 are weighting coefficients.
+V. N UMERICAL S IMULATIONS
+To validate the proposed GRF-based stochastic optimal
+control framework, comprehensive simulation studies are conducted across diverse scenarios with progressively increasing
+complexity. The experimental design follows a systematic
+evaluation strategy that first validates individual algorithmic
+components in isolation, then examines their integrated performance under challenging conditions.
+To demonstrate the efficacy of the proposed methods, the
+simulation results are presented in two parts. The initial
+part (Sections V-A–V-B) evaluates the robustness of collision
+avoidance under state uncertainty, analyzing how different
+risk formulations influence safety margins. The subsequent
+part (Sections V-C–V-D) validates the versatility of densityguided pattern control, showcasing high-quality pattern formation and autonomous recovery from partial swarm failure.
+Following the component-level validations, we perform a
+comprehensive evaluation of the integrated framework in
+Sections V-E and V-F. Specifically, Section V-E examines the
+full framework’s performance during complex multi-formation
+transitions using quadrotor UAVs. Subsequently, Section V-F
+extends the evaluation to fixed-wing UAV platforms, thereby
+demonstrating the framework’s generalization capability and
+its platform-agnostic nature across disparate vehicle dynamics.
+The pattern-oriented swarm control performance is assessed
+based on metrics spanning safety protocols, formation fidelity,
+and efficiency measures, as detailed in Section IV-D. To ensure
+statistical significance, each experimental configuration is evaluated based on Monte Carlo simulation. The proposed framework
+is implemented using PyTorch to leverage GPU-accelerated
+parallel computation within the simulation environment. This
+architecture facilitates high-throughput evaluation and ensures
+the real-time-capable processing of complex swarm trajectories.
+
+   
+
+ 6 X U Y L Y D O  5 D W H    
+
+We introduce several metrics to evaluate pattern control
+performance. The pattern conformity score Spattern measures
+the proportion of robots located within the target pattern region.
+
+           
+
+    
+
+    
+         
+
+    
+    
+
+  
+
+    
+
+  
+  
+  
+  
+
+ & 9 D 5  0 3 3 ,
+ & &  0 3 3 ,
+ % D V H O L Q H
+
+ 6 W D W L F
+
+ 0 L [ H G
+
+ ' \ Q D P L F
+
+Fig. 5. Survival rate comparison across three methods and obstacle scenarios.
+CVaR-MPPI consistently achieves the highest survival rates, with the performance gap increasing as environmental uncertainty grows. Error bars indicate
+standard deviation over 50 trials.
+
+A. Collision Avoidance Performance Evaluation
+Navigating environments with dynamic obstacles presents
+significant challenges due to the inherent stochasticity in
+obstacle motion. Deterministic collision avoidance methods,
+which rely primarily on instantaneous distance measurements,
+often fail to anticipate future obstacle states, resulting in
+reactive rather than proactive maneuvers. In this evaluation, we
+demonstrate the efficacy of explicit uncertainty modeling by
+comparing three distinct strategies: 1) CVaR-MPPI, which integrates UKF-based trajectory prediction with conditional valueat-risk optimization; 2) CC-MPPI, utilizing UKF prediction
+within a chance-constrained formulation; and 3) Baseline MPPI,
+a standard distance-based approach lacking both trajectory
+prediction and uncertainty quantification.
+1) Simulation Setup: Three obstacle-rich scenarios with
+increasing dynamic complexity are designed to systematically evaluate the collision avoidance performance of the
+proposed framework. The Static Environment contains 20
+static obstacles randomly distributed in the operational arena,
+representing classical navigation with known obstacle positions.
+The Mixed Environment introduces environmental uncertainty
+by considering 10 static obstacles and 10 dynamic obstacles,
+where dynamic obstacles follow sinusoidal motion patterns
+with velocities ranging from 0.7 to 1.0 m/s. The Dynamic
+Environment represents the most challenging scenario, featuring 20 dynamic obstacles with sinusoidal motion and high
+environmental uncertainty.
+Dynamic obstacle trajectories are predicted using the Unscented Kalman Filter as described in Section IV-B, which
+propagates state uncertainty over the prediction horizon. The
+CVaR method employs a confidence level of α = 0.9, focusing
+on the worst 10% of collision cost scenarios. Each configuration
+is evaluated over 50 Monte Carlo trials to ensure statistical
+significance. Performance is assessed using survival rate, interagent safety margin, control utilization, energy consumption,
+and path length.
+2) Results and Analysis: Figure 5 presents the survival rate
+comparison across all methods and scenarios. Table I provides
+the comprehensive performance metrics.
+
+15
+
+TABLE I
+C OMPREHENSIVE P ERFORMANCE C OMPARISON OF C OLLISION AVOIDANCE M ETHODS
+
+Safety Metrics
+
+Efficiency Metrics
+
+Scenario
+
+Method
+
+Survival (%)
+
+Margin (m)
+
+Util. (%)
+
+Energy (J)
+
+Path (m)
+
+Static
+
+CVaR-MPPI
+CC-MPPI
+Baseline
+
+100.0 ± 0.0
+100.0 ± 0.0
+99.4 ± 2.4
+
+1.66
+1.68
+1.72
+
+27.1
+25.0
+20.3
+
+166.6
+149.7
+105.0
+
+50.9
+50.0
+49.5
+
+Mixed
+
+CVaR-MPPI
+CC-MPPI
+Baseline
+
+99.8 ± 1.4
+98.9 ± 3.3
+98.8 ± 3.2
+
+1.65
+1.69
+1.74
+
+29.1
+26.2
+21.2
+
+197.1
+166.1
+109.2
+
+52.4
+50.5
+49.8
+
+Dynamic
+
+CVaR-MPPI
+CC-MPPI
+Baseline
+
+99.6 ± 2.0
+98.1 ± 4.3
+96.4 ± 4.8
+
+1.65
+1.68
+1.73
+
+29.7
+25.9
+21.9
+
+213.3
+168.2
+120.3
+
+51.8
+50.4
+50.1
+
+Margin: Inter-agent Safety Margin; Util.: Control Utilization. Bold values indicate best performance in each scenario.
+
+CVaR-MPPI achieves superior safety performance. In the mately 35% higher control utilization at 29.7% compared to
+most challenging Dynamic Environment, CVaR-MPPI achieves the baseline at 21.9%, with energy consumption of 213.3 J
+99.6% survival rate, outperforming CC-MPPI by 1.5% and the compared to 120.3 J representing a 77% increase. This energy
+baseline by 3.2%. This advantage persists across all scenarios, overhead reflects the proactive avoidance maneuvers enabled
+with CVaR-MPPI achieving 99.8% survival in the Mixed by uncertainty-aware planning. For safety-critical applications,
+Environment and 100% in the Static Environment.
+CVaR-MPPI can, therefore, provides the most reliable results.
+Performance gap increases with environmental uncertainty. The survival rate difference between CVaR-MPPI B. CVaR Parameter Sensitivity Analysis
+and other methods increases as dynamic obstacle proportion
+The CVaR confidence level α directly controls the risk senincreases. In the Static Environment, all methods achieve near- sitivity of the collision avoidance behavior. As demonstrated in
+perfect survival of 99.4 to 100%. As uncertainty grows in the Section V-A, CVaR-MPPI achieves superior safety performance
+Dynamic Environment, the gap expands to 1.5% over CC-MPPI compared to alternative formulations. However, the choice of α
+and 3.2% over the baseline. This scaling behavior validates the involves a fundamental trade-off between safety conservatism
+effectiveness of CVaR-based uncertainty modeling for handling and control efficiency. This experiment systematically invescomplex dynamic environments.
+tigates how α affects collision avoidance performance across
+CC-MPPI linearization introduces approximation errors. varying obstacle densities, providing guidance for parameter
+Despite employing UKF-based prediction, CC-MPPI exhibits selection in different operational scenarios.
+lower survival rates than expected in highly dynamic scenar1) Simulation Setup: The experiment systematically varies
+ios. This degradation stems from the linear approximation both the CVaR confidence level α ∈ {0.1, 0.3, 0.5, 0.7, 0.9}
+required for deriving the deterministic equivalent of chance and the number of dynamic obstacles Nd ∈ {15, 20, 25, 30, 35},
+constraints as formulated in Equation (44). In contrast, CVaR- resulting in a complete 5 × 5 experimental grid with 25 paMPPI Monte Carlo sampling approach accurately captures rameter combinations. For each configuration, 50 Monte Carlo
+the nonlinear uncertainty distribution, enabling more precise trials are executed to ensure statistical significance, yielding
+collision probability estimation.
+a total of 1,250 individual simulation runs. Performance is
+3) Summary: The experimental results reveal distinct char- evaluated using survival rate, control energy consumption, and
+acteristics of the three collision avoidance approaches. CVaR- control utilization metrics.
+MPPI demonstrates superior robustness by explicitly optimizing
+2) Results and Analysis: Figure 6 presents the survival rate
+against tail-risk scenarios through Monte Carlo sampling, natu- heatmap across all parameter combinations. The survival rate
+rally capturing the nonlinear nature of collision probability dis- quantifies the proportion of UAVs that successfully navigate
+tributions without linearization assumptions. CC-MPPI provides through the obstacle field without collision.
+computationally efficient collision avoidance through its closedOptimal α configuration for survival rate. The survival
+form deterministic equivalent, but the linear approximation rate exhibits a non-trivial dependence on α. Lower α values
+degrades accuracy when obstacle motion exhibits significant approach risk-neutral behavior, with α = 0.1 achieving survival
+nonlinearity. Baseline MPPI, relying solely on instantaneous rates from 97.6% at 15 obstacles to 92.2% at 35 obstacles.
+distance measurements without uncertainty modeling, exhibits Higher α values improve survival in sparse environments but
+the lowest survival rates across all scenarios, with performance show similar degradation in dense scenarios. Neither extreme
+degradation becoming more pronounced as environmental yields the best overall performance: extremely high α values
+uncertainty increases. Specifically, Baseline MPPI achieves result in overly conservative maneuvers that limit escape
+only 96.4% survival in the Dynamic Environment compared options, while extremely low α values fail to account for
+to 98.1% for CC-MPPI and 99.6% for CVaR-MPPI. From an worst-case scenarios. The α = 0.7 configuration achieves the
+energy efficiency perspective, CVaR-MPPI employs approxi- optimal balance, maintaining survival rates from 99.2% at
+
+

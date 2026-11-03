@@ -1,0 +1,615 @@
+IEEE TRANSACTIONS ON CYBERNETICS, VOL. 56, NO. 5, MAY 2026
+
+1
+
+Occlusion-Aware Contingency Safety-Critical
+Planning for Autonomous Driving
+
+arXiv:2502.06359v3 [cs.RO] 5 Oct 2026
+
+Lei Zheng, Rui Yang, Minzhe Zheng, Zengqi Peng, Michael Yu Wang, Fellow, IEEE, and Jun Ma
+
+Abstract—Ensuring safe driving while maintaining travel efficiency for autonomous vehicles in dynamic and occluded environments is a critical challenge. This paper proposes an occlusionaware contingency safety-critical planning approach for realtime autonomous driving. Leveraging reachability analysis for
+risk assessment, forward reachable sets of phantom vehicles are
+used to derive risk-aware dynamic velocity boundaries. These
+velocity boundaries are incorporated into a biconvex nonlinear
+programming (NLP) formulation that formally enforces safety
+using spatiotemporal barrier constraints, while simultaneously
+optimizing exploration and fallback trajectories within a receding
+horizon planning framework. To enable real-time computation
+and coordination between trajectories, we employ the consensus
+alternating direction method of multipliers (ADMM) to decompose the biconvex NLP problem into low-dimensional convex
+subproblems. The effectiveness of the proposed approach is
+validated through simulations and real-world experiments in occluded intersections. Experimental results demonstrate enhanced
+safety and improved travel efficiency, enabling real-time safe
+trajectory generation in dynamic occluded intersections under
+varying obstacle conditions. The project page is available at
+https://zack4417.github.io/oacp-website/.
+Index Terms—Safety-critical planning, autonomous vehicles,
+trajectory optimization, alternating direction method of multipliers.
+
+I. I NTRODUCTION
+UTONOMOUS vehicles (AVs) are increasingly recognized as a transformative solution for urban mobility [1]–
+[3]. To realize this vision, AVs must efficiently plan safe
+and feasible trajectories in dynamic environments [4]–[6].
+Despite significant advancements, addressing potential hazards
+and enhancing travel efficiency remain critical challenges,
+especially in environments like urban intersections [7]–[9].
+One of the key factors contributing to this challenge is
+the presence of occlusions, where sensors such as cameras
+and LiDAR may be obstructed by buildings or surrounding
+vehicles (SVs) [10], [11]. In such scenarios, the ego vehicle
+(EV) must continuously evaluate occlusion risks and rapidly
+
+A
+
+This work was supported in part by the Guangdong Basic and Applied
+Basic Research Foundation under Grant 2025A1515011812; and in part by
+the Guangzhou Education Bureau Project under Grant 2024312095.(Corresponding author: Jun Ma.)
+Lei Zheng, Rui Yang, Minzhe Zheng, and Zengqi Peng are with the
+Robotics and Autonomous Systems Thrust, The Hong Kong University of
+Science and Technology (Guangzhou), Guangzhou 511453, China (e-mail:
+{lzheng135, ryang253, mzheng615, zpeng940}@connect.hkust-gz.edu.cn).
+Michael Yu Wang is with the School of Engineering, Great Bay University,
+Dongguan 523000, China (e-mail: mywang@gbu.edu.cn).
+Jun Ma is with the Robotics and Autonomous Systems Thrust, The
+Hong Kong University of Science and Technology (Guangzhou), Guangzhou
+511453, China, and also with the Cheng Kar-Shun Robotics Institute, The
+Hong Kong University of Science and Technology, Hong Kong SAR, China
+(e-mail: jun.ma@ust.hk).
+
+replan its trajectory in response to unforeseen contingencies,
+ensuring safety in changing and unpredictable traffic [12],
+[13]. Contingencies, defined as potential events that cannot
+be predicted with certainty [14], require the EV to account for
+the movements of phantom vehicles (PVs) when planning safe
+trajectories. Moreover, real-time trajectory replanning in such
+environments involves addressing intricate constraints and
+objectives simultaneously [5], [11], [15]–[17]. This process
+inherently introduces non-convexity and nonlinearity into the
+optimization problem, making real-time replanning computationally intensive [18]. While existing approaches, such as
+game-theoretic methods [19], [20] and partially observable
+Markov decision processes [21], [22], offer promising solutions for occlusion-aware safe scenarios, they are computationally intractable as the problem size increases. These challenges
+are further exacerbated in dense and interaction-heavy traffic
+environments [23].
+In general, receding horizon planning and control are foundational strategies for safe and efficient autonomous driving in
+dynamic environments [23]–[25]. These methods incorporate
+real-time feedback and anticipate future events, enabling AVs
+to adapt to changing traffic conditions and interact safely with
+SVs [26]. To further handle the multi-modal behaviors of SVs,
+stochastic model predictive control (MPC) approaches have
+been developed [27], [28]. For instance, interactive multiple
+model filters [27] and Gaussian mixture models [28] are
+employed to estimate the likelihood of the behavior of SVs,
+and then a chance-constrained optimization is used to address uncertainties at uncontrolled intersections. Despite their
+effectiveness, these approaches typically assume that future
+positions of SVs can be predicted. In contingency scenarios,
+such as occluded intersections, predicting the future movement
+of PVs is challenging. These vehicles may appear suddenly
+without prior observations, posing a safety risk to the EV [29].
+To address contingencies in occluded environments, active
+perception approaches [19], [30]–[32] provide promising solutions. In [19], a zero-sum dynamic game is proposed to
+model potential interactions in dynamic and occluded driving
+scenarios through game-theoretic active perception. While this
+method solves a reach-avoid game to avoid collisions with
+hidden obstacles, it is limited to one-to-one agent interaction
+scenarios. Such a focus undermines safety in dense traffic
+environments where simultaneous interactions with multiple
+PVs are prevalent. Additionally, in [30], [31], the EV actively deviates from its reference path to increase perceptual
+coverage around occluded regions, enabling safer navigation.
+However, this behavior compromises driving consistency, as
+expert human drivers typically maintain their intended paths in
+
+2
+
+common occluded scenarios, such as intersections [10]. Other
+notable occlusion-aware motion planning approaches involve
+the use of reachable sets [10], [11], [33]–[36]. In [35], an
+over-approximation approach is developed to approximate the
+forward reachable set (FRS) of occluded traffic participants for
+online verification and fail-safe trajectory planning [37]. While
+this approach ensures safety, the inherent overestimation of
+risk typically leads to overly conservative driving behaviors,
+which could compromise travel efficiency. To address this
+problem, a probabilistic risk assessment method based on
+reachability analysis has been introduced in [38]. This method
+uses a sampling-based technique to model potential PVs as
+particles within the occluded intersection. While effective,
+this approach is computationally intensive, particularly in
+dense urban traffic intersections. To facilitate computation, an
+efficient simplified reachability quantification (SRQ) has been
+proposed for occlusion-aware risk assessment to obtain a riskbased speed boundary for the planner [10].
+To enhance safety and driving consistency in unexpected
+scenarios, contingency planning has emerged as an effective
+approach for rapidly responding to sudden events [26], [39]–
+[45]. Unlike traditional MPC, contingency planning computes
+two concurrent sequences: a nominal branch, optimized for
+the intended trajectory, and a contingency branch, which
+preserves a safe alternative in case of sudden changes [14].
+This dual-branch strategy ensures that a feasible trajectory
+is always available. To ensure persistent feasibility during
+planning, terminal set constraints are employed [42]. This
+work incorporates backward reachable sets and maximum
+control-invariant sets to guarantee that the system can maintain feasible trajectories over the planning horizon. However,
+existing contingency planning schemes typically lack explicit
+occlusion assessment [40], [41], [43], [44]. To further account
+for potential PVs in occluded environments, an occlusionaware contingency game is introduced in a receding horizon
+planning framework [20]. Despite these advancements, scaling
+contingency planning to handle multi-vehicle interactions in
+real time remains challenging, particularly in occluded dense
+traffic environments. To facilitate computational efficiency, the
+alternating direction method of multipliers (ADMM)-based
+optimization offers a promising solution [46], [47]. By iteratively solving subproblems corresponding to different variables
+or subsets, ADMM achieves better computational efficiency
+compared to traditional optimization methods [4], [48]. This
+property makes ADMM well-suited for real-time applications
+in occluded or unpredictable scenarios, where rapid response
+and adaptability are essential.
+In this work, we present an occlusion-aware contingency
+planner. By coupling online reachability analysis for risk
+quantification with a consensus ADMM formulation, we decompose the high-dimensional planning problem into a series
+of low-dimensional convex subproblems. This enables the EV
+to regenerate exploration and fallback trajectories in real time,
+preserving scalability with respect to the number of SVs in
+dynamic, occluded environments. The main contributions of
+this paper are summarized as follows:
+• We introduce an occlusion-aware contingency safetycritical planning approach that simultaneously optimizes
+
+IEEE TRANSACTIONS ON CYBERNETICS, VOL. 56, NO. 5, MAY 2026
+
+two trajectories: one that prioritizes exploration to maximize situational awareness, and the other that serves as
+a safety fallback to enhance safe navigation for potential
+hazards based on reachability analysis. Both trajectories
+share an initial segment, allowing smooth transitions to
+handle emerging or occluded PVs.
+• We leverage the consensus ADMM to facilitate real-time
+optimization in our dual-trajectory planning framework.
+The consensus ADMM approach decomposes the highdimensional planning problem into smaller subproblems
+that can be solved in an alternating optimization manner. This enables rapid computation of exploration and
+fallback trajectories within a receding horizon planning
+framework, ensuring real-time adaptation to dynamic
+occluded environments.
+• We validate our occlusion-aware contingency planning algorithm through simulations and real-world experiments
+using a 1:10 scale Ackermann mobile robot platform.
+The results demonstrate the effectiveness of the proposed
+approach in generating safe and efficient trajectories for
+AVs in occluded intersections. Additionally, a detailed
+evaluation of computational efficiency demonstrates the
+algorithm’s feasibility for real-time application in dynamic and traffic-heavy environments with varying obstacle conditions.
+The rest of the paper is structured as follows: Section II
+introduces the problem formulation and preliminaries, including spatiotemporal barriers and trajectory parameterization.
+Section III presents the proposed occlusion-aware contingency
+planning approach and provides a detailed problem decomposition. Section IV demonstrates the effectiveness of the
+proposed approach through both simulation and real-world
+experiments. Finally, Section VI concludes the paper and
+discusses the future work.
+II. P ROBLEM F ORMULATION AND P RELIMINARIES
+A. Problem Formulation
+This study addresses the challenge of enabling safe and
+efficient navigation for the EV in occluded areas, where
+visibility is hindered by static obstacles and dynamic SVs,
+as illustrated in Fig. 1. The dynamics of the EV are modeled
+using a Dubin’s car model [49]:
+
+
+
+
+px
+px + v cos (θ) ∆t
+
+
+ py 
+ py + v sin (θ) ∆t 
+uθ
+
+,
+x=
+, x+ = 
+ θ ,u =
+
+
+a
+θ + uθ ∆t
+v
+v + a∆t
+(1)
+where x, u, and x+ denote the current state vector, the
+control input vector, and the state vector at the next time
+step, respectively; px and py denote the longitudinal and lateral
+positions, respectively; θ and v denote the heading angle and
+velocity, respectively; ∆t denotes the discrete time step, and
+the control inputs are the yaw rate uθ and acceleration a. To
+simplify the problem, the following assumptions are made:
+Assumption 1. (Perception Capabilities [11]) The EV is
+equipped with perceptual sensors that can accurately detect
+free space within its field of view.
+
+ZHENG et al.: OCCLUSION-AWARE SAFETY-CRITICAL PLANNING
+
+3
+
+then be formulated as follows:
+minimize
+
+L
+
+(2a)
+
+subject to
+
+xe0 = xs0 = x(t0 ),
+
+(2b)
+
+xeN ∈ Xfe , xsN ∈ Xfs ,
+xk+1 = f EV (xk , uk ),
+
+(i)
+Xek ∪ Xsk ∩ Ok = ∅,
+xek ∈ X e , xsk ∈ X s ,
+
+(2c)
+
+x,u
+
+(2d)
+(2e)
+(2f)
+
+uk ∈ U,
+
+(2g)
+
+φ(xel ) = φ(xsl ) = φ(x̃l ),
+
+(2h)
+
+∀k ∈ I0N −1 , i ∈ I0m−1 , l ∈ I0Ns −1 .
+
+Fig. 1. The EV (red) navigates an occluded four-way intersection, generating
+two trajectories: a blue exploration trajectory and a red fallback trajectory with
+an arrow. Both trajectories share an initial common segment to enable smooth
+transitions between trajectories. Visibility is obstructed by static obstacles
+(buildings) and dynamic vehicles (orange), highlighting the challenges of safe
+and efficient driving in occluded environments.
+
+Assumption 2. (Velocity Distribution [10], [34]) The velocity
+of the PV is assumed to remain constant and is uniformly
+distributed within the range [0, vpv,max ], where vpv,max denotes
+the maximum possible velocity of the PV.
+To address the challenges of safe navigation in occluded
+areas, we introduce the concepts of Forward Reachable Set
+(FRS) and Backward Reachable Set (BRS):
+Definition 1 (Reachable Sets: Forward and Backward). Let
+X ⊂ Rn denote the state space and U ⊂ Rm denote the
+control input space. The system dynamics are described by
+f : X × U → X , where ẋ(t) = f (x(t), u(t)). Let ϕ(t, x0 , u)
+denote the state trajectory of the system, starting from x0 ∈ X
+at t = 0, under the control input u(·) : [0, T ] → U.
+1. Forward Reachable Set (FRS): The FRS over a time
+horizon T > 0, starting from an initial set X0 ⊂ X , is
+defined as the set of all states reachable within time T under
+admissible controls, as follows:
+
+FRS(T, X0 ) = x ∈ X | ∃ x0 ∈ X0 , ∃ u(·) : [0, T ] → U,
+∃ t ∈ [0, T ] : x = ϕ(t, x0 , u(·)) .
+2. Backward Reachable Set (BRS): The BRS over a time
+horizon T > 0, for a target set T ⊂ X , is the set of all initial
+states from which the trajectory can reach set T at some time
+t ∈ [0, T ] under admissible controls, as follows:
+
+BRS(T, T ) = x0 ∈ X | ∃ u(·) : [0, T ] → U,
+∃ t ∈ [0, T ] : ϕ(t, x0 , u(·)) ∈ T .
+As outlined in [10], the set T of a PV is typically treated as
+the “avoid set” to ensure safe driving, which is computed using
+the FRS. A general contingency motion planning problem can
+
+Here, xek and xsk denote the state vectors for the exploration
+and safety fallback trajectories at time step k, respectively; and
+uk is the control input. These state vectors evolve according to
+the vehicle dynamics f EV as defined in (1). The initial state
+constraint (2b) ensures both trajectories start from the same
+state, while the terminal constraint (2c) ensures they reach their
+respective goal sets. Note that the state spaces X e and X s are
+dynamically refined using reachability analysis to account for
+environmental changes [10]. Building on this, a spatiotemporal
+barrier is employed to enforce safety constraints. The safety
+constraint (2e) ensures that the EV’s reachable sets do not
+overlap with the obstacles’ occupancy sets. It is pertinent to
+note that:
+e
+s
+• Xk and Xk are the compact reachable sets of the EV along
+the exploration and fallback trajectories, respectively, at
+time step k.
+(i)
+• Ok represents the compact occupancy set of the i-th
+surrounding obstacle or vehicle at time k.
+Remark 1. SVs are excluded from these safety constraints if
+their FRSs do not intersect with the EV’s FRS. For instance,
+as illustrated in Fig. 1, vehicles A and C are excluded from
+consideration since their FRSs do not overlap with the EV’s
+FRS.
+To maintain the trajectory consistency, a global consistency
+variable x̃l is introduced, and the function φ(·) extracts the
+desired variable from the states. The consistency constraint
+(2h) ensures that the exploration and fallback trajectories share
+a common segment of length Ns .
+The objective function L minimizes the control effort and
+goal-tracking errors, defined as follows:
+L=
+
+N
+−1
+X
+
+∥uek ∥22 + w1 ∥usk ∥22 +
+
+k=0
+
++
+
+N
+−1
+X
+
+w2 ∥xek − xegoal ∥22
+
+k=Ns +Nd
+N
+−1
+X
+
+w3 ∥xsk − xsgoal ∥22 ,
+
+(3)
+
+k=Ns +Nd
+
+where w1 , w2 , and w3 are constant positive weights; N
+denotes the horizon of the trajectory; Nd denotes the free steps
+after two trajectories diverge.
+With this problem formulation, two main challenges arise:
+• Balancing driving safety and efficiency to avoid overly
+conservative or aggressive driving behaviors.
+
+4
+
+IEEE TRANSACTIONS ON CYBERNETICS, VOL. 56, NO. 5, MAY 2026
+
+Efficiently solving this nonlinear optimization problem
+while adhering to the non-convex safety constraint (2e)
+and kinematic constraint (2d).
+In this study, we adopt a trajectory selection mechanism
+that considers multiple factors, including goal-tracking, lateral
+deviation, safety, comfort, and consistency costs, as detailed in
+our prior work [18]. Notably, both the exploration and fallback
+trajectories share a common initial segment. This structure
+ensures that the next immediate control action executed by
+the EV is identical for both trajectories, regardless of the
+final trajectory chosen, thereby facilitating smooth and stable
+transitions within a receding horizon planning framework.
+•
+
+B. Spatiotemporal Barrier
+In this work, we employ the following spatiotemporal
+barrier safety constraint, as outlined in [18], [50], to enforce
+the safety constraint (2e):
+
+(i)
+(i)
+(i) (i)
+
+px,k = ox,k + lx ξk cos(ωk ),
+
+(i)
+(i)
+(i)
+(4)
+py,k = oy,k + ly(i) ξk sin(ωk ),
+
+
+
+(i)
+(i)
+∆h(xk , ok ) + αk h(xk−1 , ok−1 ) > 0, ∀i ∈ I0M −1 .
+Here, px,k and py,k represent the longitudinal and lateral
+positions of the EV at time step k, while ox,k and oy,k are
+the longitudinal and lateral positions of the i-th obstacle;
+(i)
+(i)
+(i)
+(i)
+(i)
+ok = [ox,k oy,k ovx ,k ovy ,k ]T denotes the position and
+(i)
+
+velocity of the i-th obstacle at time step k. The terms lx and
+(i)
+ly define the axes of the safety ellipse for the i-th obstacle,
+(i)
+with ξk > 1 ensuring a safety margin between the EV and the
+i-th obstacle at time step k. The barrier coefficient αk balances
+the barrier’s influence over successive time steps. The barrier
+function h is defined as
+(i)
+
+(i)
+
+h(xk , ok ) = ξk − 1,
+
+(5)
+
+(i)
+
+The angle ωk at time step k between the EV and the i-th
+obstacle is given by
+!
+(i)
+(i)
+lx,k (py,k − oy,k )
+(i)
+.
+(6)
+ωk = arctan (i)
+(i)
+ly,k (px,k − ox,k )
+C. Trajectory Parameterization
+We parameterize the EV’s trajectory using m-dimensional,
+n-th order Bézier curves. The trajectory for each curve is
+defined as
+n
+X
+(j)
+C(j) (ν) =
+Bi,n (ν)Pi , j ∈ I0Nc −1 ,
+(7)
+i=0
+(j)
+
+where Nc represents the total number of trajectories; Pi ∈
+Rm denotes the control points or Bézier coefficients that are
+optimized for the j-th trajectory. For the EV, these control
+(j)
+(j)
+(j)
+(j)
+(j)
+points are defined as Pi = [cx,i cy,i cθ,i ]T , where cx,i ,
+(j)
+(j)
+cy,i , and cθ,i represent the longitudinal position coefficient,
+lateral position coefficient, and heading angle coefficient,
+respectively. The Bernstein polynomial basis Bi,n is defined
+as follows:
+ 
+n i
+Bi,n (ν) =
+ν (1 − ν)n−i ,
+i
+
+0
+∈ [0, 1], where t0 is the initial time. The
+with ν = t−t
+T
+variable t = t0 +kδt indicates the current time in the trajectory,
+with k representing discrete time steps and δt = T /N as the
+time interval.
+Consequently, the trajectory can be expressed in a discrete
+form, as follows:
+n
+oN −1
+(j)
+T
+Ck
+= WP,j
+WB , j ∈ I0Nc −1 ,
+
+k=0
+
+(j)
+Ck
+
+(j)
+
+(j)
+
+(j)
+
+where
+= [px,k py,k θk ]T denotes the trajectory’s
+longitudinal position, lateral position, and heading angle at
+time step k. The control points matrix WP,j and the constant
+basis functions matrix WB are defined as follows:
+WP,j = [c(j)
+x
+
+c(j)
+y
+
+= [P0
+
+(j)
+
+P1
+
+WB = [B0
+
+B1
+
+(j)
+
+(j)
+
+cθ ]
+...
+...
+
+T
+(n+1)×3
+P(j)
+,
+n ] ∈R
+
+Bn ]T ∈ R(n+1)×N .
+
+(8)
+(9)
+
+In this study, we assign j = 0 and j = 1 to denote the
+exploration and fallback trajectories, respectively. Therefore,
+the
+Cx =
+i
+h point matrices
+h goal isi to optimize the control
+(1)
+(1)
+(0)
+(0)
+(n+1)×2
+(n+1)×2
+cy
+∈ R
+,
+cx
+∈ R
+, C y = cy
+cx
+h
+i
+(0)
+(1)
+(n+1)×2
+and Cθ = cθ
+cθ ∈ R
+.
+In this study, the order n is set to be 10. Notably, these
+high-order Bézier polynomials inherently impose motion constraints on the EV, ensuring alignment with the kinematics of
+discrete integrator models and facilitating smooth transitions
+in position, velocity, and acceleration.
+III. M ETHODOLOGY
+In this section, we present our contingency motion planning
+approach in occluded environments. First, we employ reachability analysis to assess risks arising from occlusions. Based on
+this analysis, we quantify the risk-aware state spaces X e and
+X s , corresponding to the exploration trajectory and safety fallback trajectory, respectively. The contingency motion planning
+problem (2) is then reformulated as a biconvex optimization
+problem that explicitly incorporates these risk considerations.
+Finally, we leverage the consensus ADMM to decompose and
+efficiently solve this reformulated problem. The overall computational workflow of the contingency planner is summarized
+in Algorithm 1.
+A. Occlusion-Aware Risk Assessment
+Navigating occluded scenarios, such as intersections or
+roads with parked vehicles, presents critical challenges for
+autonomous driving systems. In these contexts, expert human
+drivers typically adjust their speed rather than alter their path
+to mitigate risks. We employ the SRQ method [10] to assess
+risks and determine safe velocity boundaries for planning.
+1) Risk Quantification Through SRQ: The SRQ method
+quantifies risk within a dynamic Phantom Vehicle Set (PVS),
+which represents the occluded zone where PVs might exist.
+The calculation is based on two core assumptions: (1) PVs
+drive along the lane centerline, and (2) with no prior information, a PV’s initial position is uniformly distributed across the
+PVS, defined by its start and end points ss and se .
+
+

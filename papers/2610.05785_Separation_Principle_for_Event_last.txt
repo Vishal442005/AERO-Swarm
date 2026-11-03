@@ -1,0 +1,1253 @@
+From (16), we have that ri (t) ≥ 1, which implies
+Lci Af ≤e Af Lci . With (37), it yields
+
+where
+n−2
+n−1
+, γci
+, . . . , 1},
+Γci = diag{γci
+n−1
+n−2
+Γoi = diag{γoi , γoi , . . . , 1},
+Lα = diag{αn−1 , αn−2 , . . . , 1}.
+
+2 2
+⊤
+2ri x̃⊤
+i Pi (fi −f0 ) ≤ 2θi γci α |x̃i |e Lα Γci |Pni |e Af Γci Lα |x̃i |e .
+
+(38)
+Since xi − εi = xi − x0 − (εi − x0 ) = x̃i − ζi , based
+on the property of |·|e , we have that |xi − εi |e =
+|x̃i − ζi |e ≤ |x̃i |e + |ζi |e . Similarly, with Q−1
+i (ϱi ) =
+−(2n−1)
+−1
+ϱi
+Loi Qni Loi and Assumption 1, it holds that
+
+With the fact Pi = ri Lci Pni Lci in (4), the coupling term
+ri2 x̃⊤
+i Pi (ei + ζi ) satisfies
+3 ⊤
+ri2 x̃⊤
+i Pi (ei + ζi ) = ri x̃i Lci Pni Lci (ei + ζi )
+
+3
+= α3 x̃⊤
+i Lα γci Γci Pni Γci Lα (ei + ζi ).
+
+−1
+−1
+2 ⊤
+2ci ϱ2n+1
+e⊤
+i Qi (fi − f0i ) = 2ci ϱi ei Loi Qni Loi (fi − f0i )
+i
+
+−1
+2
+⊤
+≤ 2ci ϱi |ei |e Loi |Qni |e Loi θi Af |xi − εi |e
+(44)
+
+−1
+2
+⊤
+≤ 2ci ϱi |ei |e Loi |Qni |e Loi θi Af (|x̃i |e + |ζi |e )
+−1
+2 2
+= 2ci θi γoi
+α |ei |⊤
+e Lα Γoi |Qni |e Af Γoi Lα (|x̃i |e + |ζi |e ).
+
+For Vci and Voi , we have the following transformations
+
+3
+ri Vci = α3 x̃⊤
+i Lα γci Γci Pni Γci Lα x̃i ,
+
+(39)
+
+
+3
+ϱi Voi = α3 (ei + ζi )⊤ Lα ci γoi
+Γoi Q−1
+ni Γoi Lα (ei + ζi ).
+(40)
+
+Align with (39), it yields
+
+δi 2 ⊤
+δi
+3
+ri x̃i Pi x̃i = α3 x̃⊤
+i Lα γci Γci Pni Γci Lα x̃i .
+2
+2
+From Lemma 1, we can choose κi = max{σ(Qi,κ2 , −Qi,κ1 )}
+with hi > 0 such that the matrix pencil holds
+κi Qi,κ1 + Qi,κ2 < 0, since Qi,κ1 is SND and Qi,κ2 is
+symmetric, which are provided in (41) and (42).
+"
+Qi,κ1 =
+
+3
+−γci
+Γci Pni Γci
+
+0
+
+3
+−hi ci γoi
+Γoi Q−1
+ni Γoi
+#
+"
+δi 3
+δi 3
+2 γci Γci Pni Γci 2 γci Γci Pni Γci
+.
+Qi,κ2 = δ
+i 3
+0
+2 γci Γci Pni Γci
+
+#
+,
+
+(41)
+
+0
+
+Define two positive definite matrices P̄ni = diag{Pni }
+−1
+−1
+and Q̄−1
+ni = diag{Qni }. Since Pni and Qni are SPD
+matrices, the following generalized eigenvalue relationships hold
+−Pni + δiP P̄ni < 0,
+(45)
+Q −1
+−Q−1
+ni + δi Q̄ni < 0,
+where
+δiP = min{σ(Pni , P̄ni )},
+(46)
+−1
+δiQ = min{σ(Q−1
+ni , Q̄ni }.
+With Lemma 1, the matrix pencil satisfies si Qi,s1 +
+Qi,s2 < 0, where si = max{σ(Qi,s2 , −Qi,s1 )}. Since
+Qi,s1 is SND and Qi,s2 is symmetric, where two matrices are given as (47).
+With diagonal matrices P̄ni and Q̄−1
+ni , it follows that
+
+(42)
+
+y ⊤ P̄ni y = |y|⊤
+e |P̄ni |e |y|e ,
+−1
+⊤ −1
+y Q̄ni y = |y|⊤
+e |Q̄ni |e |y|e .
+
+δi 2 ⊤
+2 ⊤
+Then, the
+ inequality 4 ri x̃i Pi x̃i + δi ri x̃i Pi (ei + ζi ) ≤
+κi ri Vci + hi κi ϱi Voi can be regarded as a direct consequence of the quadratic form of the matrix pencil. In
+⊤
+⊤
+particular, with respect to α[x̃⊤
+i Lα , (ei + ζi ) Lα ] , the
+corresponding quadratic form is given by
+
+(49)
+
+Since
+
+2
+Vci ≥ δiP α2 |x̃i |⊤
+e Lα γci Γci |P̄ni |e Γci Lα |x̃i |e ,
+
+(50)
+
+3
+⊤
+− κi α3 x̃⊤
+i Lα P̄ci Lα x̃i − κi α (ei + ζi ) Lα Q̄oi Lα (ei + ζi )
+δi
+3 ⊤
++ α3 x̃⊤
+i Lα P̄ci Lα x̃i + δi α x̃i Lα P̄ci Lα (ei + ζi ) ≤ 0.
+2
+
+and
+
+Step 2. The coupling terms involving nonlinear func2n+1 ⊤ −1
+tions +2ri x̃⊤
+ei Qi (fi − f0i ) can
+i Pi (fi − f0 ) + 2ci ϱi
+be upper bounded by a linear combination of Vci and Voi .
+
+Similarly, by applying the quadratic form associated
+with the matrix pencil in (48), we obtain
+
+
+−1
+2
+Voi ≥ δiQ α2 |ei + ζi |⊤
+e Lα ci γoi Γoi |Q̄ni |e Γoi Lα |ei + ζi |e ,
+(51)
+
+2n+1 ⊤ −1
+2ri x̃⊤
+ei Qi (fi − f0i ) ≤ si Vi .
+i Pi (fi − f0 ) + 2ci ϱi
+(52)
+
+Under Assumption 1, using (4) and (11), we have
+⊤
+2ri x̃⊤
+i Pi (fi − f0 ) ≤ 2ri |x̃i |e |Pi |e |fi − f0 |e
+
+⊤
+≤ 2ri θi |x̃i |e ri Lci |Pni |e Lci Af |x̃i |e
+
+−1
+= 2θi ri2 |x̃i |⊤
+e Lci |Pni |e Lci Af Lci Lci |x̃i |e . (43)
+
+Step 3. By the triggering condition (33), it follows that
+2Ψi ≤ Vci . Then, for the term involving triggering function, we have that ri Ψi ≤ 21 ri Vci .
+
+8
+
+
+si 
+
+2
+−δiP γci
+Γci |P̄ni |e Γci
+
+0
+
+|
+
+
+
+
+
+0
+
++
+2
+−ci δiQ γoi
+Γoi |Q̄−1
+|
+Γ
+ni e oi
+{z
+} |
+
+2
+⊤
+θi γci
+Γ⊤
+ci |P̄ni |e Af Γci + Γci Af |P̄ni |e Γci
+2
+ci θi γoi
+Γoi |Q̄−1
+ni |e Af Γoi
+
+Qi,s1
+
+
+
+−1
+2
+ci θi γoi
+Γoi A⊤
+f |Q̄ni |e Γoi
+
+0
+
+{z
+
+
+ < 0.
+}
+
+Qi,s2
+
+(47)
+"
+
+
+
+2
+−1
+2
+Q 2
+⊤
+− si δiP α2 |x̃i |⊤
+e Lα γci Γci |P̄ni |e Γci Lα |x̃i |e + δi α |ei + ζi |e Lα ci γoi Γoi |Q̄ni |e Γoi Lα |ei + ζi |e
+
+#
+
+
+−1 
+2 2
+⊤
+−1
++ 2θi ri2 |x̃i |⊤
+e Lci |Pni |e Lci Af Lci Lci |x̃i |e + 2ci θi γoi α |ei |e Lα Γoi |Qni |e Af Γoi Lα |x̃i |e + |ζi |e ≤ 0.
+
+Based on the above discussion, (36) can be rewritten as
+V̇i ≤ −κci ri Vci − κoi ϱi Voi + si Vi ,
+
+upper bound holds for the stack vector χi
+s
+
+(53)
+
+|χi (t)| ≤
+
+where
+
+(tf − t)Υi +2 ϕi,2 (α0 )
+|χi (0)|2
+i
+tΥ
+ϕ
+(α
+)
+i,2
+0
+f
+
+≤ (tf − t)m̌i M̌i |χi (0)|.
+
+1 2 + ξi
+−
+− κi > 0,
+2  γci
+
+2n + 1 − 1/n
+κoi = ci 1 −
+− hi κi > 0.
+γoi
+κci =
+
+(48)
+
+(58)
+
+Then, the consensus tracking of the MAS is achieved in
+the sense of Definition 1. For the control input, (25) can
+be rewritten as
+
+(54)
+(55)
+
+ 1
+1
+ui = − B ⊤ Pi x̃i − (ei + ζi ) + B ⊤ Mi ,
+2
+2
+
+Rearrange (53), it yields
+
+(59)
+
+which follows that
+V̇i ≤ −Υi α(t)Vi + si Vi ,
+
+(56)
+|ui | ≤
+
+where Υi = min{κci γci , κoiciγoi }. Based on Lemma 1 in
+
+Ye and Song (2025), we can obtain that
+
+Vi (t) ≤
+
+tf − t
+tf
+
+t ∈ [0, tf ).
+
+(57)
+
+Then, it follows that Vi (t) ≥ α2 (t)ϕi,1 (α0 )|χi (t)|2 , where
+α0 = α(0) and
+2
+2
+ϕi,1 (α0 ) = min{γci
+, ci γoi
+}λi (α0 ),
+n
+
+λi (α0 ) = min λmin Lci (α0 )Pni Lci (α0 ) ,
+o
+λmin Loi (α0 )Q−1
+L
+(α
+)
+.
+oi
+0
+ni
+
+such that δi ri (ei + ζi )⊤ Pi (ei + ζi ) ≤ δui Voi ≤ δui Vi . Substituting these upper bounds back into (60),√thep
+control
+√
+√
+input is bounded by |ui (t)| ≤ 21 δi + δui + 2 Vi (t).
+According to (57), it can be concluded that there exist
+positive constants m̌ui and M̌ui such that
+
+Similarly, for Vi (0), one has Vi (0) ≤ ϕi,2 (α0 )|χi (0)|2 ,
+where
+2
+2
+ϕi,2 (α0 ) = max{γci
+, ci γoi
+}λi (α0 ),
+n
+
+λi (α0 ) = max λmax Lci (α0 )Pni Lci (α0 ) ,
+o
+λmax Loi (α0 )Q−1
+.
+ni Loi (α0 )
+
+r
+Let m̌i = Υ2i + 1 and M̌i =
+
+(60)
+
+By applying the triangle inequality, the right-hand side
+of ((60)) can be bounded by using Vi . It follows from
+⊤
+(30) and (31) that M⊤
+i BB Mi ≤ 2Ψi . Under the eventtriggering condition (33), it guarantees
+that Ψi ≤ Vci ≤
+√ √
+Vi . This directly implies 21 |B ⊤ Mi | ≤ 22 Vi . Using (5),
+it yields |B ⊤ Pi x̃i |2 ≤ δi Vci ≤ δi Vi . Similarly, we have
+|B ⊤ Pi (ei + ζi )|2 ≤ δi ri (ei + ζi )⊤ Pi (ei + ζi ). Recalling
+2 2
+that ri Pi = γci
+α Lα Γci Pni Γci Lα and Voi = α2 (ei +
+⊤
+2
+ζi ) Lα (ci γoi Γoi Q−1
+ni Γoi )Lα (ei +ζi ), both expressions are
+quadratic forms in terms of αLα (ei + ζi ). By virtue of
+Lemma 1, we can select a constant
+
+2
+2
+δui = max σ(δi γci
+Γci Pni Γci , ci γoi
+Γoi Q−1
+ni Γoi ) . (61)
+
+Υi
+esi tf Vi (0),
+
+1 ⊤
+1
+B Pi (x̃i − (ei + ζi )) + |B ⊤ Mi |.
+2
+2
+
+|ui (t)| ≤ (tf − t)m̌ui M̌ui |χi (0)|,
+
+(62)
+
+where m̌ui = Υi /2 and
+ϕi,2 (α0 )
+Υ
+
+tf i ϕi,1 (α0 )
+
+, the following
+
+M̌ui = 12
+
+9
+
+√
+
+δi +
+
+√
+
+δui +
+
+√ p
+2 esi tf ϕi,2 (α0 )/ϕi,1 (α0 ).
+
+Vci due to the event-triggering condition Ψi (t) ≤ Vci (t).
+Since P̄i is a constant matrix over [tik , tik+1 ), the term
+2(∆εi − ∆xi )⊤ P̄i BB ⊤ P̄i ν̇i is uniformly bounded.
+
+Part 2. The exclusion of Zeno behavior is proved by
+showing that there exists a strictly positive minimum
+inter-event time τi = tik+1 −tik > 0 for any agent i during
+the prescribed time t ∈ [0, tf ). For any time interval
+t ∈ [tik , tik+1 ) ⊂ [0, tf ), the event-triggering condition
+guarantees that Ψi (t) ≤ Vci (t).
+
+Based on the above discussion, there exists a finite constant Θi > 0 such that
+Ψ̇i (t) ≤ Θi ,
+
+ˆi ,
+Note that during t ∈ [tik , tik+1 ), the triggered values x̄
+˙
+ε̄i , and P̄i remain constant, which implies ∆xi = −x̂˙ i ,
+˙ ε = −ε̇i , and ∆
+˙ P = Ṗi . For analytical clarity, define
+∆
+i
+i
+the observation mismatch as νi = x̂i − εi . Since x̂i − εi =
+(xi − ei ) − (x0 + ζi ) = x̃i − (ei + ζi ), we have ν̇i = x̂˙ i − ε̇i .
+Taking the time derivative of Ψi yields
+
+(66)
+
+By integrating this inequality over the time elapsed since
+the last trigger, the accumulation of Ψi (t) is constrained
+by Ψi (t) ≤ Θi (t − tik ). For the next event to be triggered
+at tik+1 , the triggering function must evolve from zero
+to intersect with the dynamic threshold, satisfying the
+boundary condition Ψi (tik+1 ) = 21 Vci (tik+1 ). Substituting this condition into the integration inequality yields
+Θi (tik+1 − tik ) ≥ Ψi (tik+1 ) = 21 Vci (tik+1 ). Thus, the minimum time required to cross the triggering threshold is
+governed by:
+
+Ψ̇i =2(∆εi − ∆xi )⊤ P̄i BB ⊤ P̄i ν̇i + 2νi ∆Pi BB ⊤ ∆Pi ν̇i
+d
++ 2νi⊤ (∆Pi BB ⊤ ∆Pi )νi
+dt
+≤2(∆εi − ∆xi )⊤ P̄i BB ⊤ P̄i ν̇i + 2ri νi⊤ δi′ ∆Pi ν̇i
+2δ ′
++ i νi⊤ ri2 ∆Pi νi + cpi νi⊤ ri2 Pi νi ,
+(63)
+γci
+
+tik+1 − tik ≥
+
+where δi′ = max{σ(∆Pi BB ⊤ ∆Pi , ri ∆Pi )} and cpi =
+2δi′ (1+ξi )
+.
+γci
+
+Vci (tik+1 )
+:= τi > 0.
+2Θi
+
+(67)
+
+With Θi being finite, the inter-event time τi is strictly
+greater than zero. Therefore, Zeno behavior is successfully excluded over the prescribed time interval.
+□
+
+From the definition of χi , it shares the same convergence rate of νi . Since Vi is upper bounded, the forth
+term is strictly bounded. By selecting γoi and γci according to (34) and (16), Υi > 1 can be easily guaranteed, which implies that (57) can be rewritten as Vi (t) ≤
+i
+(tf − t)Υi Zi Vi (0), where Zi = esi tf /tΥ
+f is a constant.
+γci
+Since ri = tf −t , it can conclude that ri Vi ≤ (tf −
+t)Υi −1 Zi′ Vi (0), where Zi′ = γci Zi is a constant. As a result, the third term is upper bounded. From (28), one
+has
+
+Table 1
+Reasonable ranges of γci and γoi under different system orders
+Order
+1
+2
+3
+..
+.
+
+dPi
+˙
+x̃i + 2ri x̃⊤
+i Pi x̃i
+dt
+2 + ξi
+˙
+ri Vci + 2ri x̃⊤
+=
+i Pi x̃i
+γci
+≤ −κci ri Vci + si Vi .
+(64)
+
+n
+
+⊤
+V̇ci ≤ ṙi x̃⊤
+i Pi x̃i + ri x̃i
+
+ξi
+
+γci
+
+γoi
+
+0
+(max{4, tf }, ∞)
+(2, ∞)
+2.4142
+(max{8.8284, tf }, ∞)
+(4.5, ∞)
+5.2899
+(max{14.5798, tf }, ∞) (6.6667, ∞)
+..
+..
+..
+.
+.
+.
+max{σ(Ei Pni
+1
+(max{4 + 2ξi ,
+(2n + 1 − n
+,
++Pni Ei ,
+tf }, ∞)
+∞)
+Pni )}
+
+The choices of γci and γoi satisfy the separation principle
+as illustrated in Theorem 1, where the explicit admissible ranges of the design coeﬀicients are summarized in
+Table 1.
+
+It follows from (64) that
+
+
+2 + ξi
+˙
+2ri x̃⊤
+P
+x̃
+≤
+−
+κ
+−
+ri Vci + si Vi .
+i i
+ci
+i
+γci
+
+∀t ∈ [tik , tik+1 ).
+
+Remark 4 Compared with Ye and Song (2025), the consensus tracking of nonlinear MASs involves several design and analysis diﬀiculties. Under the directed graph
+in Assumption 2, the leader state is not directly available for all followers, and thus the relative tracking error
+xi − x0 cannot be directly reconstructed from a single local estimate. The proposed hybrid observer addresses this
+issue by generating x̂i − εi as an implementable estimate
+of the tracking error. This design introduces the local
+observation error and the distributed observation error
+into the closed-loop tracking dynamics, which makes the
+unified matrix-pencil-based decoupling analysis more involved. Moreover, the local observer incorporates f0 (εi , t)
+
+(65)
+
+Since Vci and Vi are bounded, one further obtains
+˙
+2ri x̃⊤
+i Pi x̃i ∈ L∞ . From (58), x̃i shares the same convergence rate with (ei + ζi ), we can obtanin that the third
+term is upper bounded. Rewriting the derivative of the
+tracking and observation errors yields ν̇i = x̃˙ i − (ėi + ζ̇i ).
+The magnitude of ν̇i is governed by a linear combination of the states coupled with the dynamic gains and
+the bounded nonlinearity fi − f0 . For the first term, the
+triggering error (∆εi − ∆xi ) is inherently bounded by
+
+10
+
+to compensate for the leader nonlinearity, which is necessary for nonlinear leader-following tracking. Finally,
+the event-triggered errors are handled through a triggering condition depending only on Vci , so that no extra constraint is imposed on γoi and the admissible ranges of γci
+and γoi remain independent.
+
+the estimation of the leader’s state, the distributed observer switches to an autonomous prediction mode. The
+distributed observer (17) is modified as follows
+
+ϵ̇i =
+
+4 From attack-free to DoS attacks
+
+j=0
+
+aij
+
+Aϵi + f0 ,
+
+ζ̇i = ϵ̇i − ẋ0 = Aζi .
+
+This paper considers the case where all communication links are interrupted during DoS-active intervals,
+which captures intermittent communication caused by
+cyber attacks or adverse physical environments. For instance, in autonomous aerial vehicle (AAV) networks,
+agents may temporarily lose communication with all
+neighbors when they enter occluded regions, such as areas blocked by buildings or other obstacles. Since such
+interruptions are usually constrained by the attacker’s
+energy, bandwidth, or the duration of adverse environmental conditions, the DoS attacks are modeled by imposing standard frequency and duration constraints. Let
+{dl }l∈N denote the sequence of DoS off/on transition instants, τl ∈ R≥0 denote the duration of the lth DoS
+attack, and Dl = [dl , dl + τl ) denote the corresponding attack interval. Furthermore, for any t ≥ 0, define
+the
+S set of DoS-active intervals over [0, t] as ΦD (0, t) =
+l∈N (Dl ∩ [0, t]) , and define the set of DoS-free intervals as ΦH (0, t) = [0, t] \ ΦD (0, t). Moreover, DoS attacks in this paper satisfy the following widely adopted
+assumption:
+
+t ∈ ΦH
+
+(70)
+
+t ∈ ΦD
+
+(71)
+
+In Ye et al. (2026), the authors consider a scenario where
+a DoS attack occurs exactly at tf , preventing consensus
+tracking from being achieved at the originally prescribed
+instant, as illustrated in Fig. 2. To overcome this limita-
+
+Fig. 2. Prescribed-time extension under DoS attacks, where
+Dl denotes the lth DoS attack interval. Here, tf is the prescribed time without DoS attacks, while tF c is the extended
+prescribed time under DoS attacks. The minimum required
+extension ∆t is given in (84).
+
+tion, an extended prescribed time tF c = tf +Td (0, tF c ) is
+introduced to replace tf . Under Assumption 3, the finite
+number of DoS transitions guarantees the existence of
+at least one tF c residing in a DoS-free interval. However,
+this construction remains implicit because the exact cumulative attack duration Td (0, tF c ). i.e., |D1 |+|D2 |+|D3 |
+in Fig. 2, is generally unknown a priori. Furthermore,
+the framework in Ye et al. (2026) is restricted to linear
+systems with full-state measurements, leaving nonlinear follower dynamics and output-feedback implementations unaddressed. In this section, while tF c is similarly
+adopted as the extended prescribed time, the required
+time extension ∆t = tF c − tf can be explicitly determined. Accordingly, an explicit upper bound on the allowable DoS attacks is established, and the time-varying
+scaling function is redefined over the extended interval
+as
+1
+α(t) =
+, t ∈ [0, tF c ).
+(72)
+tF c − t
+
+Assumption 3 (Persis and Tesi (2015)) For any t ≥ 0,
+the DoS frequency and duration satisfy
+t
++ kdf ,
+τf
+t
+Td (0, t) ≤
++ kdT ,
+τd
+
+N
+
+
+
+For t ∈ ΦD , the derivative of ζi is
+
+4.1 Denial-of-Service Attacks
+
+nd (0, t) ≤
+
+ PN
+ϱi
+ij [ϵ̇j − 2 (ϵi −ϵj )]
+ j=0 aP
+,
+
+(68)
+(69)
+
+where τf > 0, τd > 1, kdf ≥ 0, and kdT ≥ 0 are constants. Here, nd (0, t) denotes the number of DoS off/on
+transitions over [0, t], and Td (0, t) = |ΦD (0, t)| denotes
+the total duration of DoS intervals over [0, t].
+Remark 5 The constants kdf and kdT describe the possible initial attack capability over a finite interval. The
+parameter τf gives an average lower bound on the interval between two consecutive DoS activations, while τd
+bounds the average proportion of time during which the
+network is under DoS attacks.
+
+Theorem 2 (A separation principle for consensus
+tracking under DoS attacks) Consider the MAS consisting of a leader (9) and N followers (10) under
+Assumptions 1–3. Suppose that the hybrid observer,
+composed of the switched distributed observer (70) and
+the local observer (19), together with the event-triggered
+controller (25) under the triggering condition (33), is
+applied. Then, the following results hold: i) the observer
+
+4.2 Consensus tracking under DoS attacks
+When DoS attacks are activated, all communication
+links are interrupted as shown in Fig. 3, and the neighbors’ information becomes unavailable. To maintain
+
+11
+
+To address the additional term ci ϱ2n+1
+ζi⊤ C ⊤ Cζi resulti
+ing from the DoS-induced switching, we employ the resilient matrix-pencil formulation. By virtue of Lemma
+1, we select a positive scalar λDi = max{σ(C ⊤ C, Q−1
+ni )}
+such that the following generalized inequality C ⊤ C ≤
+λDi Q−1
+ni holds. Based on (37) and the definition of C,
+we have Loi C ⊤ CLoi = ϱ2n−2
+C ⊤ C. Then, applying (7)
+i
+−1
+⊤
+yields C C ≤ λDi ϱi Qi , which implies
+
+error convergences to zero within the prescribed time tFc
+and the prescribed-time consensus tracking is achieved in
+the sense of Definition 1; ii) Zeno behavior is excluded;
+iii) there exist positive constants m̂i , M̂i , m̂ui , and M̂ui
+⊤ ⊤
+such that, for χi := [x̃⊤
+i , (ei + ζi ) ] ,
+|χi (t)| ≤ (tF c − t)m̂i M̂i |χi (0)|,
+|ui (t)| ≤ (tF c − t)m̂ui M̂ui |χi (0)|;
+
+
+ci ϱi2n+1 ζi⊤ C ⊤ Cζi ≤ λDi ϱi ci ϱ2n+1
+ζi⊤ Q−1
+i
+i ζi ≤ λDi ϱi ci Voi .
+
+and iv) the control scheme is resilient to DoS attacks
+provided that the maximum attack duration satisfies
+kdT
+Υi
+1
++
+<
+,
+τd
+tF c
+λDi γoi
+
+Consequently, we obtain
+
+(73)
+
+V̇Di ≤ (−Υi + λDi γoi )α(t)VDi + si VDi .
+
+(76)
+
+where λDi > 0 is a constant and Υi is defined in (56).
+Furthermore, the design of the output-ffedback controller
+and the hybrid observer satisfies the separation principle
+in the sense that the coeﬀicients γci and γoi associated
+with the controller and observer gains can be independently selected from the sets defined in (34).
+
+Combining with the derivative of the Lyapunov function
+during t ∈ ΦH in (56), the piecewise differential inequality for the global Lyapunov function over t ≥ 0 can be
+formulated as
+
+Proof. The proof is divided into two parts.
+
+where the switching coeﬀicient ϖi (t) is defined as
+
+V̇i ≤ ϖi (t)α(t)Vi (t) + si Vi (t),
+
+
+
+Part 1. Similarly, the Lyapunov candidate function under DoS attacks is designed as VDi = Vci + ci Voi , where
+Vci and Voi are the same as those in Section IV.
+
+ϖi (t) =
+
+(77)
+
+−Υi ,
+t ∈ ΦH ,
+λDi γoi − Υi , t ∈ ΦD .
+
+(78)
+
+Integrating the piecewise dynamics over the interval [0, t]
+for any t ∈ [0, tF c ), we obtain
+
+During DoS attacks (t ∈ ΦD ), the distributed observer
+switches to the autonomous prediction mode, yielding
+(71). Consequently, taking the time derivative of ci Voi
+introduces the coupled term
+
+Z t
+Vi (t) ≤ Vi (0)e
+
+si t F c
+
+exp
+
+
+ϖi (τ )α(τ )dτ
+
+(79)
+
+.
+
+0
+2n+1 ⊤
+⊤ −1
+2ci ϱ2n+1
+ζi⊤ Q−1
+ζi (Q−1
+i
+i ζ̇i = ci ϱi
+i A + A Qi )ζi .
+(74)
+
+Notice that the integral of the switching coeﬀicient relative to the scaling function can be expanded as
+Z t
+
+Substituting (2) into the derivative of ci Voi yields
+2n+1 ⊤ ⊤
+2ci ϱ2n+1
+ζi⊤ Q−1
+ζi C Cζi −ci ϱ2n+2
+ζi⊤ Q−1
+i
+i ζ̇i = ci ϱi
+i
+i ζi .
+
+Z t
+ϖi (τ )α(τ )dτ = −Υi
+
+0
+
+Z
+α(τ )dτ +λDi γoi
+
+α(τ )dτ.
+
+0
+
+ΦD (0,t)
+
+Define an α-weighted DoS ratio over [0, t] as δiα (t) :=
+R
+Rt
+α(τ )dτ / 0 α(τ )dτ , allowing us to rewrite the
+ΦD (0,t)
+above inequality as
+
+Note that the second term on the right-hand side corresponds exactly to the term derived in the attack-free
+scenario, where ζ̇i = − ϱ2i ζi . Therefore, following the
+derivation process detailed in Section IV, the upper
+bound of V̇Di incurs only an additional positive term,
+ci ϱ2n+1
+ζi⊤ C ⊤ Cζi , which is induced by the DoS attacks.
+i
+Thus, the derivative of VDi yields
+
+Z t
+ϖi (τ )α(τ )dτ = − Υi + λDi γoi δiα (t)
+
+
+
+Z t
+α(τ )dτ.
+0
+
+0
+
+(80)
+Based on the definition of α(t), the α-weighted DoS ratio is bounded by a maximum physical DoS duty cycle
+δD (tF c ) := Td (0, tF c )/tF c , i.e., δiα (t) ≤ δD (tF c ). Substituting this inequality into (80) yields:
+
+V̇Di ≤ −Υi α(t)VDi + si VDi + ci ϱ2n+1
+ζi⊤ C ⊤ Cζi , (75)
+i
+where, as in Section 4,
+
+
+κoi γoi
+Υi = min κci γci ,
+,
+ci
+si = max {σ(Qi,s2 , −Qi,s1 )} .
+
+Z t
+ϖi (τ )α(τ )dτ ≤ − Υi + λDi γoi δD (tF c )
+0
+
+12
+
+
+
+Z t
+α(τ )dτ.
+0
+
+(81)
+
+According to Assumption 3, it holds that δD (tF c ) ≤ τ1d +
+kdT
+obtain
+tF c . Combining with the constraint (73), we can 
+a positive constant Υ̂i = Υi − λDi γoi τ1d + ktFdTc > 0.
+Based on Lemma 1 in Ye and Song (2025), it yields
+
+Vi (t) ≤
+
+tF c − t
+tF c
+
+We consider an MAS with one leader and four followers,
+whose communication network is described by a directed
+graph shown as Fig. 3. The dynamic of the ith agent is
+described by a single-link robotic manipulator model as
+follows (Ye et al. (2025)):
+
+Υ̂i
+esi t Vi (0),
+
+t ∈ [0, tF c ).
+
+Ji q̈i + Ki q̇i + mi gdi sin(qi ) = ui ,
+
+(82)
+
+Here, qi and q̇i denote the angular position and angular
+velocity, respectively. The parameter Ji represents the
+moment of inertia, Ki is the damping coeﬀicient, di is
+the distance from the joint axis to the center of mass, mi
+denotes the mass of the link, and g is the gravitational
+acceleration. In the simulation, the parameters are selected as J0 = J4 = 8.5, J1 = J2 = J3 = 10, K0 =
+K3 = 1.4, K1 = K2 = K4 = 1.6, d0 = d1 = 1, d2 = 0.8,
+d3 = d4 = 1.2, m0 = m2 = 1.3, m1 = m3 = m4 = 1,
+and g = 9.8. By defining xi = [xi,1 , xi,2 ]⊤ = [qi , q̇i ]⊤
+and yi = qi , the dynamic in (85) can be recast into the
+form of (10), where A = [0, 1; 0, 0], B = [0; 1], C = [1; 0],
+
+⊤
+and fi = 0, −(Ki /Ji )q̇i − (mi gdi /Ji ) sin(qi ) . For the
+leader, u0 = 0, and f0 = (·, t) is available for the overall MAS. For the followers, namely i = 1, . . . , 4, the
+nonlinear terms fi are unknown functions. The initial
+states are set as: x0 = [0, 0]⊤ , x1 = [1, 1]⊤ , x2 = [2, 2]⊤ ,
+x3 = [3, 3]⊤ and x4 = [4, 4]⊤ .
+
+Following the same procedure as the proof of Theorem
+1, the positive constants m̂i = κ̂21i +1, M̂i , m̂ui , and M̂ui
+can be successfully established, guaranteeing prescribedtime consensus tracking and all closed-loop signals are
+uniformly bounded.
+Part 2. Since Vi (t) remains bounded as shown in (82),
+and the event-triggering mechanism of the controllers is
+unaffected by DoS attacks, the exclusion of Zeno behavior can be proven using the exact same rationale as in
+Theorem 1. Therefore, the detailed proof is omitted for
+brevity.
+□
+Remark 6 The matrix-pencil technique plays a key role
+in deriving the admissible DoS duty-cycle constraint.
+Specifically, it provides explicit generalized-eigenvalue
+conditions for dominating the coupling terms induced by
+DoS attacks and provides a constant λDi to establish an
+explicit DoS duration constraint (73).
+
+Two situations are considered in this section to validate
+the effectiveness of Theorem 1 and Theorem 2, respectively.
+
+Remark 7 Based on the resilience constraint in (73),
+one can deduce the lower bound for the extended time as
+tF c > kdT
+
+
+
+Υi
+1
+.
+−
+λDi γoi
+τd
+
+5.1 Consensus tracking without DoS attacks
+
+(83)
+
+According to Table 1, we select γoi = 10 and γci = 15 for
+all followers in this case. The prescribed time is designed
+as tf = 3s.
+
+Provided in the proof of Theorem 2 that the necessary
+condition 1/τd < Υi /λDi γoi is satisfied, the extension
+interval ∆t can be explicitly designed as
+∆t >
+
+kdT λDi γoi τd
+− tf .
+Υi τd − λDi γoi
+
+i = 0, 1, . . . , 4. (85)
+
+(84)
+
+Note that this constraint can be satisfied by properly adjusting the parameters of the hybrid observer, thereby
+guaranteeing the realization of the separation principle.
+5 Numerical examples
+
+Fig. 4. Tracking errors x̃i in the absence of DoS attacks.
+
+As shown in Fig. 4–Fig. 6, the tracking errors x̃i , the
+distributed observation errors ζi , and the local observation errors ei all approach zero before the prescribed
+
+Fig. 3. The communication topology without and under DoS
+attacks
+
+13
+
+Table 2
+Comparison of Sampling Times and Minimum Inter-Event
+Times
+Scenario Type
+No DoS
+
+DoS
+
+u1
+
+u2
+
+u3
+
+u4
+
+TT
+30000
+30000
+30000
+30000
+ET
+97
+103
+94
+102
+Min.
+−4
+−4
+−4
+5.0×10
+6.0×10
+5.0×10−4
+6.0×10
+IET
+TT
+41500
+41500
+41500
+41500
+ET
+98
+68
+91
+78
+Min.
+−4
+−4
+−4
+7.0×10
+6.0×10
+5.0×10
+6.0×10−4
+IET
+
+TT: time-triggering; ET: event-triggering; IET: inter-event time.
+
+5.2
+Fig. 5. Distributed observation errors ∥ζi ∥ in the absence of
+DoS attacks.
+
+Consensus tracking under DoS attacks
+
+Fig. 8–Fig. 11 present the simulation results under DoS
+attacks. The shaded regions of all figures denote the DoSactive intervals, during which all communication links
+are unavailable, and the distributed observer switches
+from the communication-based mode to the autonomous
+prediction mode in (70). In this simulation, the parameters are selected as γoi = 10 and γci = 15 for all followers. The normal prescribed time tf is 3s. The extended
+prescribed time is designed as tF c = 4.15s, and the total
+duration of DoS attacks is selected as TD (0, tF c ) = 1.25s,
+under which the DoS duty cycle constraint (73) is satisfied, since λDi = 2.0 and Υi = 4.2.
+
+Fig. 6. Local observation errors ei in the absence of DoS
+attacks.
+
+Fig. 8. Tracking errors x̃i under DoS attacks.
+
+As shown in Fig. 8–Fig. 10, the tracking errors x̃i , the
+distributed observation errors ζi , and the local observation errors ei all approach zero before the extended prescribed time tF c . Fig. 11 shows the corresponding control inputs. These results are consistent with Theorem 2
+and demonstrate the resilience of the proposed scheme
+against intermittent communication denial. Similarly,
+the exclusion of Zeno behavior is demonstrated in Table
+2, where the simulation step size is dt = 1.0 × 10−4 s.
+
+Fig. 7. Control inputs ui in the absence of DoS attacks.
+
+time tf = 3s. Consequently, the leader-follower consensus tracking objective in the absence of DoS attacks
+is achieved. As shown in Fig. 7, the control inputs are
+piecewise constant due to the event-triggered mechanism. Meanwhile, all closed-loop signals remain ultimately bounded, which is consistent with Theorem 1.
+Moreover, the exclusion of Zeno behavior is demonstrated in Table 2, where the simulation step size is
+dt = 1.0 × 10−4 s.
+
+To further demonstrate the advantages of the proposed
+method, a comparison is conducted under the same simulation setting. For a fair implementation, the method in
+
+14
+
+Fig. 9. Distributed observation errors ζi under DoS attacks.
+
+Fig. 12. Comparison of tracking errors between the proposed
+method and the method in Ye et al. (2026) under DoS attacks.
+
+6
+
+Conclusion
+
+This paper investigated prescribed-time leader-following
+consensus tracking for high-order nonlinear MASs under DoS attacks with output-only measurements. A distributed event-triggered output-feedback framework is
+developed by combining a local observer, a switched
+distributed observer, and an event-triggered controller.
+Based on PLEs and a resilient matrix pencil analysis,
+a separation principle was established, and explicit design conditions are derived to handle nonlinearities, observer errors, tracking errors, and DoS-induced switching terms. The closed-loop MAS is shown to achieve consensus tracking within the prescribed time without DoS
+attacks and within an extended prescribed time under
+admissible DoS attacks. Zeno behavior is excluded. Future work will consider heterogeneous MASs, relaxed attack models, and experimental validation.
+
+Fig. 10. Local observation errors ei under DoS attacks.
+
+References
+Atassi, A.N., Khalil, H.K., 1999. A separation principle
+for the stabilization of a class of nonlinear systems.
+IEEE Transactions on Automatic Control 44, 1672–
+1687.
+Daum, F.E., Fitzgerald, R.J., 1983. Decoupled kalman
+filters for phased array radar tracking. IEEE Transactions on Automatic Control 28, 269–283.
+Deng, C., Che, W., Wu, Z., 2020. A dynamic periodic event-triggered approach to consensus of heterogeneous linear multiagent systems with time-varying
+communication delays. IEEE Transactions on Cybernetics 51, 1812–1821.
+Deng, C., Zhang, D., Feng, G., 2022. Resilient practical
+cooperative output regulation for mass with unknown
+switching exosystem dynamics under dos attacks. Automatica 139, 110172.
+Efimov, D., Orlov, Y., 2026. On discretization and
+
+Fig. 11. Control inputs ui under DoS attacks.
+
+Ye et al. (2026) is implemented using full-state information and without event-triggered control, and the gain
+of the time-varying function is selected as α = 3 > 0, as
+required in Ye et al. (2026). The comparison results are
+presented in Fig. 12. It can be observed that the tracking
+errors under the method in Ye et al. (2026) are not effectively suppressed in the presence of system nonlinearities and the directed communication topology, whereas
+the proposed method achieves accurate prescribed-time
+consensus tracking under DoS attacks.
+
+15
+
+

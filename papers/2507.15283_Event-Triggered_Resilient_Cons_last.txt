@@ -1,0 +1,624 @@
+8
+
+(a) Position state evolution
+
+(b) Velocity state evolution
+
+(c) Auxiliary variable evolution
+
+(d) Triggering instants
+
+(c) Auxiliary variable evolution
+
+(d) Triggering instants
+
+(c) Auxiliary variable evolution
+
+(d) Triggering instants
+
+Fig. 3. Simulation results of each normal agent using Algorithm 2 with f = 0.
+
+(a) Position state evolution
+
+(b) Velocity state evolution
+
+Fig. 4. Simulation results of each normal agent using Algorithm 2 with f = 1.
+
+(a) Position state evolution
+
+(b) Velocity state evolution
+
+Fig. 5. Simulation results of each normal agent using Algorithm 2 with the decision algorithm in [13].
+
+TABLE I
+P ERFORMANCE OF THE PROPOSED EVENT- TRIGGERED RESILIENT
+CONSENSUS ALGORITHM
+
+Agent index
+Triggering numbers
+Settling time1
+Minimum
+triggering interval
+
+A2
+36
+1.051s
+
+A3
+25
+1.961s
+
+A4
+40
+1.428s
+
+A6
+32
+1.693s
+
+A7
+41
+0.572s
+
+A8
+56
+0.632s
+
+0.007s
+
+0.013s
+
+0.009s
+
+0.017s
+
+0.006s
+
+0.005s
+
+1 Settling time: the time required for ∥e
+
+ηij ,i ∥ of agent i to converge within
+
+1% of its initial value.
+
+noted in Remark 3.2. Moreover, even when Byzantine agents
+transmit information every 0.001s, the number of executions
+of Algorithm 1 by any agent does not exceed 24813, which
+significantly reduces computational resources compared with
+executing it at every instant, thereby validating the statement in
+Remark 3.1. So far, the effectiveness of the proposed resilient
+consensus algorithm is verified.
+
+V. C ONCLUSION
+This paper has first proposed a new resilient decision algorithm, named as the auxiliary-variable-based resilient decision
+(AVBRD) algorithm, to solve the resilient consensus problem
+of networked EL systems in the presence of Byzantine attacks.
+The proposed algorithm can relax the constraints imposed on
+Byzantine agent behavior patterns in existing results within
+continuous-time scenarios by utilizing the minimal triggering
+interval and the open-loop estimation mechanism of the ET
+communication scheme. The rigorous proofs and case studies
+have been made, verifying the effectiveness of the proposed
+algorithm. Future work will involve improving the proposed
+algorithm to reduce the requirement on graph robustness.
+A PPENDIX
+A. Proof of Lemma 3.3
+Proof: Recalling Definition 2.2, if S1 = {i} and S2 =
+V\{i}, then the r-reachable set must be S1 , as there is only
+one agent outside of S2 . Therefore, according to Definition 2.1,
+
+9
+
+we have |Ni \{i}| ≥ r, which further implies |Ni | ≥ r. This
+completes the proof.
+B. Proof of Lemma 3.4
+Proof: First, let us discuss the case where f ̸= 0. In this
+scenario,
+it follows from Lemma 3.3 that |Ni | ≥ 2f + 1 and
+T
+|Ni F| ≤ f . Therefore, by constructing convex hulls using
+the auxiliary variable values from each subset of |Ni | − f
+agents in Ni , and taking the intersection of all possible convex
+l
+hulls, one can obtain a convex hull CH,i
+contained within
+the convex hull formed by the auxiliary variable values of
+all normal agents on dimension l. Considering that for a set
+of scalars, the convex hull is either a point or a line segment definedTby its maximum and minimum values, one has
+l
+l
+l
+l
+l
+and CM,i
+are the convex hulls
+CM,i
+, where Cm,i
+CH,i
+= Cm,i
+formed by the smallest and largest |Ni |−f auxiliary variables,
+l
+respectively, sharing |Ni | − 2f vertices. Thus, CH,i
+̸= ∅ and
+l
+CH,i contains these shared vertices when |Ni | ≥ 2f + 1.
+l
+Further, if CH,i
+has k vertices from Byzantine agents, then
+l
+l
+l
+l
+have at least k vertices from
+\CH,i
+both Cm,i \CH,i and CM,i
+normal agents. These vertices can form k convex hulls, such
+l
+can uniquely
+that the vertices from Byzantine agents in CH,i
+lie inside or on the vertices of one of these convex hulls.
+l
+Thus, any point in CH,i
+lies in a convex hull formed by at
+least |Ni | − 2f vertices from normal agents. Moreover, since
+l
+l
+have the most central
+the vertices shared by Cm,i
+and CM,i
+l
+state values, W̄i (t) is actually the mean of the maximum
+l
+l
+and minimum vertices of CH,i
+, implying W̄il (t) ∈ CH,i
+. The
+l
+aforementioned conclusion thus holds for W̄i (t). Based on a
+similar process, this conclusion is obvious when f = 0. So
+far, the proof is complete.
+
+respectively. elϵ2 (t) is given as the last N − 1 rows of elϵ (t).
+Then (15) is re-expressible as
+ϵ̇l1 (t) = 0,
+
+(16a)
+
+ϵ̇l2 (t) = −µ1 J2l (t)ϵl2 (t) − µ1 J2l (t)elϵ2 (t).
+
+(16b)
+
+Obviously, system (16a) is stable. Next, the analysis on the
+convergence of system (16b) will be given. From (16b), by
+solving the differential equation, one can obtain
+l
+
+∥ϵl2 (t)∥ ≤ e−λ1 (t)(t−t0 ) ∥ϵl2 (t0 )∥
+Z t
+l
+l
++ γJ (t) e−λ1 (t)(t−τ ) ∥elϵ2 (τ )∥dτ,
+
+where γJl (t)=µ1 ∥J2l (t)∥, and λl1 (t)=µ1 λJ2l (t) with λJ2l (t) being the smallest eigenvalue of J2l (t). Since ∥elϵ2 (τ )∥≤∥eϵ2 (τ )∥
+and the eigenvalues of −S are all considered with zero real
+parts, a positive constant γ−S can always be found such that
+∥e−S(t−t0 ) ∥ ≤ γ−S for any t > t0 . Recalling the ET scheme
+(6), one has
+l
+
+∥ϵl2 (t)∥ ≤ e−λ1 (t)(t−t0 ) ∥ϵl2 (t0 )∥
+Z t
+l
+γ2l (t)
+dτ,
++
+e−λ1 (t)(t−τ )
+(τ − t0 + α2 )α3
+t0
+
+According to Lemma 3.2, it canR be concluded that there
+Z t
+
+Proof: It is evident that the dynamics described in (8) are
+decoupled across
+PN dimensions. Utilizing this, we can derive
+Ẇil (t) = −µ1 j=1 ãlij (t)(Ŵil (t) − Ŵjl (t)), where Wil (t) and
+Ŵil (t) are the l-th dimension of Wi (t) and Ŵi (t), respectively.
+Thus, (8) can be written as the following compact form
+Ẇ l (t) = −µ1 L̃l W l (t) − µ1 L̃l (t)elW (t),
+
+(14)
+
+l
+where W l (t) = [W1l (t), W2l (t), · · · , WN
+(t)]T , elW (t) =
+l
+l
+l
+T
+l
+[eW1 (t), eW2 (t), · · · , eWN (t)] with eWi (t) is l-th dimension of eWi (t) and eWi (t) = e−St eηi (t), and L̃l (t) is the
+Laplacian matrix of G̃ l (t). Let JL̃l (t) ∈ RN ×N be the
+Jordan canonical form of L̃l (t), and U l (t) ∈ RN ×N be a
+nonsingular matrix such that (U l (t))−1 L̃l (t)U l (t) = JL̃l (t).
+Let ϵl (t) = (U l )−1 W l (t). Then (14) can be rewritten as
+l
+
+l
+
+ϵ̇ (t) = −µ1 JL̃l (t)ϵ (t) − µ1 JL̃l (t)elϵ (t),
+
+(15)
+
+where elϵ (t) = (U l (t))−1 elW (t). Lemma 3.1 indicates that
+L̃l (t) has only one zero eigenvalue. Therefore, JL̃l (t) can be
+rearranged as JL̃l (t) = block diag(0, J2l (t)), where J2l (t) ∈
+R(N −1)×(N −1) . Let ϵl1 (t) denote the first 1 rows of ϵl (t), and
+ϵl2 (t) is the last N − 1 rows of ϵl (t). Similarly, define ϵ̇l1 (t)
+and ϵ̇l2 (t) as the first 1 rows and the last N − 1 rows of ϵ̇l (t),
+
+(18)
+
+where γ2l (t) = γJl (t)γ−S α1 ∥(U l (t))−1 ∥. Let ρl2 (t) = (t−t0 +
+α2 )α3 ρl1 (t) with ρl1 (t0 )=∥ϵl2 (t0 )∥. The right-hand side of (18)
+can be obtained by solving the following differential equation
+
+
+α3
+l
+l
+ρ̇2 (t) =
+− λ1 (t) ρl2 (t) + γ2l (t).
+(19)
+t − t0 + α 2
+must exist γω > 0 for any γ1l (t) =
+
+C. Proof of Lemma 3.5
+
+(17)
+
+t0
+
+τ
+
+t
+λl (τ )dτ
+t0 1
+
+2(t−t0 )
+
+such that
+
+α3
+γ l (t)
+ds ≤ 1 (t − τ ) + γω .
+s − t0 + α2
+2
+
+(20)
+
+By using (19) and (20), one obtains
+ρl2 (t)≤eγω ρl2 (t0 )e−
+
+l (t)
+γ1
+2 (t−t0 )
+
++ γ̄2 e
+
+γω
+
+Z t
+
+e−
+
+l (t)
+γ1
+2 (t−τ )
+
+dτ
+
+t0
+
+≤eγω ρl2 (t0 ) + γ̄2 eγω
+
+2
+,
+γ1
+
+(21)
+
+where γ̄2 is the upper bound of γ2l (t) and γ 1 is the positive
+lower bound of γ1l (t). The existence of γ̄2 and γ 1 is ensured
+by the invertibility of U l (t) and the directed spanning tree in
+G̃ l (t). Let dlγ = eγω ρl2 (t0 ) + γ2 eγω γ2 . From (18) and (19), it
+1
+can be seen that
+∥ϵl2 (t)∥ ≤
+
+dlγ
+,
+(t − t0 + α2 )α3
+
+(22)
+
+which leads to limt→∞ ∥ϵ2 (t)∥ = 0 for any α2 > 1 and
+α3 > 1. From the above discussion, it can be obtained that,
+limt→∞ η l (t) = U l ϵl3 (t), where ϵl3 (t) = [(ϵl1 )T (t), 0TN −1 ]T and
+l
+η l (t) = [η1l (t), η2l (t), · · ·, ηN
+(t)]T . Let 1N be the eigenvector associated to the zero eigenvalue. Therefore, we have
+limt→∞ Wil (t) = 1TN ϵl1 (t), for any agent i. Thus, the auxiliary
+
+10
+
+variables of each agent can asymptotically converge to the
+same value, and there holds
+2
+
+√
+n
+X
+dγ γ̄U γ̄J n
+l
+l
+2
+,
+(23)
+∥L̃ (t)W (t)∥ ≤
+µ1 (t−t0 +α2 )α3
+l=1
+
+where dγ = maxl {dlγ }, and γ̄J and γ̄U are the upper bound
+of all possible γJl (t) and ∥γUl (t)∥, respectively. Furthermore,
+from the definition of Wi , one can get ∥ηi (t) − ηj (t)∥ ≤
+γS ∥Wi (t)−Wj (t)∥ with ∥eS(t−t0 ) ∥ ≤ γS , where the existence
+of γS is guaranteed by the fact that all the eigenvalues of S
+have zero real parts. So far, the analysis of the asymptotic
+convergence of ηi (t) is completed.
+Next, the proof about the exclusion of the Zeno behavior
+under the ET scheme (6) will be given. From (4), (5), and (8),
+one has
+ėηi (t) = Seηi (t) + µ1 WL̃l i (t) + µ1 eL̃l i (t),
+
+(24)
+
+where WL̃l i (t)=[L̃1i (t)W 1 (t), L̃2i (t)W 2 (t), · · ·, L̃ni (t)W n (t)]T
+and eL̃l i (t) = [L̃1i (t)e1W (t), L̃2i (t)e2W (t), · · · , L̃ni (t)enW (t)]T
+with L̃li (t) being the ith row of L̃l (t). From (6), (22), (23)
+and (24), the upper bound of D+ ∥eηi (t)∥ can be obtained as
+eTηi (t)ėηi (t)
+αz
+D ∥eηi (t)∥=
+≤∥ėηi (t)∥≤
+, (25)
+∥eηi (t)∥
+(t−t0 + α2 )α3
+√
+in which, αz = ∥S∥α1 + dγ γ̄J γ̄U n + µ1 γL̃ α1 γ−S , γL̃ is the
+upper bound of all possible ∥L̃l (t)∥, and the fact that ėηi (t) =
+S η̂i (t) − η̇i (t) is used. Then one has
+Z t
+αz
+i
+∥eηi (t)∥ ≤ ∥eηi (tk )∥ +
+ds
+α
+i
+(s
+−
+t
+0 + α2 ) 3
+tk
+
+
+1
+1
+= α4 i
+, (26)
+−
+(tk −t0 +α2 )α3 −1 (t−t0 +α2 )α3 −1
++
+
+z
+where α4 = αα
+. According to (6), the lower bound of tik+1
+3 −1
+can be obtained by solving the following inequality
+α1
+∥eηi (tik+1 )∥ = i
+(tk+1 − t0 + α2 )α3
+
+
+1
+1
+≤ α4 i
+−
+. (27)
+(tk −t0 +α2 )α3 −1 (tik+1 −t0 +α2 )α3 −1
+
+By using the equivalent transformation and the fact that
+tik+1 > tik ≥ t0 , we can derive from (27) that
+
+α3
+tik+1 − tik
+α1
++
+1
+≤
+1
++
+. (28)
+α4 (tik+1 − t0 + α2 )
+tik − t0 + α2
+Define t̃ik = tik − t0 + α2 . According to (28) and α3 > 1,
+the lower bound of the triggering interval can be described as
+ ⌈α1 ⌉
+
+
+3
+α1
+i
+i
++1
+− 1 t̃ik
+tk+1 − tk ≥
+α4 t̃ik+1
+=
+α4 t̃ik+1
+≥
+α4 t̃ik+1
+
+α1 t̃ik
+⌈αP
+3 ⌉−1 
+ι=0
+
+α1
++1
+α4 t̃ik+1
+
+α1 t̃ik
+⌈αP
+3 ⌉−1 
+ι=0
+
+α1
+α4 α2 + 1
+
+ ⌈αι ⌉
+3
+
+ ⌈αι ⌉ ,
+3
+
+(29)
+
+where t̃ik+1 = tik+1 − t0 + α2 , the equality is obtained by
+Pκ−1
+applying the formula ϖ1κ −ϖ2κ = (ϖ1 −ϖ2 ) ι=0 ϖ1κ−1−ι ϖ2ι
+1
+
+ ⌈α ⌉
+3
+with ϖ1 = 1, ϖ2 = α αt̃i1 + 1
+and κ = ⌈α3 ⌉.
+4 k+1
+ ⌈αι ⌉
+P⌈α ⌉−1  α1
+3
+Let ∆t = tik+1 − tik and α5 = ι=03
+.
+α4 α2 + 1
+Then one has
+α1
+1
+α2
+α1
+∆t ≥
+·
+·
+.
+(30)
+≥
+α4 α5 ∆t
+α
+α
+∆t
++ α2
++
+1
+4 5
+t̃i
+k
+
+From (30), one can obtain
+α1 α2
+> 0,
+(31)
+α4 α5
+from which it can be concluded that there is a positive constant
+ϱ such that tik+1 − tik ≥ ϱ. Thereby, as long as Wi (t0 ) is
+kept bounded for any agent i, G̃ l (t) satisfies the conditions
+described in Lemma 3.5, and no Zeno behavior occurs at the
+initial instant, one has that the Zeno behavior can be eradicated
+and the convergence of ηi (t) can be ensured, regardless of the
+specific switching instants and frequencies of G̃ l (t). So far,
+the proof about Lemma 3.5 is complete.
+∆t(∆t + α2 ) ≥
+
+R EFERENCES
+[1] T. Liu and Z. Jiang, “Distributed control of multi-agent systems
+with pulse-width-modulated controllers,” Automatica, vol. 119, art.
+no. 109020, 2020.
+[2] K. Sakurama, “Unified formulation of multiagent coordination with
+relative measurements,” IEEE Trans. Autom. Control, vol. 66, no. 9,
+pp. 4101–4116, 2021.
+[3] G. Li and L. Wang, “Adaptive output consensus of heterogeneous nonlinear multi-agent systems: A distributed dynamic compensator approach,”
+IEEE Trans. Autom. Control, vol. 68, no. 4, pp. 2483–2489, 2023.
+[4] D. Zhang, G. Feng, Y. Shi, and D. Srinivasan, “Physical safety and cyber
+security analysis of multi-agent systems: A survey of recent advances,”
+IEEE-CAA J. Automatica Sin., vol. 8, no. 2, pp. 319–333, 2021.
+[5] H. J. LeBlanc, “Resilient cooperative control of networked multi-agent
+systems,” Ph.D. Dissertation, ModEs Lab., Vanderbilt Univ., Nashville,
+TN, USA, 2012.
+[6] J. Yan, X. Li, Y. Mo, and C. Wen, “Resilient multi-dimensional consensus in adversarial environment,” Automatica, vol. 145, art. no. 110530,
+2022.
+[7] J. Yan, C. Deng, and C. Wen, “Resilient output regulation in heterogeneous networked systems under Byzantine agents,” Automatica, vol. 133,
+art. no. 109872, 2021.
+[8] Y. Shang, “Resilient consensus of switched multi-agent systems,” Syst.
+Control. Lett., vol. 122, pp. 12–18, 2018.
+[9] Y. Shang, “Resilient consensus in multi-agent systems with state constraints,” Automatica, vol. 122, art. no. 109288, 2020.
+[10] D. Fiore and G. Russo, “Resilient consensus for multi-agent systems
+subject to differential privacy requirements,” Automatica, vol. 106,
+pp. 18–26, 2019.
+[11] H. Park and S. A. Hutchinson, “Fault-tolerant rendezvous of multirobot
+systems,” IEEE Trans. Robot., vol. 33, no. 3, pp. 565–582, 2017.
+[12] H. Mendes, M. Herlihy, N. Vaidya, and V. K. Garg, “Multidimensional
+agreement in Byzantine systems,” Distrib. Comput., vol. 28, no. 6,
+pp. 423–441, 2015.
+[13] W. Abbas, M. Shabbir, J. Li, and X. Koutsoukos, “Resilient distributed vector consensus using centerpoint,” Automatica, vol. 136, art.
+no. 110046, 2022.
+[14] B. Wei, F. Xiao, F. Fang, and Y. Shi, “Velocity-free event-triggered
+control for multiple Euler-Lagrange systems with communication time
+delays,” IEEE Trans. Autom. Control, vol. 66, no. 11, pp. 5599–5605,
+2021.
+[15] R. Cao and L. Cheng, “Distributed dynamic event-triggered control for
+Euler-Lagrange multiagent systems with parametric uncertainties,” IEEE
+Trans. Cybern., vol. 53, no. 2, pp. 1272–1284, 2023.
+[16] J. Chen, B. Chen, and Z. Zeng, “Adaptive dynamic event-triggered
+fault-tolerant consensus for nonlinear multiagent systems with directed/undirected networks,” IEEE Trans. Cybern., vol. 53, no. 6,
+pp. 3901–3912, 2023.
+
+11
+
+[17] X. Jin, Y. Shi, Y. Tang, H. Werner, and J. Kurths, “Event-triggered
+fixed-time attitude consensus with fixed and switching topologies,” IEEE
+Trans. Autom. Control, vol. 67, no. 8, pp. 4138–4145, 2022.
+[18] M. W. Spong, S. Hutchinson, and M. Vidyasagar, Robot Dynamics and
+Control, 2nd ed. New York, NY, USA: Wiley, 2004.
+[19] M. Pirani, A. Mitra, and S. Sundaram, “A survey of graph-theoretic
+approaches for analyzing the resilience of networked control systems,”
+Automatica, vol. 157, art. no. 111264, 2023.
+[20] C.-Y. Koo, “Broadcast in radio networks tolerating Byzantine adversarial
+behavior,” in Proc. 23rd Annu. ACM Symp. Princ. Distrib. Comput.,
+2004, pp. 275–282.
+[21] J. Mei, W. Ren, and J. Chen, “Distributed consensus of second-order
+multi-agent systems with heterogeneous unknown inertias and control
+gains under a directed graph,” IEEE Trans. Autom. Control, vol. 61,
+no. 8, pp. 2019–2034, 2016.
+[22] S. Wang, H. Zhang, S. Baldi, and R. Zhong, “Leaderless consensus of
+heterogeneous multiple Euler-Lagrange systems with unknown disturbance,” IEEE Trans. Autom. Control, vol. 68, no. 4, pp. 2399–2406,
+2023.
+[23] Y. Hao, J. Zhang, and L. Liu, “Fully distributed event-triggered cooperative output regulation of multiagent systems under jointly connected
+digraphs,” IEEE Trans. Autom. Control, vol. 68, no. 7, pp. 4241–4248,
+2023.
+[24] W. Ren and R. W. Beard, “Consensus seeking in multiagent systems
+under dynamically changing interaction topologies,” IEEE Trans. Autom.
+Control, vol. 50, no. 5, pp. 655–661, 2005.
+[25] F. L. Lewis, D. M. Dawson, and C. T. Abdallah, Robot Manipulator
+Control: Theory and Practice, 2nd ed. New York, NY, USA: Marcel
+Dekker, 2004.
+
+

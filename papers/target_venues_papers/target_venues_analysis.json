@@ -1,0 +1,241 @@
+[
+  {
+    "id": "2507.15283",
+    "venue": "IEEE Transactions on Cybernetics",
+    "title": "Event-Triggered Resilient Consensus of Networked Euler-Lagrange Systems under Byzantine Attacks",
+    "sections_sample": [
+      "I. I NTRODUCTION\nIn the past decade, the coo",
+      "X. Zheng is with the School of Computer, Dat",
+      "X. Li is with the School of Electrical Engin",
+      "II. P RELIMINARIES AND P ROBLEM S TATEMENT\nA",
+      "V. The digraph G is said\nto be r-robust if a",
+      "1. Therefore,\naccording to Definition ",
+      "1. An example of ",
+      "2. Additionally, since "
+    ],
+    "theorems_count": 8,
+    "tables_count": 0,
+    "algos_count": 3,
+    "text_snippet": "1  Event-Triggered Resilient Consensus of Networked Euler-Lagrange Systems Under Byzantine Attacks  arXiv:2507.15283v1 [math.OC] 21 Jul 2025  Yuliang Fu, Guanghui Wen, Dan Zhao, Wei Xing Zheng, Fellow, IEEE, and Xiaolei Li  Abstract\u2014The resilient consensus problem is investigated in this paper for a class of networked Euler-Lagrange systems with event-triggered communication in the presence of Byzantine attacks. One challenge that we face in addressing the considered problem is the inapplicability of existing resilient decision algorithms designed for one-dimensional multi-agent systems. This "
+  },
+  {
+    "id": "2502.06359",
+    "venue": "IEEE Transactions on Cybernetics",
+    "title": "Occlusion-Aware Contingency Safety-Critical Planning for Autonomous Driving",
+    "sections_sample": [
+      "I. I NTRODUCTION\nUTONOMOUS vehicles ",
+      "II. P ROBLEM F ORMULATION AND P RELIMINARIES\n",
+      "1. The dynamics of the EV are modeled\nusing ",
+      "1. The EV ",
+      "V.\nTo address the challenges of safe navigat",
+      "1. Forward Reachable Set ",
+      "2. Backward Reachable Set ",
+      "1. SVs are excluded from these safety constr"
+    ],
+    "theorems_count": 2,
+    "tables_count": 0,
+    "algos_count": 1,
+    "text_snippet": "IEEE TRANSACTIONS ON CYBERNETICS, VOL. 56, NO. 5, MAY 2026  1  Occlusion-Aware Contingency Safety-Critical Planning for Autonomous Driving  arXiv:2502.06359v3 [cs.RO] 5 Oct 2026  Lei Zheng, Rui Yang, Minzhe Zheng, Zengqi Peng, Michael Yu Wang, Fellow, IEEE, and Jun Ma  Abstract\u2014Ensuring safe driving while maintaining travel efficiency for autonomous vehicles in dynamic and occluded environments is a critical challenge. This paper proposes an occlusionaware contingency safety-critical planning approach for realtime autonomous driving. Leveraging reachability analysis for risk assessment, forwar"
+  },
+  {
+    "id": "2407.11413",
+    "venue": "IEEE Transactions on Cybernetics",
+    "title": "Achieving distributed convex optimization within prescribed time for high-order nonlinear multiagent systems",
+    "sections_sample": [
+      "I. I NTRODUCTION\nDistributed convex optimiza",
+      "II. N OTATIONS AND P ROBLEM F ORMULATION\n\nA",
+      "0.\nThe Laplacian matrix L of graph G is deno",
+      "V. Therefore, if the optimization problem ",
+      "0.\nA continuous function ",
+      "III. A C ASCADE D ESIGN A PPROACH\nThe cascade ",
+      "1.\nCascaded system ",
+      "0. Suppose\nmax"
+    ],
+    "theorems_count": 5,
+    "tables_count": 0,
+    "algos_count": 0,
+    "text_snippet": "1  Achieving Distributed Convex Optimization within Prescribed Time For High-Order Nonlinear Multi-Agent Systems  arXiv:2407.11413v3 [math.OC] 25 Mar 2026  Gewei Zuo, Lijun Zhu, Yujuan Wang, Zhiyong Chen and Yongduan Song, Fellow, IEEE  Abstract\u2014 This paper addresses the distributed prescribed-time convex optimization (DPTCO) problem for high-order nonlinear multi-agent systems (MASs) under undirected connected graphs. A cascade design framework is proposed that divides the DPTCO implementation into distributed optimal trajectory generator design and local reference trajectory tracking control"
+  },
+  {
+    "id": "2308.09326",
+    "venue": "IEEE Transactions on Cybernetics",
+    "title": "Distributed Neurodynamics-Based Backstepping Optimal Control for Robust Constrained Consensus",
+    "sections_sample": [
+      "X. Yang, Senior Member, IEEE,\nS",
+      "I. I NTRODUCTION\nUTONOMOUS underwater vehicl",
+      "X. Yang",
+      "X. Yang are with Advanced Robotics and Intel",
+      "II. Section III addresses\nthe constrained con",
+      "IV. Section V provides extensive numerical si",
+      "II. PRELIMINARY AND PROBLEM FORMULATION\nIn th",
+      "1.\nThe dynamics of the i-th vehicle is model"
+    ],
+    "theorems_count": 3,
+    "tables_count": 0,
+    "algos_count": 0,
+    "text_snippet": "1  Distributed Neurodynamics-Based Backstepping Optimal Control for Robust Constrained Consensus of Underactuated Underwater Vehicles Fleet  arXiv:2308.09326v1 [eess.SY] 18 Aug 2023  Tao Yan, Graduate Student Member, IEEE, Zhe Xu, Member, IEEE, Simon X. Yang, Senior Member, IEEE, S. Andrew Gadsden, Senior Member, IEEE  Abstract\u2014Robust constrained formation tracking control of underactuated underwater vehicles (UUVs) fleet in threedimensional space is a challenging but practical problem. To address this problem, this paper develops a novel consensus based optimal coordination protocol and a rob"
+  },
+  {
+    "id": "2303.14874",
+    "venue": "IEEE Transactions on Cybernetics",
+    "title": "Optimal task and motion planning and execution for human-robot multi-agent systems",
+    "sections_sample": [
+      "I. I NTRODUCTION\nplanning to consider task d",
+      "II. TASK AND ACTION PLANNING FORMALIZATION\nA",
+      "2. Plan synthesis\n\nTask\nPlanner\n\n",
+      "1. Task planning model\n\n",
+      "4. Replanning\n\nTask Plan\nSynthesis\n\nTask Pla",
+      "3. Plan execution\n\nA",
+      "1. The\ntask planner uses a planning model of",
+      "2.\nWe formulate the action planning problem "
+    ],
+    "theorems_count": 6,
+    "tables_count": 2,
+    "algos_count": 2,
+    "text_snippet": "ACCEPTED FOR PUBLICATION ON IEEE TRANSACTIONS ON CYBERNETICS ON MARCH 2023  1  Optimal task and motion planning and execution for multi-agent systems in dynamic environments  arXiv:2303.14874v1 [cs.RO] 27 Mar 2023  Marco Faroni1 , Alessandro Umbrico2 , Manuel Beschi1,3 , Andrea Orlandini2 , Amedeo Cesta2 , Nicola Pedrocchi1  Abstract\u2014Combining symbolic and geometric reasoning in multi-agent systems is a challenging task that involves planning, scheduling, and synchronization problems. Existing works overlooked the variability of task duration and geometric feasibility that is intrinsic to thes"
+  },
+  {
+    "id": "2606.26164",
+    "venue": "Swarm and Evolutionary Computation",
+    "title": "A GPU-Native Parallel Optimizer for Multimodal Black-Box Functions",
+    "sections_sample": [
+      "I.\n\nKeywords: multimodal optimization, GPU co",
+      "3.1\n\nProblem Statement\n\nLet f : ",
+      "3.2\n\nThe Oscillation Cycle\n\nChiSao runs for no",
+      "2.1\n\nPhase ",
+      "2.2\n\nPhase ",
+      "2.3\n\nPhase ",
+      "2.4\n\nPhase "
+    ],
+    "theorems_count": 0,
+    "tables_count": 0,
+    "algos_count": 1,
+    "text_snippet": "ChiSao: A GPU-Native Parallel Optimizer for Multimodal Black-Box Functions via Convergence-Anticonvergence Oscillation  arXiv:2606.26164v1 [cs.LG] 24 Jun 2026  Ira Wolfson Department of Electronics and Electrical Engineering Braude College of Engineering, Karmiel, Israel wolfsoni@braude.ac.il June 26, 2026  Abstract Finding all modes of a multimodal black-box function is a fundamental challenge in optimization, Bayesian inference, and scientific computing. Existing approaches\u2014basinhopping, CMA-ES, multistart gradient descent\u2014operate sequentially and cannot exploit the massive parallelism of mo"
+  },
+  {
+    "id": "2506.23734",
+    "venue": "Swarm and Evolutionary Computation",
+    "title": "Governing Strategic Dynamics: Equilibrium Stabilization via Divergence-Driven Control",
+    "sections_sample": [
+      "1. Introduction\nA central difficulty in co-e",
+      "2. Related Works and Backgrounds\nThis sectio",
+      "1. Pathologies in Population Coevolution\n",
+      "1. Intransitivity\nIntransitivity is prevalen"
+    ],
+    "theorems_count": 0,
+    "tables_count": 0,
+    "algos_count": 0,
+    "text_snippet": "Governing Strategic Dynamics: Equilibrium Stabilization via Divergence-Driven Control  arXiv:2506.23734v2 [cs.NE] 28 Jan 2026  Hao Shi1 , Fangfang Xie1 , Xi Li1,\u2217 Shijiazhuang Campus, Army Engineering University, No. 97 Heping West Road, Xinhua District, Shijiazhuang, 061000, Hebei, China  Abstract Black-box coevolution in mixed-motive games is often undermined by opponentdrift non-stationarity and noisy rollouts, which distort progress signals and can induce cycling, Red-Queen dynamics, and detachment. We propose the Marker Gene Method (MGM), a curriculum-inspired governance mechanism that st"
+  },
+  {
+    "id": "2512.19321",
+    "venue": "Swarm and Evolutionary Computation",
+    "title": "Learning to Sample in Variable Neighborhood Search Algorithm for Urban Cable Routing Optimization",
+    "sections_sample": [
+      "1. Introduction\nAs economic development adva",
+      "1. This arrangement\nsupports flexible switch",
+      "3. In contrast to cable routing\nchallenges i",
+      "2. Related Work\n",
+      "1. Studies for Cable Routing Optimization\n\nC",
+      "2. Studies for Learning-assisted Neighborhoo",
+      "3. Research Motivation\nlearning-based contro"
+    ],
+    "theorems_count": 0,
+    "tables_count": 0,
+    "algos_count": 0,
+    "text_snippet": "Learning to Sample in Variable Neighborhood Search Algorithm for Urban Cable Routing Optimization Wei Liua , Rui Wanga,\u2217 , Chenhui Linb , Kaiwen Lia , Wenhua Lia and Tao Zhanga a National University of Defense Technology, 109 Deya Road, Kaifu District, Changsha, 410073, Hunan Province, China  arXiv:2512.19321v2 [cs.NE] 23 Jul 2026  b Department of Electrical Engineering, Tsinghua University, 30 Shuangqing Road, Beijing, 100084, Beijing Municipality, China  ARTICLE INFO  ABSTRACT  Keywords: Distribution network planning Cable routing Deep reinforcement learning Multiple agents Variable neighbor"
+  },
+  {
+    "id": "2610.33421",
+    "venue": "Swarm and Evolutionary Computation",
+    "title": "Freezing Mechanism and Topology Dependence of Information Flow Structure in Flocking",
+    "sections_sample": [
+      "1. Introduction\nParticle swarm optimization "
+    ],
+    "theorems_count": 0,
+    "tables_count": 0,
+    "algos_count": 0,
+    "text_snippet": "Freezing Mechanism and Topology Dependence of Information Flow Structure in Small-Scale Particle Swarm Optimization  arXiv:2610.33421v1 [cs.NE] 24 Oct 2026  Zhenglong Xianga,b,c,\u2217, Hongrun Wub , Yu Xuea , Fei Yub , Yuanxiang Lid a School of Computer Science, School of Software, Nanjing University of Information Science and Technology, Nanjing 210044, China b Key Lab of Intelligent Optimization and Information Processing, Minnan Normal University, Zhangzhou 363000, China c State Key Lab. for Novel Software Technology, Nanjing University, Nanjing 210023, China d School of Computer Science, Wuhan"
+  },
+  {
+    "id": "2304.03057",
+    "venue": "Robotics and Autonomous Systems",
+    "title": "Distributed UAV Formation Control Robust to Relative Pose Measurement Noise",
+    "sections_sample": [
+      "1. Introduction\nClose cooperation of multipl"
+    ],
+    "theorems_count": 0,
+    "tables_count": 0,
+    "algos_count": 0,
+    "text_snippet": "Graphical Abstract Distributed UAV Formation Control Robust to Relative Pose Measurement Noise  arXiv:2304.03057v4 [cs.RO] 5 Mar 2026  Viktor Walter, Matou\u0161 Vrba, Daniel Bonilla Licea, Matej Hilmer, Martin Saska  \fHighlights Distributed UAV Formation Control Robust to Relative Pose Measurement Noise Viktor Walter, Matou\u0161 Vrba, Daniel Bonilla Licea, Matej Hilmer, Martin Saska \u2022 We propose a novel technique for constructing robust distributed FormationEnforcing Control for autonomous UAV teams using onboard relative localization sensors burdened with noise. \u2022 Theoretical analysis of this techniq"
+  },
+  {
+    "id": "2610.35582",
+    "venue": "Robotics and Autonomous Systems",
+    "title": "Distributed Predictive Flocking for a Swarm of Miniature Vibration-Driven Robots in a Confined Arena",
+    "sections_sample": [
+      "1. Introduction\nAutonomous multi-robot syste",
+      "1. A distributed predictive control system f",
+      "2. Demonstration that a single controller ge",
+      "3. A careful comparison of six inter-robot s",
+      "4. Characterization of the operating swarm d",
+      "2. Preliminaries and Problem Statement\nIn th",
+      "1. Robot Model\nEach robot is modeled as a ri",
+      "1. The simulated elliptical agent is modeled"
+    ],
+    "theorems_count": 0,
+    "tables_count": 0,
+    "algos_count": 0,
+    "text_snippet": "Highlights Distributed Predictive Flocking for a Swarm of Miniature Vibration-Driven Robots in a Confined Arena Prajol Shrestha, Siddhant Mohapatra, Filip Novkoski, Julian Oelhaf, Nicolas Vandewalle, Ana-Sun\u010dana Smith, Andreas Maier \u2022 Distributed leader-free predictive flocking for a dense swarm of miniature robots.  arXiv:2610.35582v1 [cs.RO] 26 Oct 2026  \u2022 Six safety formulations compared on a single common controller footing. \u2022 Look-ahead safety constraint gives widest margins and fewest collisions. \u2022 Single generalized controller deployed to handle different tasks successfully. \u2022 Swarm sta"
+  },
+  {
+    "id": "2407.07409",
+    "venue": "Robotics and Autonomous Systems",
+    "title": "Distributed multi-robot potential-field-based exploration with submap-based mapping",
+    "sections_sample": [
+      "1. Introduction\nMulti-robot exploration has ",
+      "1. Illustration of the DMPF-Explore with dis",
+      "1. Our method is based on the submaps, which",
+      "3. In Section ",
+      "2. DSMC-Map mapping strategy\n\n",
+      "2. In\nthis paper, the initial pose of each r",
+      "2. Loop closure detection\nThe loop closure d",
+      "2. Overview of the DMPF-Explore framework\n\nA"
+    ],
+    "theorems_count": 0,
+    "tables_count": 0,
+    "algos_count": 4,
+    "text_snippet": "Distributed multi-robot potential-field-based exploration with submap-based mapping and noise-augmented strategy Khattiya Pongsirijindaa,\u2217 , Zhiqiang Caoa , Kaushik Bhowmikb , Muhammad Shalihana , Billy Pik Lik Laua , Ran Liuc , Chau Yuenc and U-Xuan Tana a Engineering Product Development, Singapore University of Technology and Design, Singapore 487372 b Inria Grenoble, Grenoble Alpes University, France 38330  arXiv:2407.07409v1 [cs.RO] 10 Jul 2024  c School of Electrical and Electronic Engineering, Nanyang Technological University, Singapore 639798  ARTICLE INFO  ABSTRACT  Keywords: Cooperati"
+  },
+  {
+    "id": "2209.10513",
+    "venue": "Robotics and Autonomous Systems",
+    "title": "Consensus-based Fast and Energy-Efficient Multi-Robot Task Allocation",
+    "sections_sample": [
+      "1. Introduction\nMulti-robot systems have bee",
+      "2. Related works\nThere exists a large body o"
+    ],
+    "theorems_count": 0,
+    "tables_count": 0,
+    "algos_count": 0,
+    "text_snippet": "Consensus-based Fast and Energy-Efficient Multi-Robot Task Allocation  arXiv:2209.10513v1 [cs.RO] 21 Sep 2022  Prabhat Mahatoa , Sudipta Sahaa , Chayan Sarkarb , Md Shaghila a  School of Electrical Sciences, Indian Institute of Technology Bhubaneswar, India b Robotics and Autonomous Systems, TCS Research, India  Abstract In a multi-robot system, the appropriate allocation of the tasks to the individual robots is a very significant component. The availability of a centralized infrastructure can guarantee an optimal allocation of the tasks. However, in many important scenarios such as search and"
+  },
+  {
+    "id": "2409.12713",
+    "venue": "Robotics and Autonomous Systems",
+    "title": "A Signal Temporal Logic Approach for Task-Based Coordination of Multi-Aerial Systems",
+    "sections_sample": [
+      "1. Introduction\nThe increasing use of Unmann",
+      "1. Related work\nExtensive research has been ",
+      "2. Contributions\nIn this paper, we introduce",
+      "2. Problem Description\nThis paper explores t",
+      "3. Preliminaries\nd\n\nThis section introduces ",
+      "1. System definition\nLet us consider a discr",
+      "2. Signal temporal logic\nSTL concisely and u"
+    ],
+    "theorems_count": 0,
+    "tables_count": 2,
+    "algos_count": 0,
+    "text_snippet": "\u00a9 2025 Elsevier. Accepted for Robotics and Autonomous Systems. Personal use of this material is permitted. Permission from Elsevier must be obtained for all other uses, in any current or future media, including reprinting/republishing this material for advertising or promotional purposes, creating new collective works, for resale or redistribution to servers or lists, or reuse of any copyrighted component of this work in other works.  A Signal Temporal Logic Approach for Task-Based Coordination of Multi-Aerial Systems: a Wind Turbine Inspection Case Study Giuseppe Silanoa,1,g , Alvaro Caballer"
+  }
+]

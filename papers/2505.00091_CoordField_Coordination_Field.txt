@@ -1,0 +1,371 @@
+CoordField: Coordination Field for Agentic UAV Task Allocation
+In Low-altitude Urban Scenarios
+
+arXiv:2505.00091v4 [cs.RO] 21 Jul 2025
+
+Tengchao Zhang1 , Yonglin Tian2 † , Fei Lin1 , Jun Huang1 ,Patrik P. Süli3 , Qinghua Ni1 , Rui Qin4 ,
+Xiao Wang5 , and Fei-Yue Wang6
+Abstract— With the increasing demand for heterogeneous
+Unmanned Aerial Vehicle (UAV) swarms to perform complex tasks in urban environments, system design now faces
+major challenges, including efficient semantic understanding,
+flexible task planning, and the ability to dynamically adjust
+coordination strategies in response to evolving environmental
+conditions and continuously changing task requirements. To
+address the limitations of existing methods, this paper proposes
+CoordField, a coordination field agent system for coordinating
+heterogeneous drone swarms in complex urban scenarios. In
+this system, large language models (LLMs) is responsible
+for interpreting high-level human instructions and converting
+them into executable commands for the UAV swarms, such
+as patrol and target tracking. Subsequently, a Coordination
+field mechanism is proposed to guide UAV motion and task
+selection, enabling decentralized and adaptive allocation of
+emergent tasks. A total of 50 rounds of comparative testing were
+conducted across different models in a 2D simulation space to
+evaluate their performance. Experimental results demonstrate
+that the proposed system achieves superior performance in
+terms of task coverage, response time, and adaptability to
+dynamic changes.
+
+I. I NTRODUCTION
+The growing demand for deploying Unmanned Aerial
+Vehicle (UAV) swarms to perform tasks such as pedestrian
+† Corresponding author: Yonglin Tian (email: yonglin.tian@ia.ac.cn).
+
+This work was partly supported by the Science and Technology Development Fund, Macau Special Administrative Region (SAR) (0145/2023/RIA3,
+0093/2023/RIA2, 0157/2024/RIA2), the Project supported by Laboratory of
+Computation and Analytics of Complex Management Systems (Tianjin University), and National Natural Science Foundation of China (#72171230);
+this is part of the LaSEE and CiSEE projects.
+1 Tengchao Zhang, Fei Lin, Jun Huang and Qinghua Ni are with the
+Department of Engineering Science, Faculty of Innovation Engineering,
+Macau University of Science and Technology, Macau 999078, China
+(e-mail: zhangtengchao@ieee.org, feilin@ieee.org, junhuang@ieee.org,
+qinghua.ni@ieee.org)
+2 Yonglin Tian is with the State Key Laboratory of Multimodal Artificial
+Intelligence Systems, Institute of Automation, Chinese Academy of Sciences, Beijing 100190, China (e-mail: yonglin.tian@ia.ac.cn).
+3 Patrik P. Süli is with the Doctoral School of Applied Informatics and Applied Mathematics, Óbuda University, Hungary, (e-mail:
+suli.patrik@nik.uni-obuda.hu).
+4 Rui Qin is with the State Key Laboratory of Multimodal Artificial
+Intelligence Systems, Institute of Automation, Chinese Academy of Sciences, Beijing 100190, China, and also with Laboratory of Computation
+and Analytics of Complex Management Systems, Tianjin University, Tianjin
+300072, China (e-mail: rui.qin@ia.ac.cn).
+5 Xiao Wang is with the School of Artificial Intelligence, Anhui University, Anhui 230601, China. (e-mail: xiao.wang@ahu.edu.cn).
+6 Fei-Yue Wang is with the State Key Laboratory for Management
+and Control of Complex Systems, Chinese Academy of Sciences, Beijing
+100190, and also with the Department of Engineering Science, Faculty of Innovation Engineering, Macau University of Science and Technology, Macau
+999078, China, and also with University Research and Innovation Center,
+Obuda University, Budapest, Hungary. (e-mail: feiyue.wang@ia.ac.cn)
+
+detection, vehicle tracking, and traffic signal monitoring in
+complex and dynamic urban environments has highlighted
+the advantages of multi-UAV systems over single UAV,
+particularly in terms of coverage, system redundancy, and
+operational efficiency. However, the increasing complexity of
+tasks and the highly dynamic nature of urban environments
+also pose significant challenges [1]. This requires effective
+task allocation methods for drone swarms to adapt to everchanging new tasks, while also achieving real-time intelligent
+scheduling of the system.
+To address these challenges, various optimization algorithms have been developed for UAV swarm coordination,
+such as the Grey Wolf Optimizer [2] and the Whale Optimization Algorithm [3]. However, these methods are typically tailored to specific types of tasks and struggle to
+adapt to heterogeneous UAV clusters operating in highly
+dynamic environments [4]. With the rise of large language
+models (LLMs), recent research has explored leveraging their
+powerful semantic understanding and tool-calling capabilities
+to address such problems. For example, several approaches
+attempt to utilize few-shot or zero-shot learning methods
+based on existing models, enabling LLMs to perform multiround planning, itinerary calibration, and execution [5], [6].
+Nevertheless, such methods still exhibit significant limitations when handling multiple tasks in complex and rapidly
+changing environments.
+To address the above challenges, the emerging Agentic
+Artificial Intelligence(AI) offers a more flexible and unified approach [7]. This paradigm is driven by LLMs, and
+integrates core functionalities such as task decomposition,
+tool invocation, and multi-agent coordination and scheduling
+into a cohesive system [8], [9]. In this paper, we propose
+a coordination field multi-UAV agentic system architecture.
+The system leverages LLM to parse natural language instructions into executable tasks for UAV swarms, and employs a
+coordination field control strategy to achieve task-oriented
+autonomous navigation and collective coordination.
+The main contributions of this work are as follows:
+• We propose CoordField, a coordination field-based UAV
+swarms task allocation method that employs continuously updated potential fields to represent both task
+urgency and UAV influence within urban environments.
+This approach enhances real-time responsiveness.
+• We present an agentic system for UAV swarms that
+enables high-precision task understanding from natural language descriptions and supports dynamic planning and deployment through specialized collaborative
+
+•
+
+agents with distinct roles.
+We evaluate our system against multiple baseline models under the same task scenarios, validating its superior
+coordination performance in urban environments.
+II. P RELIMINARIES
+
+A. Agentic Systems
+In recent years, Agentic AI has emerged as a novel intelligent paradigm characterized by autonomous perception,
+goal-driven planning, and adaptive decision-making, offering
+innovative and effective solutions for multi-agent collaborative tasks [10], [11]. Unlike traditional passive approaches,
+Agentic AI emphasizes continuous goal pursuit, contextual
+memory, adaptive tool use, and self-reflection capabilities of
+agents. These abilities enable agents to operate with greater
+autonomy and coordination in dynamic environments. Agent
+systems powered by LLMs have demonstrated strong reasoning and planning capabilities, particularly in complex task
+decomposition and sequential execution [5]. These features
+provide a solid theoretical and methodological foundation
+for building autonomous multi-UAV systems. In complex
+urban task scenarios [12], Agentic AI can assist UAVs in
+understanding high-level instructions, distributing subtasks
+effectively, and rapidly reconfiguring coordination strategies
+in response to task changes or agent failures, thereby enabling truly autonomous collaboration [13], [14].
+B. LLMs for Natural Language Task Parsing
+With the rapid advancement of LLMs in natural language understanding and general reasoning, LLMs have
+demonstrated superior capabilities over traditional rule-based
+parsers in handling ambiguous semantics, conditional logic,
+and spatial language [15]. They also exhibit strong generalization in task generation, even under limited domainspecific data. Researchers have developed several frameworks such as Code-as-Policies and Prompt2Action [16],
+[17], enabling LLMs to map natural language instructions
+into task-executable codes. These approaches often incorporate few-shot prompting and constraint prompting to improve
+the validity and safety of the generated outputs. Furthermore, the GSCE framework, which consists of Guidelines,
+Skill APIs, Constraints, and Examples, has demonstrated
+the practical value of prompt engineering in UAV task
+planning [18], guiding LLMs to generate physically feasible
+and constraint-compliant control programs by providing skill
+APIs, operational constraints, and illustrative examples [19],
+[20].
+C. Field-Based Coordination and Allocation
+Field-driven methods, particularly the Artificial Potential
+Field (APF) approach, have been widely applied in the field
+of mobile robotics [21]. In this approach, robots navigate
+by descending along the gradient of the resulting potential
+field, thereby enabling path planning and real-time obstacle
+avoidance. This approach has been applied applications in
+traffic flow modeling [22], where field-based methods are
+used to simulate the evolution of traffic dynamics. Vehicles
+
+are modeled as particles influenced by traffic density fields,
+velocity fields, and other factors, allowing the system to
+capture both macroscopic and microscopic variations more
+effectively .
+Inspired by this line of thought, our work adopts a similar
+strategy by modeling task demand and UAV workload as
+continuous spatial fields. A dynamically evolving potential
+field is constructed based on the distribution of task urgency,
+guiding UAVs to move and allocate themselves through local
+gradient descent [23]. This method excels with its decentralized structure, real-time adaptability, and responsiveness
+to dynamic tasks, making it ideal for uneven and changing
+urban scenarios. Unlike traditional discrete optimization,
+field-driven approaches are more flexible and scalable.
+III. A PPROACH
+In this work, we propose an Agentic system for UAV
+swarms, built upon a Coordination field mechanism is proposed to guide UAV motion and task selection, enabling
+decentralized and adaptive allocation of emergent tasks.
+methodology. The proposed agentic system consists of three
+primary modules, as illustrated in Fig. 1. It enables multilayered agent coordination to interpret natural language inputs and perform task decomposition and allocation for UAV
+swarms in urban environments. In particular, to address the
+heterogeneity of UAV types and the complexity of urban
+traffic conditions, a field-driven strategy is adopted to guide
+different types of UAVs toward task regions that match their
+operational roles.
+A. Semantic Understanding Module
+The semantic understanding module is responsible for
+interpreting user-provided natural language inputs and converting them into structured task representations suitable
+for downstream planning and execution. Serving as the human–system interface, it enables intuitive interaction with the
+UAV swarm through language-based commands and ensures
+that high-level semantic information is accurately conveyed
+to subsequent modules in the system [24].
+Upon receiving a user prompt, the LLM performs a task
+translation process, mapping vague or abstract natural language instructions into formalized constraints. Specifically,
+the LLM processes the input to extract key elements such as
+target location, task type, and priority level, and ultimately
+generates a structured task tuple in the following form:
+Taskj = (xj , yj , wj , typej )
+where (xj , yj ) denotes the spatial coordinates of the target,
+wj represents the task weight or priority, and typej refers
+to the semantic category of the task (e.g., patrol, tracking,
+inspection).
+This formalization process acts as a bridge between highlevel user intent and the low-level execution logic of the
+agentic system. It enables downstream modules, such as the
+planning and execution modules, to operate on a consistent
+and quantifiable task representation. Moreover, the module
+leverages the strong semantic understanding and reasoning
+
+Fig. 1.
+
+Coordination field Agentic System Implementation Process
+
+capabilities of LLMs, laying a foundation for flexible task
+expansion and constraint integration.
+B. Planning Module and Coordination Field
+The Planning Module is responsible for transforming the
+task tuples (xj , yj , wj , typej ) obtained from semantic parsing
+into a dynamic UAV coordination strategy. The Planning
+Agent first feeds the task tuples and UAV state data into
+the coordination field. This field-based framework consists of
+three submodules—perception mapping, task decomposition,
+and task assignment—which operate in a closed-loop manner
+to continuously adapt to evolving task demands and spatial
+distribution patterns. The results are then aggregated and
+delivered by the Planning Agent for execution.
+Perception Mapping: The Planning Agent first reads relevant map information and UAV configurations, such as types,
+capabilities, and quantities. When a task emerges at any given
+time t, the Planning Agent groups related tasks and identifies
+a set of active tasks, each T askj located at position (xj , yj )
+with a dynamic urgency weight wj (t).
+To establish task density awareness in the environment, we
+construct a time-varying potential field ϕ(x, y, t) to represent
+the spatial intensity and distribution of high-priority task
+regions. This scalar field is composed of a sum of weighted
+Gaussian functions, defined as:
+M
+X
+
+2
+
+∥(x, y) − (xj (t), yj (t))∥
+ϕ(x, y, t) :=
+wj (t) · exp −
+2σj2
+j=1
+
+!
+
+Here, σj denotes the spatial influence radius of task
+j, reflecting the degree to which its urgency propagates
+across nearby areas. Notably, obstacles such as buildings are
+
+excluded from the field domain, and ϕ(x, y, t) is explicitly
+set to zero within these regions.
+By constructing this continuous “task landscape”, UAVs
+are able to perceive and exploit the gradient of ϕ(x, y, t) to
+identify and navigate toward high-priority task areas.
+Task decomposition: To convert the scalar potential field
+ϕ into actionable guidance for UAV navigation and control,
+we further construct a time-varying vector field v(x, y, t),
+which represents the motion velocity field of the UAV swarm.
+During the process, the following motion equation is defined
+based on the Navier–Stokes equations in fluid dynamics:
+dv
+1
+:= − ∇p + ν∇2 v + Ftask (ϕ)
+dt
+ρ
+In this model, v(x, y, t) = (vx , vy ) denotes the velocity
+vector at each point in the 2D space, indicating the direction
+and magnitude that a UAV should follow at a given position. The parameter ν represents the fluid viscosity, which
+governs the smoothness and responsiveness of the velocity
+field: higher viscosity results in smoother flows but slower
+response. Ftask is the external force term used to steer UAVs
+toward regions with higher ϕ values, and it is defined as:
+Ftask = k∇ϕ
+where k is a scaling coefficient that adjusts the attraction
+strength. ρ is the nominal fluid density, which can be
+normalized in this system for simplification.
+By constructing such a velocity field, UAVs do not need to
+explicitly plan trajectories. Instead, they can simply follow
+the local flow direction, naturally converging toward highdemand task regions. Meanwhile, the inclusion of the diffusion term ν∇2 v helps prevent over-concentration of UAVs
+
+in a single area, thereby enhancing spatial distribution and
+system robustness.
+Task Assignment: To further enhance coordination efficiency among multiple agents and prevent resource redundancy or execution conflicts caused by UAVs clustering in
+the same task region, we introduce a local vortex mechanism
+around each UAV to serve as a dynamic repulsion control
+strategy. Specifically, each UAV i generates a rotational field
+centered at its current position (xi , yi ), defined as:
+ 2 !
+r
+Γi
+exp −
+ωi (r) :=
+2πr
+r0
+where r is the radial distance from UAV i, and r0 denotes
+the influence radius of the field. Γi is the circulation strength
+generated by the UAV, which depends on its capability score
+ci (t) and the local potential value ϕ(xi , yi , t), calculated as:
+Γi (t) :=
+
+ci (t) · ϕ(xi (t), yi (t), t)
+PN
+j=1 cj (t)
+
+Based on this field, the system computes a tangential
+velocity component vθ,i (r), which forms a repulsive velocity
+around each UAV and models the inter-agent avoidance
+dynamics:
+ 2 !!
+r
+Γi
+1 − exp −
+vθ,i (r) :=
+2πr
+r0
+
+virtual) via middleware such as MAVSDK, ROS2, or AirSim.
+These control commands can be formalized as:
+UAV(x, y, t) → Map(x′ , y ′ , t′ )
+which maps the current state to a new target position and
+time step.
+Based on the task type typej , UAVs are assigned distinct
+execution modes, such as performing area patrol or tracking
+specific targets. These operational differences are embedded
+in the command structure during instruction generation and
+are reflected in the API parameters.
+To maintain adaptability in dynamic environments, each
+UAV continuously reports its status, including position, velocity, and execution state, to the control system. These
+updates are used to refresh the task potential field ϕ(x, y, t)
+and the flow field vector v(x, y, t) in real time. When the
+environment changes, such as when new task targets appear,
+current tasks are completed, or obstacles are introduced, the
+system recalculates the relevant fields and delivers updated
+control instructions through the Execution Agent.
+This closed-loop perception–planning–execution cycle operates at a high frequency, ensuring the system exhibits
+strong responsiveness and decentralized dynamic coordination. Under this mechanism, UAVs are capable of replanning, cooperative obstacle avoidance, and target adaptation in complex and ever-changing environments, thereby
+realizing truly adaptive intelligent behavior.
+
+Finally, the control velocity vector of each UAV is
+obtained by combining the global guiding velocity field
+v(x, y, t) with the superimposed tangential repulsive velocities generated by all UAVs:
+vnew (x, y, t) = v(x, y, t) +
+
+n
+X
+
+IV. E XPERIMENTS
+
+vθ,i (x, y, t)
+
+i=1
+
+This mechanism ensures that UAVs are not only guided
+toward high-priority task regions but also mutually repelled
+through localized vortex effects, thereby enabling dynamically stable task allocation and coordination behavior in a
+fully decentralized setting. The system thus achieves high
+adaptability and strong scalability.
+C. Execution Module
+The core task of the Execution Module is to translate
+the outputs of the planning module, including the flow field
+vector vnew (x, y, t) and the UAV task assignment information, into real-time control commands executable by either
+physical or simulated UAVs. This process is managed by the
+Execution Agent, which communicates with the underlying
+control system through standardized API interfaces.
+During the task execution phase, each UAV samples a
+local velocity vector from the precomputed control field
+vnew (x, y, t) based on its current position (x, y, t), and uses
+this vector as its next navigation direction. The Execution
+Agent then generates flight control commands accordingly
+and dispatches them to the UAV platform (either physical or
+
+Building
+
+Road
+Pedestrian
+
+Fig. 2.
+
+Vehicle
+Tiaffic Light
+
+2D space simulation map.
+
+To validate the proposed architecture, we conducted a
+series of experiments in a simulated urban environment. We
+
+

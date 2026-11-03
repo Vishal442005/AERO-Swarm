@@ -1,0 +1,667 @@
+ACCEPTED FOR PUBLICATION ON IEEE TRANSACTIONS ON CYBERNETICS ON MARCH 2023
+
+1
+
+Optimal task and motion planning and execution for
+multi-agent systems in dynamic environments
+
+arXiv:2303.14874v1 [cs.RO] 27 Mar 2023
+
+Marco Faroni1 , Alessandro Umbrico2 , Manuel Beschi1,3 , Andrea Orlandini2 , Amedeo Cesta2 , Nicola Pedrocchi1
+
+Abstract—Combining symbolic and geometric reasoning in
+multi-agent systems is a challenging task that involves planning,
+scheduling, and synchronization problems. Existing works overlooked the variability of task duration and geometric feasibility
+that is intrinsic to these systems because of the interaction
+between agents and the environment. We propose a combined
+task and motion planning approach to optimize sequencing,
+assignment, and execution of tasks under temporal and spatial
+variability. The framework relies on decoupling tasks and actions,
+where an action is one possible geometric realization of a symbolic
+task. At the task level, timeline-based planning deals with temporal constraints, duration variability, and synergic assignment
+of tasks. At the action level, online motion planning plans
+for the actual movements dealing with environmental changes.
+We demonstrate the approach effectiveness in a collaborative
+manufacturing scenario, in which a robotic arm and a human
+worker shall assemble a mosaic in the shortest time possible.
+Compared with existing works, our approach applies to a broader
+range of applications and reduces the execution time of the
+process.
+
+agent systems. The method addresses the tasks’ temporal and
+geometric uncertainty by decoupling the abstract representation
+of the task from all its possible realizations. Timeline-based
+planning reasons on abstract tasks, while online action planning
+optimizes their geometric implementations. Compared with
+existing methods, our approach deals with a broader variety
+of real-world problems and reduces execution and idle times.
+A. Related works
+
+This paper deals with interleaving task planning and motion
+planning and how to consider human behaviors in this process. Existing methods address the first aspect by following
+the combined task and motion planning (TAMP) paradigm
+[2]. Usually, TAMP provides a task planner able to reason
+geometrically through calls to a motion planning algorithm. In
+such a hierarchical approach, a task planning algorithm finds
+Index Terms—Human-robot interaction; task and motion plan- a feasible sequence of actions, and a motion planner checks
+for geometric feasibility [3]–[7]. Most TAMP methods focus
+ning; industry 4.0; AI planning; manipulation planning.
+on the feasibility of the plan rather than its optimality (except
+for a few exceptions [8], [9]). Few works address temporal
+I. I NTRODUCTION
+planning to consider task duration [10].
+UMAN-ROBOT collaboration (HRC) boosts the flexibilHRC-oriented works usually focus on sub-problems such as
+ity of manufacturing processes, although the inefficient scheduling human and robot actions [11]–[13], or cooperative
+coordination between humans and robots often jeopardizes planning at a symbolic level [14]–[16]. Few works address
+productivity [1]. From a planning perspective, efficiency in TAMP by explicitly modeling the human agent [17], [18].
+HRC is tied to different intertwined problems. First, the system For example, [19] and [20] proposed a hierarchical agentshould find a suitable sequence of operations (task planning), based task planner, where complex tasks are decomposed
+assign them to the agents (task assignment), and schedule into simple actions. The method improves the collaborative
+their execution (scheduling). At run-time, the execution of experience by considering human preferences as social costs,
+the operations should be adapted to the human and robot’s but throughput-oriented objectives are not considered [21],
+state (motion planning and replanning). All these steps should [22]. In manufacturing-oriented methods, [23] optimizes the
+also consider the variability of the duration and good (or bad) ergonomics of the human worker by using an online workflow
+synergy of simultaneous collaborative operations. The com- scheduler. [24] and [25] proposed a TAMP framework for
+plexity of the overall planning problem limits the effectiveness planning and executing tasks using first-order logic graphs. A
+of existing methods in real-world scenarios, and standardized contingent-based approach was proposed in [26], and [27] to
+shared approaches to task and motion planning are still to deal with uncertainty on the outcome of actions.
+come.
+The approaches above focus on finding feasible plans and do
+In this paper, we propose a tiered approach interleaving task
+not consider: (i) process throughput; (ii) temporal constraints
+planning, scheduling, assignment, and action planning for multiand uncertainty; (iii) human-robot synergy. Regarding (i) and
+(ii),
+timeline-based task planning [28] has proved to be a
+This work is partially supported by ShareWork project (H2020, European
+Commission: G.A. 820807). Authors from ISTC-CNR are also partially powerful approach in many real-world applications [29], [30].
+supported by ROXANNE project (H2020, ROSIN – G.A. 732287).
+The value of this approach consists of integrating planning and
+1
+STIIMA-CNR:
+Institute
+of
+Intelligent
+Industrial
+Technologies and Systems, National Research Council of Italy scheduling in a unified reasoning framework, making decisions
+{name.surname}@stiima.cnr.it
+about what actions to perform and when. This approach can
+2 ISTC-CNR: Institute of Cognitive Sciences and Technologies, National
+also model the features’ controllability, i.e., the planner knows
+Research Council of Italy {name.surname}@istc.cnr.it
+whether it can control the task’s beginning or the end [31].
+3 Dipartimento di Ingegneria Meccanica e Industriale, University of Brescia
+{name.surname}@unibs.it
+Timelines were applied to HRC in [32], although the integration
+
+H
+
+2
+
+ACCEPTED FOR PUBLICATION ON IEEE TRANSACTIONS ON CYBERNETICS ON MARCH 2023
+
+with motion planning was inefficient because it reasoned
+at a low level of abstraction (point-to-point movements).
+Consequently, motion plans were pre-computed, hindering the
+flexibility of the approach in dynamic environments.
+B. Contribution
+As shown in Figure 1, we propose a hierarchical planner
+where the higher layer reasons over symbolic tasks, optimizing
+their order, scheduling, and assignment under temporal constraints and duration variability. At the same time, the lower
+level turns the symbols into robot motions, selecting the optimal
+task execution among all the possible alternatives.
+Our formulation relies on the definition of ACTIONS as a
+set of instances of a TASK (Section II). Compared to previous
+works, such formulation explicitly maps a symbolic TASK to all
+its possible geometric realizations. From the task planning point
+of view, this formulation considers the duration uncertainty of
+the tasks, temporal constraints, and the possible synergy of
+simultaneous tasks performed by the different agents. At the
+action level, the robot plans and executes the its motions based
+on the current context.
+Then, we propose algorithms to solve the proposed task
+and action planning problems (Section III). On the one hand,
+we convert the optimal task planning problem into a multiobjective problem – which constitutes a novelty in timelinebased planning – and use the notion of Pareto optimality to
+optimize the coupling of simultaneous tasks. On the other hand,
+we make the optimal action planning problem tractable online
+by converting it into a multi-goal motion planning problem
+that can be solved with efficient off-the-shelf algorithms.
+Compared to previous works, our formulation is robust
+to temporal and spatial uncertainty typical of hybrid multiagent systems (e.g., human-robot collaboration). We assess
+the broad applicability of the approach and its superiority to
+existing works qualitatively and experimentally (Sections IV
+and V), showing that our approach applies to a broader range of
+applications and reduces execution and idle times of the process.
+A video of the experiments is attached to the manuscript.
+II. TASK AND ACTION PLANNING FORMALIZATION
+A. Definitions and Approach at a Glance
+Our approach builds on the following definitions:
+Definition 1 (Worker): It is an agent that performs a job
+assigned by the system. It can be a human worker or a robot.
+Definition 2 (Task): It is a step of the production process
+performed by a worker. TASKS do not provide geometrical
+information on their execution, as they model an operation at
+a higher level of abstraction. Each TASK might be performed
+in several ways, making its duration a random variable rather
+than a scalar variable.
+Definition 3 (Robot Configuration): It is a vector collecting
+the joint positions and the auxiliaries’ state1 .
+Definition 4 (Robot Movement): it is a discrete change of
+the ROBOT C ONFIGURATION. Each ROBOT M OVEMENT might be
+1 Example: consider a 2-axes mechanism with a gripper. The ROBOT
+C ONFIGURATION is a vector of length equal to three, where the first two
+components are the joint positions, and the third one is the gripper state.
+
+2. Plan synthesis
+
+Task
+Planner
+
+1. Task planning model
+
+4. Replanning
+
+Task Plan
+Synthesis
+
+Task Plan
+Execution
+
+3. Plan execution
+
+A. Action dispatching
+B. Action feedback
+
+Action
+Planner
+
+C. Motion instance
+
+Motion
+Planner
+Human tracking
+
+D. Plan and cost
+
+Action
+Synthesis
+and Execution
+
+Motion request
+Motion feedback
+
+HMI
+
+Motion Controller
+
+Fig. 1: Proposed hierarchical framework.
+realized by an infinite number of possible trajectories that
+satisfy the physical constraints of the robot.
+Definition 5 (Action): An ACTION is a sequence of ROBOT
+M OVEMENTS. It is a feasible implementation of a TASK. Each
+ROBOT M OVEMENT is defined by the ACTION parameters2 .
+The proposed hierarchical approach is shown in Figure 1. The
+task planner uses a planning model of the process to search for
+a feasible, possibly optimal sequence of TASKS. The planning
+model specifies the TASKS to be performed with temporal
+and allocation constraints. The Task Plan Execution module
+dispatches the target TASK to the workers. The Action Planner
+converts each TASK into a set of feasible ACTIONS. Then, it
+chooses the best ACTION among the feasible ones and sends the
+motion plan to the robot controller. If the Action Planner fails
+at planning or executing (e.g., no trajectory could be computed
+or task execution fails at run-time), the Task Planner re-plans
+according to the Sense-Plan-Act paradigm [33].
+B. Model Formalization
+The following elements describe a collaborative process:
+W = {H, R} is the set of workers, i.e., a human and a robot;
+P = {pi } is the set of production targets;
+T = {tpj i } is the set of TASKS necessary to carry out a
+production target pi ;
+A = {aj } is the set of ACTIONS;
+D : T → R2 is the duration function that associates a TASK
+with an interval [dmin , dmax ];
+T : T → T is the transition function that defines valid transitions among TASKS;
+2 Example: TASK “screw bolt A” corresponds to different ACTIONS , each
+composed by the same sequence of ROBOT M OVEMENTS: “open the gripper”,
+“move to grasp point X” (where X is the position of a particular screwdriver),
+“close the gripper”, “move to Y ” (where Y is the screwing position for bolt A),
+“screw bolt A”. Each ACTION differs in the value of X, Y , A. For example,
+multiple suitable screwdriver might be available in different locations.
+
+FARONI et al.: OPTIMAL TASK AND MOTION PLANNING AND EXECUTION FOR MULTI-AGENT SYSTEMS IN DYNAMIC ENVIRONMENTS
+
+γ : T → {c, pc, uc} is the controllability tag. The tag is “controllable”, “partially controllable” or “uncontrollable” if
+the system can decide the execution start and end, only
+the start or neither of the TASK a worker performs.
+F : T → {{H}, {R}, {H, R}} is a function that defines for
+each TASK which worker can execute it;
+S : A → T is a function that maps each ACTION to its
+corresponding TASK.
+SV = (V, T, D, γ) is a “state variable” that describes the
+behaviors of a domain feature that is represented by the
+set of tasks V = {vi } ∈ T . Such a set gathers all the valid
+TASKS that can be executed over time for that specific
+feature. T , D, γ are defined as above.
+x = (v, [e, e0 ] , [d, d0 ] , γ (v)) is a “token” where v ∈ V , [e, e0 ]
+is end-time interval, and [d, d0 ] = D(v) is the duration
+interval for task v.
+FTLSV = {xj } is a flexible timeline of a state variable SV
+representing a temporal sequence of tokens xj .
+Solving a collaborative TAMP problem consists of identifying
+a task plan, a temporal schedule, and an assignment of the tasks
+considering that each task can be realized by a set of actions
+and each movement composing an action can be executed by
+an infinite set of trajectories. Each task plan is modeled through
+flexible timelines of tokens of state variables.
+
+3
+
+begin
+move to pre-picking pose
+
+move to post-grasp pose
+
+open gripper
+
+move to pre-placing pose
+
+move to picking pose
+
+move to placing pose
+
+close gripper
+
+open gripper
+end
+
+Fig. 2: Example: a pick-and-place action.
+Task tpmi ,wk is uncontrollable if performed by humans since they
+may refuse to do a task or quit halfway through. Conversely,
+it is partially controllable if performed by a robots, as they
+may not be able to finish a task because humans obstruct all
+possible way-outs.
+As mentioned above, much information of the complete
+model is intertwined. For example, the execution time of the
+process task tpj i results
+
+
+
+
+wk
+wk
+wk
+wk
+Dpi tpj i = min
+d
+−
+δ
+,
+max
+(d
++
+δ
+)
+m
+m
+m
+j
+p ,w
+p ,w
+tmi
+
+k
+
+s.t.
+
+tmi k
+tpmi ,wk implements tpj i
+
+otherwise, the problem is unfeasible. Similarly, the map of
+pi
+pi ,wk
+Given the notation in Section II-B, we define the production processes tasks tj into several feasible workers tasks of ti
+goals, each worker’s possible behaviors, and the synchroniza- according to the different constraints (precedence constraints,
+tion rules to model a human-robot scenario. Refer to [34], [35] resource constraints, etcetera) is far to be simple. Proper
+SW tools autonomously compute such information (see Sec.
+for a description of the formalization approach.
+V)
+that complete the model from user input, using proper
+p
+First, consider a set of high-level production targets V =
+synchronization
+rules R.
+{pi }, where pi ∈ P. Each pi can be further associated with
+pi
+Given
+a
+set
+of
+state variables SV P , SV pi , SV wk and
+pi
+a set V = {tj } that gathers TASKS to carry out pi , where
+synchronization rules R, we can now introduce the timelinetpj i ∈ T 3 . Second, we consider a generic worker wk ∈ W
+based planning formalization [28], [36]. We consider the
+that may implement some of the needed tasks in V pi , and
+generic state variable SV g = V g , T g , Dg , γ g and denote
+pi
+wk
+pi ,wk
+pi
+ − +  −
+
+
+denote by V
+= {tm } ⊂ V the subset of tasks tj that
+by xgj = vjg , egj , egj , dgj , dg j + , γ vjg a “token” with
+a worker wk can do according to F .
+ g − g +
+g
+g
+g
+g
+Additionally to the set of tasks, we need to define their vj ∈ V , and D vj = dj , d j . We define a flexible
+timeline FTLSV i of a state variable SV i as a sequence of
+precedence constraints, task duration, and controllability.
+g
+To gather all this information
+complactly, we denote by tokens {xj } that span the process execution time and describes
+
+p
+p
+P
+p
+p
+SV = V , T , D , γ the production state variable asso- what the worker does over the process. Finally, a timelineciated with the high-level production
+targets V p = {pi } and based plan π consists of a set of flexible timelines, one for
+
+pi
+pi
+pi
+pi
+pi
+by SV = V , T , D , γ
+the production state variables each state variable, valid with respect to R. A timeline-based
+associated with the production tasks V pi = {tpj i } necessary for solver exploits different search techniques to find the optimal
+a particular production target pi . The transitions T p and T pi are π among the feasible ones.
+usually an input of the model, while duration and controllability
+come from the worker modeling and selection (see below). D. Action planning model for human-robot cooperation
+Then, we denote by SV wk = (V wk , T wk , Dwk , γ wk ) as the
+The action planner finds the best ACTION to execute a given
+behavior state variables for the kth worker (often one robot and TASK twk . To do so, it gathers all the necessary geometric
+j
+one human). Transitions T wk , duration Dwk , and controllability information from the scene descriptor (e.g., through queries
+wk
+γ are usually input of the model. The duration
+is an interval to a database). Then, it determines all the actions that can
+
+pi ,wk
+wk
+wk
+wk
+k
+Dwk (tm
+) = dw
+−
+δ
+,
+d
++
+δ
+that
+describes
+the realize task twk (i.e., all actions ai ∈ A such that twk = S(ai ),
+m
+m
+m
+m
+j
+j
+pi ,wk
+duration uncertainty whenworker wk performs tm
+∈ V wk . according to Definition 5). For example, consider twk equal
+j
+wk pi ,wk
+Controllability γ
+tm
+depends on the nature of the worker. to “pick a blue object and place it in an empty box”. The
+C. Task planning model for human-robot cooperation
+
+3 The set V p could be {assembly A, check the quality of B, disassemble
+
+C}, and V p1 = {Take the bottom of part A, pick and places the screws of A,
+Tight the screws of A}.
+
+action planner uses the tags “blue object” and “empty box” to
+identify all the locations of the scene to which these labels are
+assigned. Then, the action planner finds the best sequence of
+
+4
+
+ACCEPTED FOR PUBLICATION ON IEEE TRANSACTIONS ON CYBERNETICS ON MARCH 2023
+
+ROBOT M OVEMENTS that connects those locations in the order
+
+TABLE I: Synergy matrix. Each element si,j represents the
+increment or decrement of duration given by the simultaneous
+execution of tasks i and j.
+
+specified in Figure 2.
+We formulate the action planning problem as the identification of the best path on a directed graph G = (Ug , Eg ), where
+H
+0
+1
+2
+...
+n-1
+n
+R
+Ug is the set of vertices and Eg is the set of edges, and:
+0
+∞
+s0,1
+s0,2
+...
+s0,n−1
+s0,n
+• Ug,i is a set of ROBOT C ONFIGURATIONS, that corresponds
+s1,0
+∞
+s1,2
+...
+s1,n−1
+s1,n
+1
+...
+...
+...
+...
+...
+...
+...
+to the goal of the ith ROBOT M OVEMENT;
+n-1
+sn−1,0
+sn−1,1
+sn−1,2
+...
+∞
+sn−1,n
+• Eg,j connects two sets of ROBOT C ONFIGURATIONS , i.e.,
+sn,0
+sn,1
+sn,2
+...
+sn,n−1
+∞
+n
+each edge is a set of ROBOT M OVEMENTS.
+Indeed, Ug,i includes all the ROBOT C ONFIGURATIONS that are
+A duration cost function fd can be therefore defined as:
+logically equivalent for the task (e.g., each one is the location of
+XX
+R
+H H
+equivalent “blue objects”). Furthermore, if the representation of
+fd =
+dR
+(4)
+i bi,j + di bi,j
+the location is in the Cartesian space, many joint configurations
+i
+j
+may correspond to each Cartesian pose.
+pk
+R
+where dH
+i and di are the expected duration of task ti ∈ T
+For a generic action composed of n movements, the set of
+when performed by the human and by the robot separately.
+vertices is therefore given by
+However, (4) does not consider coupling effects between the
+n
+[
+robot and the human. For example, if the robot and the human
+Ug =
+Ug,i
+move to the same area concurrently, the robot will either stop
+i=0
+or slow down for safety reasons. To capture this synergy, we
+H
+where the starting vertex Ug,0 is a single ROBOT C ONFIGURATION define ∆dR
+i,j and ∆di,j as
+since the starting configuration is usually known.
+R
+R
+H
+H
+∆dR
+and ∆dH
+(5)
+i,j = di,j − di
+i,j = di,j − di
+The action planner shall find the shortest path on G from
+a vertex in Ug,0 to a vertex in Ug,n . The advantage of this where dR is the expected duration of task tpk performed by
+i,j
+i
+formulation is that it maps a symbolic task into all its possible the robot while the human is performing tpk (and vice versa
+j
+realizations. Recalling the example of the blue cubes, the best for dH ). The synergy cost function f is therefore defined as:
+s
+i,j
+action is optimal for all possible inverse kinematic solutions
+XXX
+H R
+H R H
+of all grasping points of all available blue cubes.
+fs =
+∆dR
+i,j bj,k bi,k + ∆di,j bj,k bi,k
+i
+
+III. O PTIMIZATION AND SOLVERS
+This section proposes algorithms to solve task and action
+planning problems despite the high computational complexity
+of these problems in real-world scenarios. Without loss of
+generality, we will refer to the case where the workers are one
+robot and one human.
+
+!
+=
+
+XX
+i
+
+si,j
+
+j
+
+X
+
+The robot and the operator can perform only one task during
+a particular interaction window, namely:
+X
+X
+∀ j s.t. yj ∈ Y,
+bR
+bH
+(2)
+i,j = 1, and
+i,j = 1
+i
+
+Each task can be assigned only once during a process and thus
+executed only by the human or the robot, i.e.,
+X
+H
+∀ i s.t. tpi k ∈ T ,
+bR
+(3)
+i,j + bi,j = 1
+
+R
+bH
+j,k bi,k
+
+(6)
+
+k
+
+H
+where si,j = ∆dR
+i,j + ∆di,j is a synergy coefficient, i.e., an
+index of the simultaneous tasks coupling, as shown in Table I.
+In conclusion, the solution plan π is a solution to the
+following multi-objective optimization problem:
+
+π
+
+Consider a set of interaction windows Y = {yj } during
+which the human and the robot perform some task tpi k
+R
+associated with a production target pk . Let bH
+i,j and bi,j be
+binary control variables such that:
+(
+1, if the robot does tpi k during yj
+R
+bi,j =
+0, otherwise
+(
+(1)
+1, if the human does tpi k during yj
+H
+bi,j =
+0, otherwise.
+
+j
+
+k
+
+minimize {fd , fs }
+
+A. Optimization of collaborative processes
+
+i
+
+j
+
+(7)
+
+subject to constraints (2) and (3). This paper focuses on timeefficiency criteria, but the extension to other objectives is
+straightforward and does not undermine the search strategy.
+B. Task planning as multi-objective search
+The synthesis of a plan π uses a domain-independent
+refinement search, briefly described in Algorithm 1. Timelines
+are refined iteratively to solve inconsistencies. We detect flaws
+in the current partial plan at each iteration, select which flaw
+to solve, and refine the plan by applying possible solutions.
+Each solution determines an alternative refinement and, thus,
+an alternative partial plan. Unexplored partial plans compose
+the fringe of the search space and are collected into a dedicated
+data structure in case of backtracking. A solution is found when
+the partial plan extracted from the fringe does not contain flaws.
+Three points are crucial in Algorithm 1: first, the selection
+of the flaw to solve for plan refinement (line 5); second, the
+selection of the next partial plan (line 8); third, the computation
+of the objective functions.
+
+

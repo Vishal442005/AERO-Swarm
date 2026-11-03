@@ -1,0 +1,72 @@
+[
+  {
+    "id": "2507.15283",
+    "venue": "IEEE Transactions on Cybernetics",
+    "title": "Event-Triggered Resilient Consensus of Networked Euler-Lagrange Systems under Byzantine Attacks"
+  },
+  {
+    "id": "2502.06359",
+    "venue": "IEEE Transactions on Cybernetics",
+    "title": "Occlusion-Aware Contingency Safety-Critical Planning for Autonomous Driving"
+  },
+  {
+    "id": "2407.11413",
+    "venue": "IEEE Transactions on Cybernetics",
+    "title": "Achieving distributed convex optimization within prescribed time for high-order nonlinear multiagent systems"
+  },
+  {
+    "id": "2308.09326",
+    "venue": "IEEE Transactions on Cybernetics",
+    "title": "Distributed Neurodynamics-Based Backstepping Optimal Control for Robust Constrained Consensus"
+  },
+  {
+    "id": "2303.14874",
+    "venue": "IEEE Transactions on Cybernetics",
+    "title": "Optimal task and motion planning and execution for human-robot multi-agent systems"
+  },
+  {
+    "id": "2606.26164",
+    "venue": "Swarm and Evolutionary Computation",
+    "title": "A GPU-Native Parallel Optimizer for Multimodal Black-Box Functions"
+  },
+  {
+    "id": "2506.23734",
+    "venue": "Swarm and Evolutionary Computation",
+    "title": "Governing Strategic Dynamics: Equilibrium Stabilization via Divergence-Driven Control"
+  },
+  {
+    "id": "2512.19321",
+    "venue": "Swarm and Evolutionary Computation",
+    "title": "Learning to Sample in Variable Neighborhood Search Algorithm for Urban Cable Routing Optimization"
+  },
+  {
+    "id": "2610.33421",
+    "venue": "Swarm and Evolutionary Computation",
+    "title": "Freezing Mechanism and Topology Dependence of Information Flow Structure in Flocking"
+  },
+  {
+    "id": "2304.03057",
+    "venue": "Robotics and Autonomous Systems",
+    "title": "Distributed UAV Formation Control Robust to Relative Pose Measurement Noise"
+  },
+  {
+    "id": "2610.35582",
+    "venue": "Robotics and Autonomous Systems",
+    "title": "Distributed Predictive Flocking for a Swarm of Miniature Vibration-Driven Robots in a Confined Arena"
+  },
+  {
+    "id": "2407.07409",
+    "venue": "Robotics and Autonomous Systems",
+    "title": "Distributed multi-robot potential-field-based exploration with submap-based mapping"
+  },
+  {
+    "id": "2209.10513",
+    "venue": "Robotics and Autonomous Systems",
+    "title": "Consensus-based Fast and Energy-Efficient Multi-Robot Task Allocation"
+  },
+  {
+    "id": "2409.12713",
+    "venue": "Robotics and Autonomous Systems",
+    "title": "A Signal Temporal Logic Approach for Task-Based Coordination of Multi-Aerial Systems"
+  }
+]

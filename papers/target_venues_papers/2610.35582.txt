@@ -1,0 +1,214 @@
+Highlights
+Distributed Predictive Flocking for a Swarm of Miniature Vibration-Driven Robots in a
+Confined Arena
+Prajol Shrestha, Siddhant Mohapatra, Filip Novkoski, Julian Oelhaf, Nicolas Vandewalle, Ana-Sunčana Smith,
+Andreas Maier
+• Distributed leader-free predictive flocking for a dense swarm of miniature robots.
+
+arXiv:2610.35582v1 [cs.RO] 26 Oct 2026
+
+• Six safety formulations compared on a single common controller footing.
+• Look-ahead safety constraint gives widest margins and fewest collisions.
+• Single generalized controller deployed to handle different tasks successfully.
+• Swarm stays coordinated up to the geometric packing limit in each task.
+
+Distributed Predictive Flocking for a Swarm of Miniature
+Vibration-Driven Robots in a Confined Arena⋆
+Prajol Shresthaa,∗ , Siddhant Mohapatrab , Filip Novkoskib , Julian Oelhafa , Nicolas Vandewallec ,
+Ana-Sunčana Smithb,d and Andreas Maiera
+a Pattern Recognition Lab, Department of Computer Science, Friedrich-Alexander-Universität Erlangen-Nürnberg, 91058, Erlangen, Germany
+b PULS, Institute for Theoretical Physics, Friedrich-Alexander-Universität Erlangen-Nürnberg, 91058, Erlangen, Germany
+c GRASP, Institute of Physics B5a, University of Liège, B4000, Liège, Belgium
+d Group for Computational Life Sciences, Division of Physical Chemistry, Ruđer Bošković Institute, 10000, Zagreb, Croatia
+
+ARTICLE INFO
+
+ABSTRACT
+
+Keywords:
+Distributed model predictive control
+Multi-robot systems
+Control barrier functions
+Collision avoidance
+Collective behavior
+
+Coordinating many miniature robots in a confined arena, with no leader, central planner, or
+global map, is a core challenge for swarm robotics. As the swarm grows denser, collision
+avoidance becomes the limiting factor, and the number of safely coexisting robots depends on
+the formulation of the inter-robot safety constraint. We present a distributed predictive flocking
+controller in which each robot solves its own nonlinear model predictive control (NMPC)
+problem, optimizing swarm cohesion and alignment costs, inter-robot and obstacle safety, and a
+task objective, while exchanging only predicted trajectories with local neighbors. Within this
+generalized controller architecture, solved in real time, we compare six barrier and controlbarrier-function (CBF) safety formulations on a digital twin of an open-source vibration-driven
+bristlebot in a 0.64 m2 arena. A look-ahead discrete-time CBF performs best overall, with the
+fewest collisions and the widest inter-robot margins across nearly every swarm size tested.
+We deploy it on phototaxis, phototactic orbiting, and cohesion without a stimulus tasks, using
+swarm sizes starting from ten robots and up to the geometric packing limit. The swarm holds
+well: collisions stay low in small swarms, rising steeply as the packing limit approaches, while
+coordination and cohesion degrade gently rather than collapsing. The swarm is found not to
+trade safety for order, keeping both across the confined arena, with local alignment high at every
+swarm size.
+
+1. Introduction
+Autonomous multi-robot systems are a promising approach for tasks in cluttered, inaccessible, or hazardous spaces,
+from confined-structure inspection to search in collapsed buildings and medical micro-robotics [1]. In these settings,
+many miniature robots must coordinate in proximity within a tight, bounded arena. As in natural swarms, such as
+flocking of starlings, schooling of fish, the crowded colonies of ants and honey bees, and even the collective migration
+of cells, robust group behavior emerges from purely local interactions among simple agents [2, 3, 4], with no central
+control [1]. Miniaturization, however, tightly bounds onboard compute, memory, and power [5], demanding control
+that is theoretically principled yet computationally light. Moreover, when the arena is fixed, a growing number of robots
+increases the density of the swarm and hinders smooth motion. When it is also cluttered with obstacles, coordination
+is even harder. In this scenario, collision avoidance becomes the central challenge.
+The standard way to coordinate such a swarm from purely local interactions is Reynolds’ boid model [6, 7], which
+reduces collective motion to three local rules (cohesion, alignment, and separation) that produce coherent group motion
+without global information [8]. Early control laws formalized these as artificial potential fields over a communication
+graph [9, 10], and reactive velocity-matching rules scale to tens of drones [11]. Such reactive methods, however, offer no
+predictive horizon, no formal safety guarantee under nonlinear dynamics, and no systematic handling of kinodynamic
+limits. These shortcomings are especially severe in confined, high-density settings, where many underactuated robots
+have little room to recover from unsafe motions.
+⋆
+
+This work was supported by the Pattern Recognition Lab, Friedrich-Alexander-Universität Erlangen-Nürnberg.
+
+∗ Corresponding author
+
+prajol.shrestha@fau.de (P. Shrestha); andreas.maier@fau.de (A. Maier)
+
+ORCID (s): 0009-0005-9585-3800 (P. Shrestha)
+
+Shrestha et al.: Preprint submitted to Elsevier
+
+Page 1 of 26
+
+Distributed Predictive Flocking for a Swarm of Miniature Vibration-Driven Robots in a Confined Arena
+
+Model predictive control (MPC) [12] addresses these limitations. For the nonlinear dynamics of mobile robots,
+this takes the form of nonlinear MPC (NMPC). It solves a finite-horizon optimal control problem (OCP) online,
+which provides closed-loop feedback, constraint satisfaction, and explicit multi-objective trade-offs. Distributed MPC
+(DMPC) extends this to a swarm by splitting the global problem into per-agent OCPs coupled through shared
+constraints [13, 14, 15, 16]. Solvers such as the Sequential Quadratic Programming real-time iteration (SQP-RTI) [17]
+solve each per-agent OCP in real time. Similarly, optimization-based swarm planners achieve strong real-world
+navigation [18, 19, 20, 21]. These methods are mainly developed for point-to-point navigation [14, 22], with collision
+avoidance typically encoded as geometric constraints such as separating hyperplanes or safe corridors.
+The closest works embed Reynolds behaviors in NMPC. They have been demonstrated on up to 16 quadrotors [23,
+24], leader-follower teams [25, 26, 27], and fixed-wing unmanned aerial vehicles (UAVs) [28]. Most share one regime.
+They assume sparse flight in large 3D airspace, with the swarm migrating toward a shared goal. Even when several
+obstacles are present, they remain sparse relative to the available space, keeping the environment effectively lowdensity. Few address the opposite regime that we target, where many underactuated robots coordinate at high density
+in a fixed, confined, and cluttered arena under a task objective such as following a light gradient. Here, the inter-robot
+safety formulation, not free-space planning, governs how many robots can coexist. Each of these works, however, fixes
+a single safety formulation in advance, usually a distance constraint or a penalty. It remains open which formulation
+fits the most robots into a fixed arena with minimal collisions.
+Safety formulations differ in how collision avoidance is encoded as a constraint in the OCP. Such a constraint is
+classically formulated using a barrier function ℎ(𝑥) whose safe set  = {𝑥 ∣ ℎ(𝑥) ≥ 0} is kept forward invariant
+to certify safety [29], typically imposed as a hard [30] or soft [31] distance constraint. A Control Barrier Function
+(CBF) [29] relaxes this strict boundary condition by allowing ℎ(𝑥) to decrease at a rate bounded by a class- function,
+and its discrete-time form (Dt-CBF) [32] imposes this at each MPC stage. Zeng et al. [33] enforces it as a hard
+constraint, which is often infeasible. Feasibility is restored by softening the decay with slack variables [34, 35, 36],
+adding terminal barrier terms [37, 38], or anchoring a soft CBF with one hard step [39]. Beyond feasibility, when the
+constraint has relative degree greater than one, as for a distance constraint under unicycle dynamics, a higher-order CBF
+(HOCBF) [40, 41] chains the barrier conditions. Lu et al. [39] compare a distance-constraint MPC, a hard discrete-time
+CBF, a slacked CBF, and their combination on a common footing, but for a single robot. In the multi-robot setting, safety
+is enforced by reactive schemes [42, 43], by post-hoc CBF-QP (quadratic program) filters [44], or by a CBF inside a
+decentralized MPC with neighbors as predicted trajectories [45, 46, 47, 48]. A formulation’s collision performance,
+however, likely changes with the swarm density. A comparison across densities is required to find the best one.
+In this work, we investigate the maximum number of miniature robots a distributed predictive controller can flock in
+a fixed arena, and design a controller to push that limit. Each robot solves its own NMPC combining Reynolds cohesion,
+alignment, and separation (gated by neighbor presence) with inter-robot/obstacle safety and the task objective. It selects
+the 𝐾 nearest neighbors within the communication radius and exchanges predicted trajectories synchronously as OCP
+parameters, giving a fully distributed, leader-free architecture with no central planner or global map. We evaluate it
+on a physics-informed digital twin [49] of the GRASPion [50], an open-source vibration-driven bristlebot studied as
+an active-matter model system. We characterize how densely the swarm packs a 0.64 m2 arena while sustaining two
+behaviors. These are phototaxis (ascending toward a moving Gaussian light gradient) and a phototactic orbital mode
+(orbiting the source along the intensity level-set). We compare six inter-robot safety formulations on a common footing
+(Section 3.3). A slacked barrier paired with a discrete-time CBF at a forward handle [51] sustains the highest density
+with the fewest collisions. The main contributions of this paper are as follows:
+1. A distributed predictive control system for dense swarms of miniature vibration-driven robots. Each robot solves
+its own NMPC fusing flocking, safety, and the task objective, coupled to neighbors only through exchanged
+predicted trajectories.
+2. Demonstration that a single controller generalizes across qualitatively different collective behaviors. The same
+architecture produces gradient-ascending phototaxis, stable phototactic orbital formation, and generic flocking
+with no modification to the safety or coordination layers, showing that task objectives and coordination structure
+are separable and that new tasks can be added without re-deriving safety guarantees.
+3. A careful comparison of six inter-robot safety formulations within one identical controller, isolating the safety
+constraint as the only varying factor. The Look-ahead Slack Dt-CBF gives the best overall trade-off for the
+phototaxis deployment target.
+Shrestha et al.: Preprint submitted to Elsevier
+
+Page 2 of 26
+
+Distributed Predictive Flocking for a Swarm of Miniature Vibration-Driven Robots in a Confined Arena
+
+4. Characterization of the operating swarm density that the controller sustains in a fixed arena. The swarm stays
+cohesive with few collisions in small swarms; collisions rise steeply towards the geometric packing limit, as
+saturation sets in, while coordination and feasibility degrade gently rather than collapse.
+The remainder of this paper is structured as follows. Section 2 presents the robot model, light field, control
+architecture overview, behavior generation, flocking rules, and the DMPC OCP. Section 3 reports the simulation
+results, including the safety-formulation study (Section 3.3), the analysis of collective behavior (Section 3.4), and the
+quantification of collision avoidance under different tasks (Section 3.5). Section 4 summarizes the work and provides
+an outlook for future studies.
+
+2. Preliminaries and Problem Statement
+In this work, we consider a swarm of 𝑁𝑏 robots operating in a bounded arena  = [−𝐴ℎ , 𝐴ℎ ]2 ⊂ ℝ2 , with each
+robot labeled by 𝑖 ∈ {1, … , 𝑁𝑏 }. The state of robot 𝑖 is 𝒙𝑖 = [𝒑𝑖 , 𝜃𝑖 ]⊤ ∈ ℝ3 , where 𝒑𝑖 = [𝑝𝑥,𝑖 , 𝑝𝑦,𝑖 ]⊤ is the position and
+𝜃𝑖 the heading. Inter-robot communication is modeled as a directed sensing graph  = (, ), where  = {1, … , 𝑁𝑏 }
+denotes the set of robots and  ⊆  ×  is the communication set of ordered pairs (𝑖, 𝑗) for which robot 𝑖 can observe
+robot 𝑗. The neighbor set of robot 𝑖 is 𝑖 = {𝑗 ∈  ∣ (𝑖, 𝑗) ∈ }. We adopt a topological neighborhood with fixed
+cardinality |𝑖 | ≤ 𝐾, selecting the 𝐾 nearest robots within communication radius 𝑅comm of robot 𝑖. This choice
+keeps the neighbor count constant and avoids the cost discontinuities that arise under Voronoi or attraction-based
+topologies [52, 53, 54]. Each robot additionally accounts for up to 𝑀 nearby static circular obstacles within a sensing
+range 𝑑obs , indexed by 𝑚 ∈ {1, … , 𝑀}, with obstacle 𝑚 at center 𝒑𝑚 ∈ ℝ2 and radius 𝑟𝑚 . The environment also
+includes a single light source whose intensity field serves as the swarm stimulus.
+The OCP is compiled once with a fixed parameter dimension. Neighbor and obstacle information therefore enters
+two fixed-size blocks of 𝐾 and 𝑀 slots, the neighbor block and the obstacle block. At each control step, robot 𝑖 receives
+{
+}𝑁
+2
+2
+̂ (𝑘) ⊤ 𝑘=0 from each neighbor 𝑗 ∈ 𝑖 , where 𝒑̂ (𝑘)
+̂ (𝑘)
+a predicted trajectory 𝝉𝑗 = [𝒑̂ (𝑘)
+𝑗 , 𝒗𝑗 ]
+𝑗 ∈ ℝ and 𝒗𝑗 ∈ ℝ are the
+predicted position and velocity of neighbor 𝑗 at horizon stage 𝑘. Throughout, a hat denotes a quantity the per-robot
+OCP treats as fixed data (the ego robot’s current measured state and the neighbors’ received predicted trajectories).
+The ego robot’s own predicted states are decision variables. These trajectories fill the neighbor block, and the number
+of occupied slots changes from step to step. Each neighbor slot therefore carries a binary activation mask 𝑎(𝑘)
+𝑗 ∈ {0, 1},
+(𝑘)
+where 𝑎(𝑘)
+𝑗 = 1 if slot 𝑗 is occupied at stage 𝑘 and 𝑎𝑗 = 0 otherwise. The obstacle block is filled the same way. Robot
+𝑖 selects the 𝑀 nearest obstacles within obstacle sensing range 𝑑obs and writes each center 𝒑𝑚 into a slot together with
+its own activation flag.
+
+2.1. Robot Model
+Each robot is modeled as a rigid ellipse with semi-major axis 𝑎 and semi-minor axis 𝑏, matching the physical
+footprint of the GRASPion open-source bristlebot [50], as illustrated in Fig. 1. The simulated elliptical agent is modeled
+after this hardware platform, following the physics-informed digital twin of [49], so the simulation study is grounded
+in a physical robot footprint and can serve as a precursor to future physical experiments.
+The dynamics of each robot are described by a three-state kinematic unicycle model with state 𝒙 ∈ ℝ3 , input
+𝒖 ∈ ℝ2 , and continuous-time dynamics 𝑓 (𝒙, 𝒖) given by
+(1)
+
+𝒙 = [ 𝑝 𝑥 , 𝑝 𝑦 , 𝜃 ]⊤ ,
+
+(2)
+
+𝒖 = [ 𝑣, 𝜔 ]⊤ ,
+⊤
+
+𝒙̇ = 𝑓 (𝒙, 𝒖) = [ 𝑣𝑥 , 𝑣𝑦 , 𝜔 ] ,
+
+(3)
+
+where (𝑝𝑥 , 𝑝𝑦 ) is the position, 𝜃 the heading angle, 𝑣 the linear velocity, 𝑣𝑥 = 𝑣 cos 𝜃 and 𝑣𝑦 = 𝑣 sin 𝜃 are the velocity
+components, and 𝜔 the angular velocity. The continuous-time dynamics (3) are integrated using an explicit Runge-Kutta
+4 (ERK-4) integrator with three steps per control interval, yielding the discrete-time map 𝒙(𝑘+1) = 𝐹 (𝒙(𝑘) , 𝒖(𝑘) ).
+
+2.2. Light Field Model
+The arena contains a time-varying light field that each robot senses locally to compute its navigation reference. The
+field is modeled as a Gaussian intensity profile whose source either orbits the arena center or remains stationary.
+Shrestha et al.: Preprint submitted to Elsevier
+
+Page 3 of 26
+
+

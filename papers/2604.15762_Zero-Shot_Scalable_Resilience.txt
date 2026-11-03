@@ -1,0 +1,509 @@
+1
+
+Zero-Shot Scalable Resilience in UAV Swarms:
+A Decentralized Imitation Learning Framework
+with Physics-Informed Graph Interactions
+
+arXiv:2604.15762v2 [cs.LG] 18 May 2026
+
+Huan Lin
+
+, Chun Yang, Lianghui Ding
+
+Abstract—Large-scale UAV failures can fragment a swarm
+network into disconnected sub-networks, making connectivity
+recovery both urgent and difficult. Centralized recovery methods
+rely on global topology information and become difficult to deploy
+after severe fragmentation, while decentralized heuristics and
+existing learning-based methods still degrade under wide variations in swarm scale and damage severity. We present Physicsinformed Graph Adversarial Imitation Learning (PhyGAIL),
+a recovery framework trained under centralized training and
+decentralized execution that adapts graph-based MARL at three
+coupled stages. First, bounded local interaction graphs provide
+scale-stable policy inputs from heterogeneous local observations.
+Second, a physics-gated graph neural network explicitly models attraction and repulsion interactions for reconnection and
+collision avoidance. Third, scenario-adaptive imitation learning
+combines an offline composite expert database, dense GAIL
+rewards, and expert-normalized temporal rewards to stabilize
+training under sparse terminal feedback and variable recovery
+horizons. Structural analysis further explains why PhyGAIL supports scale-free adaptation and stable recovery learning in large
+damaged swarms. In large-scale simulations, a policy trained on
+20-UAV swarms transfers directly to swarms of up to 500 UAVs
+without fine-tuning and achieves superior reconnection reliability,
+recovery efficiency, motion safety, and runtime efficiency over
+representative baselines.
+Index Terms—Resilient network, UAV swarm, multi-agent
+reinforcement learning, graph neural network.
+
+I. I NTRODUCTION
+
+R
+
+ECENT advances in sensing, communication, and autonomous control have made unmanned aerial vehicle
+(UAV) swarms increasingly practical for surveillance, search
+and rescue, and emergency communication [1], [2]. In these
+applications, multiple UAVs cooperate through a UAV swarm
+network (USNET). The network, however, is fragile. Environmental hazards, coordinated failures, or hostile interference
+may disable many UAVs in a single event, splitting the swarm
+into disconnected sub-networks and triggering the communication network split (CNS) problem [3].
+The CNS problem has long been studied through mobilityassisted connectivity restoration in wireless sensor, mobile
+This paper was supported in part by Shanghai Key Laboratory Funding
+under Grant STCSM15DZ2270400, and in part by the Program for Professor
+of Special Appointment (Eastern Scholar) at Shanghai Institutions of Higher
+Learning. (Corresponding author: Lianghui Ding.)
+Huan Lin, Chun Yang, Lianghui Ding, and Yulin Qiu are with the
+Institute of Image Communication and Network Engineering, School of
+Integrated Circuits, Shanghai Jiao Tong University, Shanghai 200240, China.
+Email: lhzt715@sjtu.edu.cn; yangchun123@sjtu.edu.cn; lhding@sjtu.edu.cn;
+qyl7@sjtu.edu.cn.
+
+, Member, IEEE, and Yulin Qiu
+
+ad hoc, and UAV networks [4]–[9]. For large-scale UAV
+swarms, existing solutions are broadly either centralized or
+decentralized, with most relying on hand-crafted recovery
+rules. Centralized recovery plans motion from global topology
+information, which becomes communication-intensive and increasingly impractical when severe fragmentation prevents efficient global state collection. Decentralized heuristic methods
+act on local observations and are easier to deploy after a split,
+but they typically follow fixed recovery rules that adapt poorly
+to large variations in topology and damage severity.
+Multi-agent reinforcement learning (MARL) offers a more
+adaptive alternative [10], [11] because CNS recovery is a
+closed-loop continuous-control problem rather than a oneshot path planning task. Each UAV acts from partial local
+observations, and its motion changes inter-UAV distances,
+reshapes the communication graph, and affects the nextstep observations. A learned decentralized policy is therefore
+attractive because it can adapt online as fragmentation evolves,
+instead of relying on fixed motion rules or repeatedly solving
+a centralized recovery plan after every topology change.
+This perspective reveals three coupled bottlenecks in adapting graph MARL to damaged USNETs. First, if the graph receptive field grows with swarm size, the number of neighbors,
+the message range, and the aggregated feature distribution all
+change, so a policy trained on small swarms can face an out-ofdistribution local decision context in larger swarms [12]. Second, local neighbors can imply opposite interaction semantics,
+pulling disconnected subnets together for reconnection while
+pushing nearby UAVs apart for collision avoidance. Existing
+graph aggregation, however, mainly learns which neighbors
+matter, rather than whether they should induce attraction or
+repulsion. Third, recovery learning becomes increasingly difficult because success feedback is sparse and heavier damage
+creates much longer, harder reconnection episodes. Successful
+reconnection is observed only after separated components
+merge, so before success the main feedback is often the
+step penalty, which can dominate long and difficult episodes.
+Imitation learning [13] can densify guidance, but it must still
+account for scenario difficulty.
+We address these issues with a Physics-informed Graph
+Adversarial Imitation Learning algorithm (PhyGAIL), a decentralized recovery framework trained under centralized training
+and decentralized execution (CTDE). Rather than stacking
+CTDE, graph neural encoding, and imitation learning as
+separate components, PhyGAIL adapts graph MARL at three
+coupled stages: bounded graph construction, physics-gated
+
+2
+
+interaction modeling, and expert-guided imitation training. A
+bounded local interaction graph keeps the policy input scalestable and limits its dependence on global swarm size. Physicsinformed graph neural network (PhyGNN) uses attraction and
+repulsion gates to encode reconnection and safety cues directly
+in message passing, so that the policy can distinguish these
+opposite interaction semantics directly through the architecture
+rather than from sparse environmental feedback alone. An
+expert-guided imitation strategy combines an offline composite
+expert database, dense GAIL rewards, and expert-normalized
+temporal rewards to stabilize training across variable damage
+levels without giving the decentralized test-time actor extra
+global information. Structural analysis of the proposed architecture provides theoretical support for PhyGAIL’s scale-free
+adaptation and stable recovery learning. In large-scale simulations with 50 disconnected post-damage cases per setting,
+PhyGAIL reduces the average recovery time by 24.1% relative
+to the best non-PhyGAIL baseline, while maintaining strong
+reconnection reliability, motion safety, and runtime efficiency.
+The main contributions of this paper are as follows:
+1) A scale-invariant decentralized recovery formulation
+for zero-shot transfer. We enable zero-shot transfer,
+i.e., direct deployment without retraining or fine-tuning,
+from 20-UAV training swarms to networks of up to 500
+UAVs. This is achieved by formulating CNS recovery
+as a decentralized continuous-control problem under
+the CTDE paradigm and constructing bounded local
+interaction graphs for policy execution.
+2) A physics-gated graph neural network for resolving
+neighbor interaction ambiguity. We propose PhyGNN
+to separate attraction from repulsion through dual-gated
+message passing on local interaction edges. This design
+provides a physically meaningful coordination prior for
+reconnection and collision avoidance, reducing the burden of learning opposite motion semantics from sparse
+delayed rewards.
+3) An expert-guided imitation learning strategy for stable variable-damage training. We construct an offline
+expert database by running multiple baseline methods
+across diverse damage severities and selecting the fastest
+successful trajectory for each scenario. Based on this
+database, PhyGAIL combines dense GAIL rewards with
+expert-normalized temporal rewards, improving credit
+assignment and reward balance across variable-length
+recovery tasks.
+The remainder of this paper is organized as follows. Section
+II reviews the related work. Section III formulates the system
+model, conceptualizing the USNET graph and the CNS problem. Section IV details the architectural design and learning
+paradigm of the proposed algorithm. Extensive simulation
+results and performance evaluations are discussed in Sections
+V, followed by the conclusions in Section VI.
+II. R ELATED W ORK
+Existing mobility-based solutions to the Communication
+Network Split (CNS) problem can be grouped into three categories: centralized recovery algorithms, decentralized heuristic
+
+methods, and learning-based approaches. Table I summarizes
+the main CNS recovery families using labels that are detailed
+subsequently in this section.
+A. Centralized Optimization Algorithms
+Early studies treated connectivity restoration as a centralized
+optimization problem and assumed whole-swarm topology
+information at decision time. Senel and Younis [14], Chouikhi
+et al. [9], and Zhang et al. [15] respectively studied relay
+placement, critical-node replacement, and hybrid optimization
+in partitioned networks. More recently, graph-learning methods such as CR-MGC [16] and DEMD [17] further improved
+centralized recovery. Mou et al. used graph convolution in CRMGC to iteratively generate recovery motions from the postdamage global topology. Lin et al. further proposed DEMD
+to inject explicit damage cues into global graph reasoning
+for multihop reconnection. Their common limitation is that
+they still rely on post-damage whole-swarm information and
+centralized inference over the full graph. Such dependence
+is effective when global state can be collected reliably, but
+becomes harder to sustain after severe fragmentation, precisely
+where decentralized recovery is most needed.
+B. Decentralized Heuristic Methods
+After a communication network split, complete global topology is often unavailable or unreliable. Decentralized heuristic
+methods therefore rely on local or intra-subnet information.
+One line uses critical-node replacement, such as volunteerinstigated relocation [18], LeDir [19], and DCRMF [7]. These
+methods are simple and effective in single-node or mildly
+damaged settings, but repeated relocation can trigger cascaded
+motion and coverage loss under more severe failures. Another
+line uses reference-direction or potential-field coordination,
+such as HERO [20] and SIDR [21]. These methods are
+lightweight and deployment-friendly, but their recovery logic
+remains rule-based and becomes less adaptive under large
+topology and damage variations.
+C. Reinforcement Learning-Based Approaches
+Reinforcement learning (RL) is attractive because CNS
+recovery is inherently a sequential continuous-control problem
+under time-varying topology. Each motion decision changes
+inter-UAV geometry and future connectivity, so the policy
+must respond to an evolving recovery state rather than execute
+a fixed relocation rule. Wang et al. [11] proposed GDR-TS,
+which learns topology-sensitive recovery policies from global
+swarm information through centralized graph construction. Li
+et al. [10] proposed CR-MA, which follows a CTDE-style
+MARL design and combines artificial potential fields with
+learned control to support more decentralized execution and
+explicit collision avoidance.
+The baselines mentioned above suggest that graph-based
+RL, CTDE, and collision-aware priors are useful for CNS
+recovery. However, they do not fully resolve large-scale adaptation. GDR-TS remains tied to global graph construction,
+whereas CR-MA supports more decentralized execution but
+
+3
+
+TABLE I
+R EPRESENTATIVE CNS RECOVERY METHODS .
+
+Method
+
+Year Observation Scope† Swarm Scale Damage Scale‡ Collision Avoidance
+
+Centralized optimization
+CIST [14]
+2011
+RNFR [9]
+2017
+HPC-CR [15]
+2019
+CR-MGC [16]
+2022
+DEMD [17]
+2024
+
+Global
+Global
+Global
+Global
+Global
+
+15
+250
+140
+200
+200
+
+Single-node
+Single-node
+Single-node
+Large-scale
+Large-scale
+
+Decentralized heuristic
+HERO [20]
+2011
+LeDir [19]
+2013
+DCRMF [7]
+2018
+SIDR [21]
+2020
+
+Intra-subnet
+Local
+Local
+Intra-subnet
+
+32
+100
+80
+100
+
+Small-scale
+Single-node
+Single-node
+Large-scale
+
+Reinforcement learning-based
+GDR-TS [11]
+2025
+Global
+CR-MA [10]
+2025
+Intra-subnet
+PhyGAIL (ours)
+Intra-subnet
+
+100
+20
+500
+
+Large-scale
+Large-scale
+Large-scale
+
+Recovery Paradigm
+Relay node placement
+Critical-node replacement
+Critical-node replacement
+GNN-based online iteration
+GNN-based online iteration
+
+✓
+
+✓
+
+Potential field coordination
+Critical-node replacement
+Critical-node replacement
+Potential field coordination
+
+✓
+✓
+
+GNN-based online CTCE RL
+CTDE RL + Potential field
+GNN-based zero-shot CTDE RL
+
+† Observation scope is grouped as global (whole-swarm topology access), intra-subnet (information shared within the surviving connected component),
+
+and local (purely node-neighbor observations).
+‡ Damage scale is grouped as single-node, small-scale (≤ 20% failed nodes), and large-scale (≥ 90% failed nodes).
+
+still inherits scale-dependent local graph inputs and relies
+heavily on hand-crafted interaction bias. More broadly, sparse
+terminal rewards and variable recovery horizons motivate
+stronger imitation-learning guidance [13]. These gaps motivate
+PhyGAIL, whose design targets graph construction, interaction
+modeling, and training stability jointly.
+
+III. S YSTEM MODEL
+This section defines the mathematical models for UAV
+swarm connectivity restoration. We first introduce the communication and network models, followed by the mobility
+model. Subsequently, the damage model is described, and the
+decentralized recovery process is formulated as a constrained
+problem.
+Throughout this section, we adopt a first-order system
+abstraction: UAVs move on a common flight layer, communication is predominantly LoS and later approximated
+by an effective disk model, peer-to-peer links are treated
+as symmetric, and the damage event occurs at t0 before
+recovery begins. We further assume that a coarse mission-level
+reference (the virtual center used later in Section IV) and the
+last valid positions of failed nodes are available before severe
+fragmentation, e.g., through pre-failure topology maintenance,
+routing exchange, or shared flight-reference information [16],
+[21]. This information-availability mechanism is an operational assumption adopted to isolate the decentralized postdamage recovery problem, rather than an online estimation
+subsystem solved in the present paper. These assumptions
+isolate the topology restoration problem considered here; vertical maneuvers as an additional control degree of freedom,
+persistent stochastic link outages, online reference generation
+after the split, and sequential damage events are beyond the
+scope of the present system model.
+
+A. Communication Channel and Network Topology
+Consider a highly dynamic UAV swarm network (USNET)
+composed of N homogeneous UAVs, represented by the node
+set U = {u1 , u2 , . . . , uN }. In many surveillance, searchand-rescue, and emergency-communication missions, UAVs
+coordinate on a common flight layer so that sensing coverage, search patterns, and communication footprints remain
+organized over the horizontal plane [1], [2]. Under this operating regime, horizontal separation is the dominant factor
+for pairwise connectivity, while moderate altitude deviations
+act mainly as a secondary perturbation to the link geometry;
+accordingly, planar coordination models are also common in
+CNS recovery methods such as HERO and SIDR [20], [21].
+We therefore formulate the spatial state of node ui ∈ U at any
+discrete time step t using a two-dimensional coordinate vector
+pi (t) = [xi (t), yi (t)]⊤ ∈ R2 , so the problem remains one
+of distributed connectivity restoration under incomplete postdamage network state information rather than pure motion
+coordination.
+To characterize the air-to-air communication links while
+retaining a tractable topology model, we start from the Friis
+transmission equation with a fading term. Assuming a predominantly line-of-sight (LoS) channel, the received signal power
+at UAV uj from a transmitting UAV ui is given by
+2
+
+λc
+|h0 |2 ,
+(1)
+Pij (t) = P0 Gtx Grx
+4πdij (t)
+where P0 is the transmission power, Gtx and Grx are the
+antenna gains, λc is the carrier wavelength, and dij (t) =
+∥pi (t) − pj (t)∥ denotes the Euclidean distance between the
+two UAVs. The term |h0 |2 denotes the small-scale fading
+power gain. Rather than explicitly tracking instantaneous link
+outages, we adopt an equivalent communication radius Dcomm
+for a prescribed link budget and outage tolerance, and ap-
+
+4
+
+proximate the communication condition by dij (t) ≤ Dcomm .
+Consequently, bidirectional communication between ui and uj
+is feasible if and only if dij (t) ≤ Dcomm .
+Since the UAVs are homogeneous and peer-to-peer links are
+assumed symmetric under the same transmission power and
+receiver sensitivity, the global physical topology of the USNET
+at time t is modeled as an undirected graph G(t) = (U, E(t)).
+The edge set E(t) is defined as E(t) = {eij (t) | ui , uj ∈
+U, dij (t) ≤ Dcomm }. Accordingly, the physical neighborhood
+set of node ui , which includes all reachable neighbors within
+its communication coverage, is formulated as
+Ni (t) = {uj ∈ U \ {ui } | eij (t) ∈ E(t)}.
+
+(2)
+
+B. Mobility Model and Safety Constraints
+To characterize the controlled mobility of the UAV swarm,
+we adopt a discrete-time first-order kinematic model. Let t ∈
+{0, 1, 2, . . . } denote the discrete time index, and ∆t represent
+the constant duration of each control step. At each step t,
+the local controller of UAV ui ∈ U outputs a velocity vector
+vi (t) ∈ R2 , and the spatial position is updated as:
+pi (t + ∆t) = pi (t) + vi (t)∆t.
+
+(3)
+
+Considering the physical maneuverability of the UAVs, the
+magnitude of the velocity vector is subject to a maximum
+speed constraint vmax :
+∥vi (t)∥ ≤ vmax ,
+
+∀ui ∈ U.
+
+(4)
+
+In addition to kinematic limits, the autonomous coordination
+must also avoid collisions. To prevent inter-UAV collisions
+during the connectivity restoration process, a minimum safety
+distance Dsaf e is maintained between any pair of UAVs. This
+constraint is defined as:
+∥pi (t) − pj (t)∥ ≥ Dsaf e ,
+
+∀ui , uj ∈ U, i ̸= j.
+
+(5)
+
+Under this mobility framework, the objective of the decentralized recovery algorithm is to determine an optimal velocity
+vi (t) for each UAV, ensuring that both the speed constraint in
+(4) and the safety constraint in (5) are satisfied throughout the
+mission duration.
+C. Damage Model and Network Connectivity
+We consider a scenario where the USNET undergoes massive node failures at initial time t0 due to external hazards.
+Let Udmg ⊂ U denote the set of Ndmg destroyed UAVs, and
+Uact = U \ Udmg represent the set of Nact remaining nodes.
+The post-damage topology is modeled as a remaining graph
+Gact (t) = (Uact , Eact (t)), where the edge set Eact (t) consists
+of links between operational UAVs satisfying the distance
+constraint dij (t) ≤ Dcomm .
+To mathematically evaluate the fragmentation of Gact (t),
+we define the adjacency matrix Aact (t) = [aij (t)] ∈
+{0, 1}Nact ×Nact for i, j ∈ {1, . . . , Nact }, where aij (t) = 1 if
+eij (t) ∈ Eact (t) and aij (t) = 0 otherwise. The degree matrix
+PNact
+Dact (t) is a diagonal matrix with entries Dii = j=1
+aij .
+
+The Laplacian matrix of the remaining graph is then formulated as:
+Lact (t) = Dact (t) − Aact (t).
+(6)
+The connectivity properties of Gact (t) are characterized by
+the eigenvalues of Lact (t), denoted as 0 = λ1 (t) ≤ λ2 (t) ≤
+· · · ≤ λNact (t). The graph is connected if and only if the
+second smallest eigenvalue (i.e., the Fiedler value) satisfies
+λ2 (t) > 0 [22]. In the event of a Communication Network
+Split (CNS), the graph decomposes into Ns (t) disjoint subnetworks, where Ns (t) equals the multiplicity of the zero
+eigenvalue of Lact (t). Therefore, we focus on massive damage
+scenarios where Ns (t0 ) > 1. The recovery objective is to
+control the velocity vi (t) of each remaining UAV ui ∈ Uact
+such that the disjoint sub-networks merge, eventually achieving λ2 (t0 + Tres ) > 0 within a finite duration Tres .
+D. Problem Formulation for Decentralized Recovery
+The primary objective of the resilient coordination is to
+restore the global network connectivity of the fragmented
+USNET within a minimum time duration Tres . Unlike centralized approaches that rely on a global state, we consider
+a decentralized execution paradigm where each remaining
+UAV ui ∈ Uact determines its control action from localized
+observations together with the shared reference established
+before fragmentation.
+At each time step t, a UAV ui perceives its local environment through a limited observation space Oi (t), which is
+derived from its physical neighborhood Ni (t), nearby failednode cues, and the pre-shared virtual center. The decentralized
+control policy, parameterized by θ and denoted as πθ , maps
+the local observation to a continuous velocity vector:
+vi (t) = πθ (Oi (t)),
+
+∀ui ∈ Uact .
+
+(7)
+
+Mathematically, the decentralized connectivity restoration
+problem is formulated as:
+(P1) :
+
+min E[Tres ]
+
+(8)
+
+πθ
+
+s.t.
+
+λ2 (t0 + Tres ) > 0,
+∥vi (t)∥ ≤ vmax ,
+
+(C1)
+∀ui , t,
+
+(C2)
+
+∥pi (t) − pj (t)∥ ≥ Dsaf e ,
+
+∀i ̸= j, t, (C3)
+
+Oi (t) ⊆ {pj (t), vj (t) | uj ∈ Ni (t) ∪ {ui }}
+∪ {pk (t) | uk ∈ Udmg , dik (t) ≤ Dcomm }
+∪ {pcenter }.
+
+(C4)
+
+Constraints (C1)-(C3) enforce global connectivity restoration, kinematic limits, and collision avoidance, respectively.
+Constraint (C4) restricts the policy execution to a strictly
+decentralized manner. Problem P1 therefore defines the ideal
+constrained control objective. Since directly solving P1 over
+decentralized continuous policies is intractable, Section IV
+introduces a reward-based learning surrogate that is designed
+to approximate the minimization of Tres while respecting
+the same physical and informational constraints during policy
+learning and execution.
+
+

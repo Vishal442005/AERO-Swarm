@@ -1,0 +1,405 @@
+E QUIVARIANT S HEAF N EURAL N ETWORKS : L EARNING
+G EOMETRIC T RANSPORT ON G RAPHS
+Alessio Borgi1,3∗ Mario Severino1,2∗ Fabrizio Silvestri3
+
+Pietro Liò1
+
+1
+
+Department of Computer Science and Technology, University of Cambridge
+2
+Department of Information Engineering, University of Padua
+3
+Department of Computer, Control and Management Engineering, Sapienza University of Rome
+
+arXiv:2608.28853v3 [cs.LG] 1 Oct 2026
+
+A BSTRACT
+Equivariant graph neural networks constrain how geometric features transform, but
+efficient first-order architectures remain limited in how vector information can be
+transported across graph edges. We introduce ESNN, an Equivariant Sheaf Neural
+Network that learns directed, matrix-valued transport between neighboring vector
+features while preserving exact Euclidean equivariance. Rather than increasing
+representation order, ESNN retains first-order scalar and vector features and places
+additional geometric expressivity in the edge interactions themselves. Its transport
+mechanisms range from isotropic transformations to feature-conditioned rotations
+and anisotropic radial–tangential actions, allowing vector messages to be transformed according to the local geometry before aggregation. We also equip ESNN
+with a controlled symmetry-relaxation mechanism for systems with a preferred
+ambient direction, preserving exact equivariance to the remaining symmetry while
+recovering full E(n)-equivariance as a special case. Across diverse geometric
+learning problems spanning physical dynamics, point clouds, and molecular systems, ESNN improves predictive performance over first-order equivariant baselines,
+learns a latent preferred direction from data, and remains robust to unseen rotations.
+These results establish edge-wise geometric transport as a source of equivariant
+expressivity that does not require higher-order representations.
+
+1
+
+I NTRODUCTION
+
+Many physical systems, from molecular dynamics to fluid mechanics, are naturally represented as
+geometric graphs embedded in Euclidean space (Satorras et al., 2021; Brandstetter et al., 2022; Du
+et al., 2023; Wang et al., 2024b; Aykent & Xia, 2025). Their states may contain invariant scalar attributes together with vectors or tensors that transform with the geometry (Schütt et al., 2021; Simeon
+& De Fabritiis, 2023; Liao et al., 2024). Equivariant neural networks encode these transformation
+laws directly, ensuring predictable behavior under translations, rotations, and, when appropriate,
+reflections. Equivariance alone, however, does not determine how geometric information should be
+transformed as it passes between neighboring nodes. Many interactions are intrinsically directional:
+longitudinal and transverse responses, shear, and anisotropic propagation depend on local orientation
+rather than on distance alone. Existing geometric architectures capture this structure in different
+ways. Cartesian models work efficiently with invariant scalars and first-order vectors (Satorras et al.,
+2021; Schütt et al., 2021), while steerable models enrich the propagated representations through
+higher-order features, spherical harmonics, and tensor products (Thomas et al., 2018; Batatia et al.,
+2025; 2022). We instead retain a first-order scalar–vector representation and increase expressivity
+through richer geometric transport of vector features. This perspective is closely related to Sheaf
+Neural Networks (SNNs), where interactions between local feature spaces are mediated by matrixvalued maps (Hansen & Gebhart, 2020; Bodnar et al., 2022). Generic sheaf maps, however, are
+not inherently constrained to respect the transformation laws of geometric vector features. ESNN
+addresses this by constraining matrix-valued edge transport to satisfy Euclidean equivariance. Each
+transport separates an O(n)-covariant spatial action from invariant mixing across vector channels,
+allowing the geometric transformation applied to a message to depend on the local interaction while
+∗
+Equal
+contribution.
+ab3352@cam.ac.uk
+
+†
+
+Corresponding
+
+author:
+
+1
+
+alessio.borgi@uniroma1.it,
+
+EGNN
+
+SNN
+
+edge message j → i
+
+sheaf message j → i
+
+rij
+
+j
+
+i
+
+ESNN
+sheaf message j → i
+
+rij
+
+Fi
+
+Fj
+
+rij
+
+Fi
+
+Fj
+
+ϕ(∥rij ∥)
+
+·
+
+= Wij
+isotropic scalar transport
+Schematic spatial motifs:
+
+compression ✓
+
+shear ×
+
+torsion ×
+
+equivariance test
+input x
+rotated Qx
+f (x) Q
+exp.
+Qf (x)
+
+i
+
+i
+✓ f (Qx) = Qf (x)
+
+equivariant ✓
+
+anisotropic ×
+
+Sij spatial Mij channels
+Schematic spatial motifs:
+
+unconstrained coupling map
+Schematic spatial motifs:
+
+compression ✓
+
+shear ✓
+
+torsion ✓
+
+equivariance test
+input x
+rotated Qx
+f (Qx)
+f (x) Q
+exp.
+Qf (x) ̸=
+i
+i
+× f (Qx) ̸= Qf (x)
+
+equivariant ×
+
+anisotropic ✓
+
+compression ✓
+
+shear ✓
+
+torsion ✓
+
+equivariance test
+input x
+rotated Qx
+f (x) Q
+exp.
+Qf (x)
+
+i
+
+i
+✓ f (Qx) = Qf (x)
+
+equivariant ✓
+
+anisotropic ✓
+
+Figure 1: Edge-wise geometric transport in EGNN-style models, generic sheaf networks, and ESNNs.
+EGNN-style models couple invariant weights with relative displacements, while sheaf networks allow
+matrix-valued maps between local feature spaces. ESNN combines matrix-valued transport with
+exact equivariance through O(n)-covariant spatial actions and invariant channel mixing.
+retaining scalar–vector representations throughout the network. We instantiate this framework through
+a family of transport mechanisms, from identity and isotropic cases to feature-conditioned rotations
+and anisotropic radial–tangential transport. ESNN also accommodates systems with a preferred
+ambient direction, such as those governed by gravity or imposed flow. This direction may be specified
+from prior knowledge or learned from data. The resulting model remains exactly equivariant to the
+subgroup that preserves the preferred direction, while full E(n)-equivariance is recovered when
+the directional conditioning is inactive. Figure 1 contrasts EGNN-style isotropic message passing,
+unconstrained sheaf transport, and ESNN’s equivariant matrix-valued transport.
+Our main contributions are summarized as follows: (i) We introduce Equivariant Sheaf Neural
+Networks, a first-order Cartesian framework that learns matrix-valued transport of vector features
+across graph edges while preserving E(n)-equivariance. (ii) We develop a family of equivariant
+transport mechanisms that progressively enrich how vector features interact across edges, from
+identity and isotropic transport to feature-conditioned orthogonal transformations and anisotropic
+radial–tangential transport. (iii) We extend ESNN to systems with a preferred ambient direction, while
+retaining exact equivariance to the corresponding stabilizer subgroup, and evaluate the framework
+across particle dynamics, mesh-based physical simulation, point-cloud classification, and molecular
+property prediction.
+
+2
+
+R ELATED W ORK AND BACKGROUND
+
+Related Work. ESNN combines ideas from equivariant message passing and sheaf-based graph
+learning. Cartesian architectures such as EGNN (Satorras et al., 2021) and scalar–vector models such
+as PaiNN and GVP (Schütt et al., 2021; Jing et al., 2021) achieve efficient E(n)-equivariance using
+invariant scalars together with low-order covariant features. Steerable architectures instead propagate
+higher-order representations and couple them through equivariant tensor products (Thomas et al.,
+2018; Fuchs et al., 2020; Brandstetter et al., 2022; Batatia et al., 2022; Liao et al., 2024). ESNN
+remains in the first-order scalar–vector setting, but increases geometric expressivity by enriching
+the transport applied to vector features rather than by introducing higher-order representations. The
+transport viewpoint is closely related to SNNs, where scalar edge weights are replaced by linear maps
+between local feature spaces (Hansen & Gebhart, 2020; Bodnar et al., 2022). Subsequent work has
+explored more structured forms of transport, including orthogonal connection maps for geometric
+propagation (Barbero et al., 2022a) and directed and asymmetric sheaf propagation (Ribeiro et al.,
+2026; Fiorini et al., 2026). Closely related copresheaf formulations place similar emphasis on directed
+maps and their composition across the graph (Hajij et al., 2025). ESNN adopts this matrix-valued view
+of message transport, but constrains the learned maps to respect the Euclidean transformation laws of
+geometric vector features. A complementary line of work studies settings in which external structure
+reduces the symmetry of the problem. Subequivariant models enforce the stabilizer of a prescribed
+2
+
+direction (Han et al., 2022), while relaxed-equivariant approaches learn controlled departures from
+an underlying symmetry (Wang et al., 2022; Hofgard et al., 2024). ESNN incorporates a preferred
+direction within the transport framework, retaining exact stabilizer equivariance and recovering full
+E(n)-equivariance when the directional conditioning is inactive. Further discussion of related work
+is provided in Appendix A.
+2.1
+
+G EOMETRIC BACKGROUND
+
+We consider a physical system represented by a graph G = (V, E), where each node i ∈ V has
+coordinates xi ∈ Rn . We seek message-passing operators that respect Euclidean symmetries while
+allowing interactions to depend on local geometry. We first specify the relevant feature transformations
+and then introduce the cellular-sheaf viewpoint that motivates the transport construction of Section 3.
+Equivariance. The Euclidean group E(n) = O(n) ⋉ Rn acts on coordinates and relative displacements as:
+xi 7→ Qxi + t,
+
+rij = xi − xj 7→ Qrij ,
+
+Q ∈ O(n),
+
+t ∈ Rn
+
+(1)
+
+Relative displacements are therefore translation invariant, and operations built from relative geometry
+only need to preserve the corresponding O(n) transformation laws.
+Feature Representation. Each node carries invariant scalar features si ∈ Rcs and covariant vector
+features Vi ∈ Rn×cv , collected as:
+hi = (si , Vi ),
+
+si 7→ si ,
+
+Vi 7→ QVi
+
+(2)
+
+The corresponding local feature space is F(i) = Rcs ⊕ (Rn ⊗ Rcv ), which we interpret below as the
+node stalk. ESNN transports the vector component geometrically, while scalar features are propagated
+through invariant operations.
+Cellular Sheaves and Transport. Standard message passing implicitly assumes that neighboring
+features can be compared and aggregated in a common space. Cellular sheaves generalize this picture
+by assigning local vector spaces to nodes and edges together with linear restriction maps (Hansen
+& Gebhart, 2020; Bodnar et al., 2022). For an edge e = {i, j}, a cellular sheaf provides an edge
+stalk F(e) and maps ρi→e : F(i) → F (e) and ρj→e : F(j) → F(e), which express the two node
+features in a common edge space. These maps define the cellular coboundary and the associated sheaf
+∗
+Laplacian LF = δF
+δF . For an edge e = {i, j}, its off-diagonal term induces, up to the conventional
+minus sign, the node-to-node map:
+ρ∗i→e ρj→e : F(j) → F(i)
+
+(3)
+
+This induced coupling provides the starting point for the ESNN construction. Rather than introducing
+separate incidence maps through an intermediate edge stalk, ESNN directly parameterizes transport
+between neighboring node features. For geometric vector channels, these maps must additionally
+respect the ambient O(n) action, which motivates the spatial–channel formulation developed in
+Section 3. The connection to classical sheaf diffusion and directed transport is developed further in
+Appendix C.
+
+3
+
+E QUIVARIANT S PATIAL T RANSPORT
+
+The vector features introduced in Section 2.1 naturally decompose into two factors: a spatial component Rn , which carries the O(n) action, and a channel component Rcv , which remains invariant
+under the group. ESNN exploits this structure by factorizing each edge transport into a spatial action
+on geometric vectors and a channel action across vector features. Let Cij denote the local context
+for the directed interaction j → i, including the relative displacement rij and, when used, covariant
+features at the incident nodes. We write Q · Cij for the simultaneous action of Q ∈ O(n) on all
+covariant quantities in this context.
+
+3
+
+Definition 3.1 (Equivariant Transport Map). For a directed interaction j → i and a fixed local
+edge context, ESNN defines a transport map Ti←j : Rn×cv −→ Rn×cv of the form:
+Ti←j (Vj ) =
+
+K
+X
+
+(k)
+
+(k)
+
+Sij Vj Mij
+
+(4)
+
+k=1
+
+where K denotes the number of components in the transport expansion. Each term combines two
+actions:
+(k)
+
+• The spatial operator Sij ∈ Rn×n acts on the spatial axis and transforms covariantly:
+(k)
+
+(k)
+
+Sij (Q·Cij ) = Q Sij (Cij )Q⊤
+
+∀Q ∈ O(n)
+
+(5)
+
+(k)
+
+• The channel operator Mij ∈ Rcv ×cv mixes vector channels and is constructed from
+O(n)-invariant edge features:
+(k)
+
+(k)
+
+Mij (Q·Cij ) = Mij (Cij )
+
+∀Q ∈ O(n)
+
+(6)
+
+These two transformation laws are sufficient to make the resulting transport equivariant.
+Proposition 3.2 (Equivariance of the Transport Map). Suppose that, for every component k, the
+spatial operator satisfies:
+(k)
+(k)
+Sij (Q·Cij ) = QSij (Cij )Q⊤
+(7)
+(k)
+
+and the channel operator Mij is unchanged under the O(n) action. Then the transport map in
+Equation 4 is O(n)-equivariant:
+′
+Ti←j
+(QVj ) = Q Ti←j (Vj )
+
+(8)
+
+′
+where Ti←j
+denotes the transport evaluated from the transformed geometric inputs. (Proof is
+provided in Appendix D.1).
+
+The transport associated with each edge is conditioned on the local geometric context, which may
+include both invariant quantities and covariant features. This allows the operator in Equation 4 to
+adapt to the current interaction while preserving the scalar–vector representation of the network. In
+ESNN, the invariant channel maps are parameterized as:
+
+
+(k)
+(k)
+Mij = W(k) D ηij
+(9)
+(k)
+
+where W(k) is shared across edges and ηij ∈ Rcv is an edge-dependent gating vector predicted
+(k)
+
+from invariant edge features, with D(ηij ) denoting the corresponding diagonal matrix. The shared
+transformation mixes vector channels, while the gate adapts this mixing to the local interaction. In
+this way, Equation 4 separates channel mixing from geometric transformation: the channel maps act
+across vector features, while the spatial operators determine how those features are transformed in
+the ambient space. Section 4 introduces the resulting spatial transport families, with further details on
+the decomposition provided in Appendix B.
+
+4
+
+E QUIVARIANT T RANSPORT M APS
+
+We now instantiate the spatial–channel decomposition of Section 3 through four transport families,
+illustrated in Figure 2. They differ in the spatial action applied to a vector message, while their
+learned coefficients and channel maps are constructed from O(n)-invariant edge features.
+Identity Transport. The simplest choice leaves the vector message unchanged:
+Ti←j (Vj ) = Vj
+
+(10)
+
+corresponding to Sij = In and Mij = Icv . Identity Transport therefore provides the reference case
+in which vector features are exchanged without an edge-dependent transformation.
+4
+
+

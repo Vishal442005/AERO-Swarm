@@ -1,0 +1,1096 @@
+8
+
+D. Scenario-Adaptive Imitation Learning Strategy
+Sparse environmental rewards alone are insufficient for
+training the PhyGNN policy across fragmented CNS scenarios with different damage levels. We therefore introduce a
+scenario-adaptive adversarial imitation learning strategy under
+the CTDE paradigm. This part contains three components: expert demonstration generation, step-level adversarial imitation
+rewards, and an expert-normalized temporal baseline.
+1) Expert Demonstration Generation: High-quality expert
+demonstrations guide the policy toward collision-safe and
+time-efficient connectivity restoration. Since no single algorithm consistently performs best over all fragmented topologies, we build the expert dataset offline by running multiple
+baseline algorithms, including both centralized optimization
+methods and decentralized heuristics, over simulated damage
+scenarios. For each topology, we select the trajectory with the
+minimum restoration time as the expert reference. An expert
+trajectory is defined as
+(E)
+
+τE = {(Oi
+
+(E)
+
+(t), vi
+
+E
+(t))}Tt=0
+,
+
+(28)
+
+where TE denotes the task completion time. Because both
+expert trajectories and policy rollouts are generated in the
+same simulator, their observation spaces are consistent, which
+avoids distribution mismatch during discriminator training.
+This composite expert pool is used to broaden offline supervision coverage across fragmented scenarios, rather than to
+transfer centralized test-time information into the decentralized
+actor.
+This expert pool is used only during offline training. Even
+when a selected trajectory comes from a centralized baseline
+with whole-topology access, that global information is never
+queried by the learned actor during decentralized execution.
+The centralized trajectories therefore act only as privileged
+supervision for expert selection, not as test-time side information for PhyGAIL.
+We also use spatial data augmentation to improve sample
+efficiency and reduce overfitting to absolute geographic coordinates. Specifically, we augment the positions and velocities
+in each expert trajectory with the dihedral symmetry group D4
+[25]. By applying 90◦ rotations and axis reflections, each original trajectory yields eight geometrically isomorphic variants.
+The resulting expert buffer BE encourages the discriminator
+to focus on relative topology rather than absolute orientation,
+which improves zero-shot generalization.
+2) Step-Level Adversarial Imitation Reward: In highly
+fragmented topologies, successful subnetwork merging occurs rarely, so the environmental reward is extremely sparse.
+We therefore use Generative Adversarial Imitation Learning
+(GAIL) [13] to provide dense step-level guidance through a
+node-level discriminator Dω .
+Instead of operating on the whole swarm, the discriminator
+evaluates localized state-action pairs. For an active node ui ,
+we use an independent L-layer PhyGNN encoder to extract
+the state embedding hD
+i from the localized observation Oi .
+We then normalize the executed velocity command by the
+
+mechanical limit and map it to an action embedding with a
+multi-layer perceptron:
+
+
+vi
+.
+(29)
+ziA = MLPact
+vmax
+We concatenate the state and action embeddings and feed them
+into a discriminator head with LeakyReLU activations:
+
+Dω (Oi , vi ) = LeakyReLU MLPhead ([hD⊤
+, ziA⊤ ]⊤ ) .
+i
+(30)
+Here, Dω (·) ∈ (0, 1) denotes the probability that the stateaction pair comes from the expert policy.
+To reduce discriminator overconfidence, we apply one-sided
+label smoothing [26]. The discriminator minimizes the BCE
+loss with soft labels, where expert trajectories use target
+probability λE = 0.9 and actor-generated trajectories use
+λA = 0.1:
+LD (ω) = −E(Oi ,vi )∼BE [λE log Dω (Oi , vi )]
+− E(Oi ,vi )∼πθ [(1 − λA ) log(1 − Dω (Oi , vi ))] .
+(31)
+Here, BE is the mini-batch sampled from the expert database.
+We convert the stabilized discriminator output into a steplevel imitation reward. For numerical stability, we clip the
+discriminator output with a small constant ϵ = 10−8 :
+D̃ω = clip(Dω (Oi (t), vi (t)), ϵ, 1 − ϵ).
+
+(32)
+
+The dense imitation reward is then
+riGAIL (t) = − log(1 − D̃ω ).
+
+(33)
+
+Maximizing this reward encourages the policy to match
+the collision-safe merging behavior contained in the expert
+demonstrations.
+3) Expert-Normalized Temporal Baseline: Constant step
+penalties are often used to encourage fast task completion. In
+CNS restoration, however, recovery horizons vary significantly
+with the damage level. Mild fragmentation may be resolved
+in tens of steps, whereas severe fragmentation may require
+several hundred steps. A fixed step penalty therefore biases the
+value function toward short-horizon tasks and can destabilize
+learning.
+We reduce this effect with an expert-normalized temporal
+baseline. For a given scenario, let TE denote the completion
+steps of the expert algorithm. We define the dynamic speed
+bonus factor as
+
+
+
+ 
+t
+, ηmax .
+(34)
+η(t) = min exp λ 1 −
+αTE
+Here, α ≥ 1 is a tolerance margin relative to the expert time,
+λ controls the exponential decay, and ηmax caps the maximum
+bonus.
+When connectivity is successfully restored, i.e., all subnetworks merge into one connected component with Ns = 1, the
+active UAVs receive the terminal reward
+rsuccess (t) = rbase + rtime · η(t).
+
+(35)
+
+Here, rbase is the base success reward and rtime is the speed
+bonus pool. If the learned policy matches the expert pace, it
+
+9
+
+receives the nominal bonus; if it reconnects faster, the bonus
+increases; if it is slower, the bonus decays smoothly. This
+normalization keeps reward scaling more consistent across
+scenarios with different damage severities.
+4) Reward Design and Training: For each active node ui ,
+the total step-level reward combines the adversarial imitation
+term and the environmental reward:
+Ri (t) = wIL · riGAIL (t) + rienv (t).
+
+(36)
+
+Here, wIL is the imitation coefficient. We decompose the
+environmental reward into three parts:
+rienv (t) = rstep + risaf e (t) + rterm (t).
+
+(37)
+
+step
+
+The urgency penalty r
+< 0 is a small constant that
+discourages loitering. To enforce physical safety and reduce
+local congestion, we define the safety penalty as
+X
+max(0, Dsaf e − dij ),
+(38)
+risaf e (t) = −ωcol
+uj ∈Nicomm
+
+where dij is the physical distance between nodes and ωcol is
+the scaling weight. This term discourages collisions directly.
+The terminal reward incorporates the expert-normalized
+success reward when restoration succeeds. If the maximum
+episode length Tmax is reached without convergence, we assign a failure penalty proportional to the number of remaining
+disconnected components:
+
+success
+
+(t),
+if Ns = 1,
+r
+term
+f
+ail
+r
+(t) = −P
+· Ns , if t = Tmax and Ns > 1, (39)
+
+
+0,
+otherwise.
+
+Algorithm 1 CTDE Training Procedure of PhyGAIL
+Input: Augmented expert buffer BE , maximum epochs Emax ,
+rollout horizon T , batch size B.
+Output: Trained actor πθ , critic Vϕ , and discriminator Dω .
+1: for epoch = 1, 2, . . . , Emax do
+2:
+Reset the parallel environments and initialize the rollout
+buffer Brollout .
+3:
+for t = 1, 2, . . . , T do
+4:
+Construct localized observations Oi (t) and apply
+active-node masking.
+5:
+Sample actions vi ∼ πθ (·|Oi (t)) for all active UAVs.
+Execute actions, observe next states, and collect
+environmental rewards rienv (t).
+7:
+Store the resulting transitions in Brollout .
+8:
+end for
+9:
+Sample expert state-action pairs from BE and policy
+rollouts from Brollout .
+10:
+Update the discriminator Dω with BCE loss and label
+smoothing.
+11:
+Compute the imitation reward riGAIL (t) for each active
+node.
+12:
+Compute the final reward Ri (t) = wIL riGAIL (t) +
+rienv (t) and clip to [−Rmax , Rmax ].
+13:
+Compute GAE advantages and value targets.
+14:
+Update the actor parameters θ and critic parameters ϕ
+with MAPPO.
+15: end for
+6:
+
+E. Structural Property Analysis
+
+matrix of the directed K-NN perception graph Glocal , where
+directed edges represent message-passing flow. Under algorithmic truncation and physical constraints, the spectral norm
+(induced 2-norm) of Ã is bounded by a constant independent
+of the global swarm size N :
+p
+max
+∥Ã∥2 ≤ ∆max
+(40)
+in · ∆out ,
+
+This section examines several structural properties of PhyGAIL. Because decentralized multi-agent interactions are nonlinear and discrete, the following results are not performance
+guarantees for recovery optimality, convergence speed, or
+zero-shot success. We instead focus on three properties that
+matter directly for large-scale deployment: the bounded spectral norm of the local perception graph, the bounded pseudoforce generated by physics-gated message passing, and the
+controlled variance of the expert-normalized terminal reward.
+1) Bounded Spectral Norm of Scale-Invariant Perception:
+In large-scale MARL, graph feature magnitudes may grow
+uncontrollably when a policy trained on small swarms is
+deployed on much larger systems. Standard unmasked communication graphs can indeed have unbounded degree. In
+PhyGAIL, by contrast, the perception graph is bounded by
+K-NN truncation and physical spatial constraints.
+We assume that all UAVs maintain a minimum safety
+distance Dsaf e > 0 during flight and that communication links
+exist only within radius Dcomm .
+Proposition 1: Bounded Spectral Norm of Directed Perception Graphs. Let Ã denote the asymmetric adjacency
+
+where the maximum in-degree is bounded algorithmically by
+∆max
+= Kact + Kdmg + 1, and the maximum out-degree
+in
+d
+satisfies ∆max
+out ≤ Cpack . Here, Cpack = O((Dcomm /Dsaf e ) )
+is a conservative sphere-packing bound [27] on the maximum
+number of coexisting nodes within the communication region
+in a d-dimensional space.
+Proof: See Appendix A.
+This result formalizes the role of bounded graph construction: even when the global swarm size grows, the local
+aggregation operator seen by each UAV remains numerically
+controlled. Thus, the amplification factor of graph propagation
+stays bounded as the swarm grows, which provides a structural
+explanation for the zero-shot scale generalization observed in
+the full framework.
+2) Bounded Dynamics of Physics-Gated Message Passing:
+We next analyze the boundedness of the pseudo-force generated by the physics-gated message passing mechanism. This
+property is directly related to stable mobility control.
+Proposition 2: Bounded Pseudo-Force Generation. Suppose the local observation Oi (t) lies in a compact feature
+
+Finally, we clip the synthesized reward Ri (t) to the bounded
+range [−Rmax , Rmax ] to stabilize critic training and reduce
+variance in value estimation. The overall training procedure is
+summarized in Algorithm 1.
+
+10
+
+space X . Then the aggregated pseudo-force mi produced by
+the PhyGNN encoder is bounded.
+Proof: See Appendix B.
+This bound complements Proposition 1: after bounding
+how much information can be aggregated, we also bound the
+magnitude of the resulting interaction response. As a consequence, the policy network cannot generate arbitrarily large
+internal interaction signals, which helps keep the coordination
+dynamics numerically stable.
+3) Variance Decoupling via Expert-Normalized Baseline:
+Long-horizon reinforcement learning tasks often have high
+return variance because episode length changes from scenario
+to scenario. Here we examine the terminal success signal
+induced by the expert-normalized reward.
+Proposition 3: Variance Control of the Terminal Success
+Signal. Let the terminal success reward be
++
+rterm
+= rbase + rspeed η(t),
+
+(41)
+
+where the normalized speed bonus factor is clipped such that
+η(t) ∈ [0, ηmax ]. Then
++
+Var(rterm
+)≤
+
+1
+(rspeed ηmax )2 .
+4
+
+(42)
+
+Proof: See Appendix C.
+This result clarifies why expert normalization is useful
+beyond heuristic reward shaping: it explicitly limits the spread
+of the positive terminal signal across scenarios with different
+completion times. The bound applies only to the terminal
+success signal. Step penalties may still introduce variance
+through stochastic episode length, but the positive success
+reward itself remains bounded. Hence, value estimation is less
+sensitive to large differences in task horizon.
+F. Complexity Analysis
+We analyze the communication, computational, and memory costs of PhyGAIL during decentralized execution. For
+practical UAV swarm deployment, each agent should keep its
+onboard resource consumption bounded and independent of
+the global swarm size N .
+During execution, each active UAV broadcasts only a fixedsize local state, including relative position, velocity, and current degree, to neighbors within the communication range
+Dcomm . Proposition 1 bounds the number of active UAVs
+inside this region by the geometric packing constant Cpack ,
+so the per-step communication overhead of each UAV remains
+O(Cpack ) = O(1) with respect to N .
+The onboard computation has two bounded parts: local
+graph construction and PhyGNN inference. In graph construction, each UAV selects the Kact nearest active neighbors and
+the Kdmg nearest damaged neighbors from a bounded candidate set, yielding worst-case complexity O(Cpack log Kact ).
+In inference, the ego node receives at most ∆max
+≤ Kact +
+in
+Kdmg + 1 incoming messages, so an L-layer PhyGNN with
+hidden dimension dh requires
+
+2
+O Cpack log Kact + L · ∆max
+(43)
+in · dh .
+
+All terms are constants or bounded hyperparameters, so the
+per-agent computational complexity is also O(1) with respect
+to N .
+The memory footprint is similarly bounded by the fixed-size
+PhyGNN parameters, O(L · d2h ), together with the bounded
+local observation buffer whose size scales with ∆max
+in . For
+practice, the trained PhyGAIL actor requires only 2.78 MB
+of onboard storage for 723K parameters. Taken together,
+these three results show that PhyGAIL maintains constant
+communication, computation, and memory overhead per UAV
+during decentralized execution. This bound characterizes the
+asymptotic local decision cost under bounded observations,
+rather than the end-to-end wall-clock latency of the centralized
+simulator benchmark reported later in Section V-D.
+V. E XPERIMENTAL R ESULTS
+This section first introduces the simulation setups and then
+discusses the performance of the proposed algorithm 1 . The
+experiment results of centralized algorithms like CR-MGC
+[16], DEMD [17], and GDR-TS [11], decentralized approaches
+including center-fly, HERO [20], SIDR [21], and CR-MA [10],
+are also displayed for comparisons.
+A. Experimental Setup
+Simulation Environment: All experiments are conducted
+in a 2-D UAV swarm simulator with communication radius
+Dcomm = 120 m, maximum UAV speed vmax = 10 m/s, and
+control interval ∆t = 0.1 s. We consider five swarm sizes,
+N ∈ {20, 50, 100, 200, 500}, with square mission areas of
+side length 320, 500, 750, 1000, and 1600 m, respectively.
+The maximum episode length is set to Tmax = 0.8W , where
+W denotes the map width. An episode terminates when the
+surviving UAVs reconnect into a single connected component
+or when the step budget is exhausted. During training, we
+impose a repulsion reward with a safety margin of 15 m, while
+in evaluation a collision is counted when the pairwise distance
+falls below 10 m.
+Baselines and Metrics: For the main comparison, we
+vary the damage ratio ρ = ND /N from 0.05 to 0.95 with
+an interval of 0.05, except for the N = 20 case where the
+maximum ratio is 0.90. For each swarm size, damage ratio,
+and method, we average the results over 50 disconnected postdamage cases. The main evaluation metrics are the convergence rate, average recovery time, and average collisions per
+UAV; case-level variability is shown by confidence intervals in
+the curves and mean±std values in the aggregate tables. The
+runtime evaluation additionally reports the first-action latency,
+total solving time, and per-step inference time. All baselines
+strictly follow their original formulations and reported parameter settings. Centralized baselines such as CR-MGC, DEMD,
+and GDR-TS are evaluated with post-damage whole-topology
+access according to their original formulations. When these
+methods provide expert trajectories, the resulting supervision
+is restricted to offline expert selection and does not alter the
+local observation budget of PhyGAIL at test time.
+1 The source codes of the proposed PhyGAIL algorithm are available on
+https://github.com/lytxzt/Physics-informed-GAIL
+
+11
+
+(a) Convergence rate under different swarm scales and damage ratios.
+
+(b) Average recovery time under different swarm scales and damage ratios.
+
+(c) Average collisions per UAV under different swarm scales and damage ratios.
+Fig. 4. Performance comparison under different swarm scales and damage ratios. Curves denote mean performance over 50 disconnected post-damage cases
+for each setting. In panels (b) and (c), shaded bands indicate the corresponding 95% confidence intervals.
+
+Training Details: We train PhyGAIL on 20-UAV scenarios and directly evaluate it on larger swarms without finetuning. Training uses 32 parallel environments for 1000 epochs
+under PPO with standard GAE settings, clipping coefficient
+0.2, and 5 policy-update epochs per outer iteration. The
+entropy coefficient decays from 0.05 to 0.005. The actor, critic,
+and discriminator are optimized by AdamW with learning rates
+of 10−4 , and the discriminator is updated once per outer epoch
+with label smoothing. The final training reward is computed
+as the environment reward plus 0.1 times the GAIL reward,
+followed by normalization and clipping.
+Network Architecture: The PhyGAIL encoder contains
+three physics-informed gated message-passing layers with hidden dimension 128, and each node feature includes the relative
+position, velocity, and normalized topological degree. In graph
+construction, each active UAV retains up to Kact = 8 activeneighbor communication edges and up to Kdmg = 3 damagedneighbor observation edges. The actor adopts a tanh-squashed
+Gaussian policy, the critic combines local graph features
+with masked global mean/max pooling, and the discriminator
+performs node-level expert classification conditioned on both
+state embeddings and actions.
+B. Overall Performance Comparison
+We first compare PhyGAIL with representative baselines
+under different swarm scales and damage ratios. Figure 4 summarizes the three primary metrics: convergence rate, average
+recovery time, and average collisions per UAV.
+
+PhyGAIL maintains a perfect convergence rate across all
+tested swarm scales and damage ratios, as shown in Fig. 4a.
+This advantage becomes most evident in the large-scale settings (N = 100, 200, 500), where HERO, SIDR, and CR-MA
+degrade rapidly as the damage ratio increases. Several centralized or centroid-seeking baselines, including center-fly, CRMGC, DEMD, and GDR-TS, still preserve high convergence
+under low to moderate damage. Their behavior in the other
+two panels, however, shows that high convergence alone does
+not guarantee efficient or safe recovery. Among all compared
+methods, only PhyGAIL maintains perfect reconnection reliability over the full tested range.
+Recovery time increases with the damage ratio for all methods, reflecting the increasing difficulty of reconnecting more
+severely fragmented swarms. In the large-scale settings, PhyGAIL stays in the best-performing group over most damage
+ratios and consistently outperforms the decentralized baselines
+in Fig. 4b. The shaded confidence bands stay relatively compact through low-to-moderate damage ratios and widen mainly
+in the most fragmented regimes, indicating that the dominant
+variability comes from scenario difficulty rather than unstable
+recovery behavior. Under extremely high damage ratios, some
+centralized baselines, especially DEMD, become slightly faster
+when reconnection is still feasible. This suggests that global
+topology information can help identify short merging paths in
+highly fragmented cases. Even so, this advantage appears only
+in a narrow high-damage regime, whereas PhyGAIL remains
+more robust over the full large-scale range and achieves the
+
+12
+
+TABLE II
+P ERFORMANCE SUMMARY OVER LARGE - SCALE SETTINGS
+(N = 100, 200, 500).
+Algorithm
+
+Conv. Rate↑
+
+Rec. Time↓
+
+Collision↓
+
+Overall Rank↓
+
+PhyGAIL
+DEMD
+CR-MGC
+GDR-TS
+SIDR
+center-fly
+CR-MA
+HERO
+
+1.000
+0.990
+0.949
+0.975
+0.472
+0.998
+0.606
+0.276
+
+20.14±22.42
+26.55±22.84
+33.84±29.92
+36.48±32.84
+49.36±38.88
+28.94±25.12
+49.39±40.81
+67.56±43.51
+
+0.161±0.115
+0.964±0.419
+0.772±0.313
+0.931±0.537
+0.131±0.116
+1.173±0.622
+0.333±0.176
+0.809±0.584
+
+2.061
+3.956
+4.462
+4.471
+4.731
+4.798
+4.904
+6.617
+
+Fig. 5. Robustness under localization noise.
+
+C. Robustness under Imperfect Observations
+We further examine whether PhyGAIL remains effective under imperfect local observations. Figure 5 shows the
+large-scale localization-noise results aggregated over N =
+{100, 200, 500} and ρ = {0.25, 0.5, 0.75}. The perturbation
+is applied to all observed position cues, including surviving
+UAVs, damaged UAVs, and the virtual-center reference of each
+local subnet, so the test covers noise on both neighborhood
+geometry and shared directional guidance. As the noise standard deviation increases from 0 to 10 m, PhyGAIL degrades
+gracefully: its aggregated convergence rate remains essentially
+unchanged (1.000 to 0.998), while the average recovery time
+increases only moderately from 17.94 s to 21.30 s. By contrast,
+CR-MGC and DEMD suffer much larger drops in convergence
+rate and much larger increases in recovery time under the same
+perturbation, which suggests that the bounded local graph with
+relative kinematic observations is substantially less sensitive to
+spatial state noise than recovery policies that rely more heavily
+on accurate global topology snapshots. As a supplementary
+check, we also tested delayed local neighbor information for
+PhyGAIL. Across 0 to 5 delay steps, the convergence rate
+remained 1.000 and the average recovery time changed only
+from 17.94 s to 18.37 s, so its effect was negligible and we
+omit a separate figure for brevity.
+D. Ablation Study
+
+best overall average recovery time.
+The collision curves in Fig. 4c show a similarly clear
+trend. PhyGAIL keeps collisions near zero at small scales and
+maintains a much lower collision level than center-fly, CRMGC, GDR-TS, and CR-MA in the large-scale cases. SIDR
+yields slightly lower collision values in part of the large-scale
+regime, but this comes with a substantial drop in convergence
+rate and recovery efficiency, which is consistent with a more
+conservative subnet-level motion strategy that avoids close
+encounters but often fails to drive timely reconnection under
+severe fragmentation. The collision-confidence bands remain
+narrow for PhyGAIL over most settings, which is consistent
+with stable collision-aware behavior. The main strength of
+PhyGAIL therefore lies in its overall balance: it combines
+reliable reconnection, competitive restoration speed, and low
+collision risk within a single decentralized policy.
+Table II aggregates the results over the large-scale settings
+N = {100, 200, 500}. The overall rank is computed case by
+case and then averaged over all tested cases. PhyGAIL attains
+perfect average convergence (1.000), the shortest average recovery time (20.14 s), and the best overall rank (2.061). SIDR
+achieves a slightly smaller collision value, but this comes with
+a substantial drop in convergence rate and recovery efficiency.
+This result should be read as an overall comparison rather
+than a claim of uniform dominance in every case: in a narrow
+subset of extremely fragmented but still recoverable cases,
+methods with full global topology access can occasionally
+find shorter merging paths, whereas PhyGAIL is stronger
+in overall balance and decentralized deployability across the
+tested range.
+
+We next identify which components contribute most to
+large-scale robustness and training stability.
+1) Scalability and Robustness: Table III reports the performance drop of each variant relative to the full PhyGAIL
+model on the large-scale settings after averaging over the
+tested damage ratios ρ = {0.25, 0.5, 0.75}; the overall rank is
+again obtained case by case and then averaged over all tested
+cases.
+The two gate ablations first confirm the need for complementary attraction and repulsion modeling. Removing either
+gate causes clear degradation across all three scales, while
+removing the repulsion gate is particularly harmful: both the
+convergence rate and the recovery time deteriorate sharply,
+indicating that attraction alone cannot maintain safe and effective large-scale coordination. Removing the attraction gate is
+less destructive but still causes large efficiency loss, especially
+at N = 500, showing that repulsion alone is insufficient for
+reliable subnet merging.
+The graph-encoder replacements then show the strongest
+effect on scalability. Replacing PhyGNN with conventional
+graph encoders consistently reduces convergence and recovery
+efficiency, and the gap widens with swarm size. The largest
+degradation occurs with the GCN variant, while the GAT
+and GraphSAGE variants remain more competitive at smaller
+scales but also degrade sharply at N = 500. This pattern
+shows that standard graph aggregation is insufficient for stable
+large-scale recovery, whereas the physics-gated interaction in
+PhyGNN becomes more important as the topology grows more
+fragmented and heterogeneous.
+Among the perception-related components, the virtual center has the largest impact on large-scale coordination, with
+
+13
+
+TABLE III
+A BLATION SUMMARY ON LARGE - SCALE SETTINGS .
+N = 100
+
+Ablated Variant
+
+N = 200
+
+N = 500
+
+Overall Rank↓
+
+∆Conv. Rate↑
+
+∆Rec. Time↓
+
+∆Conv. Rate↑
+
+∆Rec. Time↓
+
+∆Conv. Rate↑
+
+∆Rec. Time↓
+
+w/o attraction gate
+w/o repulsion gate
+
+-0.267
+-0.667
+
++16.88
++37.48
+
+-0.260
+-0.833
+
++22.27
++53.10
+
+-0.700
+-0.807
+
++63.91
++75.01
+
+6.077
+7.185
+
+w/ GAT instead of PhyGNN
+w/ GraphSAGE instead of PhyGNN
+w/ GCN instead of PhyGNN
+
+-0.000
+-0.067
+-0.353
+
++5.70
++9.35
++19.36
+
+-0.007
+-0.107
+-0.447
+
++22.22
++11.85
++33.03
+
+-0.293
+-0.260
+-0.673
+
++51.43
++44.56
++64.90
+
+6.457
+6.250
+8.216
+
+w/o KNN selection
+w/o damaged neighbor
+w/o virtual center
+
+-0.007
+-0.040
+-0.127
+
++1.52
++7.79
++13.80
+
+-0.007
+-0.120
+-0.347
+
++7.01
++19.96
++29.66
+
+-0.113
+-0.433
+-0.640
+
++27.24
++50.88
++65.69
+
+4.940
+6.351
+7.294
+
+w/o GAIL reward
+w/o centralized critic
+w/o expert time reward
+w/o any time reward
+
+-0.000
+-0.000
+-0.187
+-0.553
+
++1.27
++2.43
++15.40
++26.95
+
+-0.000
+-0.000
+-0.513
+-0.593
+
++5.68
++6.34
++35.47
++35.87
+
+-0.007
+-0.160
+-0.607
+-0.667
+
++20.18
++38.82
++57.84
++58.70
+
+4.591
+5.198
+7.429
+8.011
+
+(a) Training curves with GNN replacements.
+
+(b) Training curves with representative component ablations.
+
+Fig. 6. Training stability of PhyGAIL and its ablated variants.
+
+its removal causing strong drops in both convergence and recovery efficiency across all three scales. Removing damagedneighbor observations also degrades performance substantially,
+especially at N = 500, while removing the KNN selection
+mechanism has only a mild effect until the largest scale. The
+bounded local graph is therefore useful for scalability, but the
+shared directional cue from the virtual center plays the larger
+role in driving subnet merging.
+The training-related ablations finally highlight the importance of temporal reward design. Removing the expert time
+reward causes large degradation across all three scales, and
+removing all time-related rewards yields the worst overall
+rank. By comparison, removing the centralized critic or the
+GAIL reward changes the final large-scale averages much less.
+This pattern suggests that temporal reward design mainly determines large-scale restoration efficiency, whereas the centralized critic and GAIL reward contribute more to optimization
+quality than to the final asymptotic metrics.
+2) Training Stability: Figure 6 shows the same separation
+in optimization dynamics. In Fig. 6a, the full PhyGAIL model
+quickly reaches a high-reward regime and maintains a high
+convergence level, whereas the GCN variant starts to collapse
+after its early improvement, the GAT variant reaches strong
+intermediate performance and then degrades in the later stage,
+and the GraphSAGE variant oscillates more strongly and
+recovers only partially after its drop. Figure 6b further shows
+that removing damaged-neighbor observations weakens later-
+
+Fig. 7. Sensitivity to Kact and Kdmg .
+
+stage convergence, removing the virtual center causes much
+larger instability throughout training, and removing the GAIL
+reward mainly slows the early and middle stages without
+preventing eventual convergence. Together with Table III,
+these curves indicate that PhyGNN and the virtual center
+govern large-scale robustness, the temporal reward design
+governs restoration efficiency, and the GAIL reward mainly
+accelerates and stabilizes training.
+3) Parameter Sensitivity: Figure 7 further examines the
+two bounded-perception parameters that determine the activeneighbor budget and damaged-node cue budget. As Kact
+increases, the recovery time drops sharply from very small
+neighborhoods and then becomes almost unchanged beyond
+Kact = 8, while the collision level also stabilizes in the
+same range. A similar pattern appears for Kdmg : very small
+
+14
+
+(a) Training dynamics of PhyGAIL.
+
+(b) Validation trajectories at representative epochs.
+Fig. 8. Case study of the learning and behavioral evolution of PhyGAIL.
+
+damaged-node budgets are less efficient, but the performance
+difference becomes marginal once Kdmg reaches 3. Since
+larger Kact and Kdmg directly increase the local graph size
+and associated processing cost, we use the smallest values in
+this near-saturated region, namely Kact = 8 and Kdmg = 3.
+
+epoch 505 further reduces the recovery time to 55 steps mainly
+by removing redundant motion. Overall, the figure shows a
+progression from local motion learning, to expert cloning, then
+to stable reconnection behavior, and finally to more efficient
+large-scale coordination.
+
+E. Case Study
+
+F. Runtime Overhead Analysis
+
+We further inspect how the learned policy evolves during
+training and how this evolution appears in representative
+trajectories. Figure 8a presents the training dynamics of the
+full model, and Fig. 8b shows the corresponding validation
+trajectories at representative epochs.
+The learning curves in Fig. 8a show a clear two-stage
+pattern. In the early stage, both the episode reward and the
+success rate rise quickly, which indicates that the policy first
+acquires basic collision avoidance and local coordination. A
+sharper transition then appears in the middle stage, after which
+both training and validation success rates approach 1.0 and
+the episode reward climbs to a high plateau. The actor, critic,
+and discriminator losses follow the same stabilization trend,
+which suggests that the policy progresses from local motion
+regularities to an effective subnet-merging strategy.
+The trajectories in Fig. 8b illustrate the same evolution
+on one validation case with 10 damaged nodes and three
+disconnected surviving subnets. At epoch 20, the subnet motions are no longer random, but they still lack a consistent
+merging direction and cannot reconnect within the horizon.
+At epoch 35, the same case is solved in 130 steps, showing
+that the policy has begun to use the shared directional cues
+encoded in the graph. This stage already captures the correct
+reconnection objective, although the subnet motions are still
+relatively indirect and only partially coordinated. By epoch
+190, the three subnets move toward the central region in a
+more synchronized way and solve the case in 68 steps, while
+
+We finally evaluate the computational overhead of PhyGAIL and compare it with representative baselines. Table IV
+lists the first-response latency, end-to-end solving time, and
+recovery steps of all methods under the large-scale settings
+N = {100, 200, 500}.
+PhyGAIL keeps a low first-response latency of 4.02, 7.42,
+and 17.61 ms for N = {100, 200, 500}, respectively, which remains far below the other learning-based baselines. The same
+advantage appears at the system level: PhyGAIL achieves the
+shortest solving time at N = 200 and N = 500, and stays
+close to the shortest at N = 100 (0.14 s versus 0.08 s for
+center-fly). Although center-fly is lighter per step, it requires
+many more recovery steps, especially at large scale, so its
+end-to-end solving time becomes larger. Overall, PhyGAIL
+provides the best runtime–performance trade-off among the
+compared methods for large-scale decentralized recovery.
+The growth of measured response time with swarm size
+does not conflict with the theoretical O(1) complexity in
+Section IV-E. The complexity analysis characterizes the local
+decision cost of one UAV under bounded local observations
+and bounded graph size, whereas the benchmarked latency
+is measured from the current centralized simulator implementation, which also includes subnet extraction, neighbor
+search, graph construction, batching, and action write-back
+for all active subnets. The observed latency growth therefore
+mainly reflects implementation overhead at the simulator level
+rather than a violation of the constant per-agent complexity
+
+15
+
+TABLE IV
+RUNTIME COMPARISON UNDER LARGE - SCALE SETTINGS (N = 100, 200, 500).
+N = 100
+
+Algorithm
+PhyGAIL
+center-fly
+HERO
+SIDR
+CR-MGC
+DEMD
+GDR-TS
+CR-MA
+
+N = 200
+
+N = 500
+
+Resp. (ms)
+
+Solve (s)
+
+Rec. Steps
+
+Resp. (ms)
+
+Solve (s)
+
+Rec. Steps
+
+Resp. (ms)
+
+Solve (s)
+
+Rec. Steps
+
+4.02±0.23
+0.46±0.04
+1.43±0.09
+1.19±0.14
+511.93±384.61
+2862.48±620.27
+9185.78±71.61
+14.96±0.26
+
+0.14±0.08
+0.08±0.05
+0.82±0.33
+0.35±0.37
+0.58±0.38
+2.87±0.65
+9.28±0.10
+3.27±2.27
+
+52.7±32.3
+114.2±74.0
+515.8±205.9
+266.9±279.7
+94.4±53.7
+100.1±61.1
+119.1±58.2
+201.2±139.5
+
+7.42±0.58
+1.73±0.15
+4.73±0.58
+4.17±0.28
+556.10±130.87
+2792.71±1262.92
+14404.36±427.61
+46.75±1.02
+
+0.82±0.38
+0.93±0.33
+4.59±1.05
+4.01±1.63
+1.28±0.21
+3.40±1.05
+15.29±0.46
+24.86±11.13
+
+143.5±66.2
+301.2±109.6
+761.3±173.1
+686.4±277.6
+238.6±63.8
+223.7±70.4
+287.3±31.8
+487.9±218.4
+
+17.61±1.24
+9.29±0.95
+23.21±1.06
+22.87±1.22
+4901.74±1532.01
+16032.39±192.72
+69241.05±4248.93
+247.65±1.57
+
+6.60±3.02
+8.98±3.57
+39.30±0.12
+21.39±19.75
+17.18±3.87
+24.88±1.94
+80.73±4.50
+241.10±62.62
+
+269.5±122.7
+501.0±203.9
+1280.0±0.0
+642.8±592.2
+680.9±182.5
+493.9±109.2
+641.6±51.7
+924.1±239.5
+
+result, and from the TMC perspective this bounded local
+processing is valuable because fragmented networks require
+fast recovery decisions before a whole-swarm topology view
+can be reassembled.
+VI. C ONCLUSION
+This paper considered decentralized connectivity restoration
+for UAV swarm networks under communication network split
+caused by large-scale node failures. We developed PhyGAIL,
+a CTDE-based framework that combines bounded heterogeneous graph perception, physics-informed graph interaction,
+and scenario-adaptive imitation learning for large-scale recovery. Its core PhyGNN module models local attraction and
+repulsion through gated message passing, while the accompanying structural analysis establishes bounded graph propagation, bounded pseudo-force generation, and controlled variance
+of the expert-normalized terminal reward. Simulation results
+showed that a policy trained on 20-UAV swarms transfers
+directly to swarms of up to 500 UAVs without fine-tuning,
+and achieves the best overall balance among reconnection
+reliability, recovery efficiency, motion safety, and runtime
+overhead. These results support PhyGAIL as a scalable solution for fragmented network settings in which post-damage
+information collection and per-agent online processing must
+both remain limited.
+The present study still assumes a common 2-D flight
+layer, disk-like communication abstraction, a single damage
+event, and a shared pre-failure reference for decentralized
+recovery. Future work can consider more realistic deployment
+conditions, including continuous failures, obstacle-constrained
+environments, and tighter onboard resource limits, as well as
+broader continuous-space multi-agent coordination problems
+beyond connectivity restoration.
+
+For any asymmetric real matrix,
+q
+∥Ã∥2 ≤ ∥Ã∥1 ∥Ã∥∞ .
+Substituting the two bounds above gives
+q
+∥Ã∥2 ≤ (Kact + Kdmg + 1) · Cpack ,
+
+(46)
+
+(47)
+
+which is constant with respect to the global swarm size N .
+A PPENDIX B
+P ROOF OF P ROPOSITION 2
+Proof: The localized observation Oi (t) consists of normalized relative positions, velocities clipped by vmax , and
+structural degrees mapped through a logarithmic function.
+These components lie in closed and bounded intervals, so the
+input space X is compact.
+By the extreme value theorem, a continuous mapping on a
+compact set is bounded. The MLP layers in PhyGNN have
+finite parameters and continuous activations (ReLU, Sigmoid,
+and Softplus). Therefore, the interaction feature fij and the
+interaction strength Sij are bounded by constants Cf and
+Smax , respectively. Each directed message then satisfies
+∥mj→i ∥ ≤ Smax Cf .
+
+(48)
+
+Proposition 1 bounds the number of incoming messages by
+∆max
+in . Hence,
+∥mi ∥ ≤ ∆max
+in Smax Cf .
+
+A PPENDIX A
+P ROOF OF P ROPOSITION 1
+
+(49)
+
+Therefore, the aggregated pseudo-force remains bounded.
+
+Proof: In the directed perception graph Glocal , an edge
+ej→i exists if node ui selects uj for information aggregation.
+i. Algorithmic in-degree bound: The in-degree of node ui
+equals the number of neighbors from which it pulls information. By construction, ui can aggregate messages from at
+most Kact active UAVs, Kdmg damaged UAVs, and one virtual
+center. Therefore,
+∥Ã∥∞ ≤ Kact + Kdmg + 1.
+
+ii. Physical out-degree bound: The out-degree of node uj
+equals the number of agents that may select it as a neighbor.
+Inside a communication disk of radius Dcomm , the number of
+UAVs that can coexist while respecting the minimum safety
+distance Dsaf e is bounded by geometric packing. Hence,
+
+∥Ã∥1 ≤ Cpack = O (Dcomm /Dsaf e )d .
+(45)
+
+(44)
+
+A PPENDIX C
+P ROOF OF P ROPOSITION 3
+Proof: Because η(t) is clipped to [0, ηmax ], the terminal
+success reward lies in the interval
+[rbase , rbase + rspeed ηmax ],
+whose length is L = rspeed ηmax .
+
+(50)
+
+

@@ -1,0 +1,82 @@
+Graphical Abstract
+Distributed UAV Formation Control Robust to Relative Pose Measurement Noise
+
+arXiv:2304.03057v4 [cs.RO] 5 Mar 2026
+
+Viktor Walter, Matouš Vrba, Daniel Bonilla Licea, Matej Hilmer, Martin
+Saska
+
+Highlights
+Distributed UAV Formation Control Robust to Relative Pose Measurement Noise
+Viktor Walter, Matouš Vrba, Daniel Bonilla Licea, Matej Hilmer, Martin
+Saska
+• We propose a novel technique for constructing robust distributed FormationEnforcing Control for autonomous UAV teams using onboard relative
+localization sensors burdened with noise.
+• Theoretical analysis of this technique is provided, allowing the user to
+predict its performance under a given configuration.
+• Experimental verification was performed, showing that application of
+the proposed technique in real-world scenarios significantly improves
+performance of real formation flights.
+• The source code of an implementation of the proposed technique was
+made publicly available.
+
+Distributed UAV Formation Control Robust to
+Relative Pose Measurement Noise
+Viktor Waltera , Matouš Vrbaa , Daniel Bonilla Liceab , Matej Hilmera ,
+Martin Saskaa
+a
+
+Faculty of Electrical Engineering, CTU in Prague, Technická 2, Prague, 16627, Czechia
+b
+Mohammed VI Polytechnic University, Lot 660, Ben Guerir, 43150, Morocco
+
+Abstract
+A technique that allows a Formation-Enforcing Control (FEC) derived from
+graph rigidity theory to interface with a realistic relative localization system
+onboard lightweight Unmanned Aerial Vehicles (UAVs) is proposed in this
+paper. The proposed methodology enables reliable real-world deployment
+of UAVs in tight formations using relative localization systems burdened by
+non-negligible sensory noise. Such noise otherwise causes undesirable oscillations and drifts in sensor-based formations, and this effect is not sufficiently
+addressed in existing FEC algorithms. The proposed solution is based on decomposition of the gradient descent-based FEC command into interpretable
+elements, and then modifying these individually based on the estimated distribution of sensory noise, such that the resulting action limits the probability
+of overshooting the desired formation. The behavior of the system was analyzed and the practicality of the proposed solution was compared to pure
+gradient-descent in real-world experiments where it presented significantly
+better performance in terms of oscillations, deviation from the desired state
+and convergence time.
+Keywords: Mutual Relative Localization, Unmanned Aerial Vehicles,
+Formation-enforcing Control, Multi-Robot Systems
+
+1. Introduction
+Close cooperation of multiple robotic Unmanned Aerial Vehicles (UAVs)
+sharing operational space requires these units to be able to obtain localization of UAVs in their proximity. Such information is necessary for low-level
+
+Figure 1: An example of our fully autonomous Unmanned Aerial Vehicles (UAVs) [1] equipped with the
+mutual relative localization system UltraViolet Direction And Ranging (UVDAR). The units depicted are
+based on the MRS F450 platforms. These devices can cooperate using a mutual relative localization and
+control scheme, such as the one proposed here. The output of the relative localization system is subject
+to observation noise expressed in terms of covariance of a multivariate Gaussian distribution that is taken
+into account in the presented method. An illustration of 3D ellipsoids representing the distribution of
+noise in relative position measurement is shown on the right.
+
+tasks such as collision avoidance, for enforcing a specific layout [2], or for
+stabilization of the desired shape of a formation. Recent technological developments have rapidly progressed towards the possibility of accomplishing
+cooperative robotic tasks in unstructured environments, such as arbitrary
+outdoor spaces or underground tunnels. While in limited cases the UAVs
+can obtain mutual localization from sources of precise global localization, e.g.
+Real-Time Kinematic Global Navigation Satellite System (RTK-GNSS) or
+Motion capture (mo-cap) systems, this is extremely limiting for a wide range
+of applications where such a source is unavailable or not reliable enough.
+Typically, these systems require operators to directly access the operational
+space ahead of robotic deployment in order to prepare the equipment. Additionally, these are sensitive to environmental conditions and they require
+radio communication to share poses of the agents within the team.
+The alternative to global localization infrastructure is to use onboard sensors for mutual relative localization [3, 2]. The two most common modalities
+of these sensors are distance-based relative localization, which is typically
+based on the strength or timing of a selected omnidirectionally broadcasted
+signal [4, 5, 6], and vision-based relative localization using camera systems
+and image processing.
+In this paper, we propose a novel, distributed, formation-enforcing control law derived from the graph rigidity theory. This control law mitigates
+the effects of noise in vision-based relative localization on the agent motion,
+without needlessly sacrificing the speed of convergence to the desired formation.
+2
+
+

@@ -1,0 +1,6 @@
+attrition_rate,tasks_completed,task_completion_rate,recovery_time_sec,active_survivors
+0.1,4,16.0,2.9,45
+0.2,7,28.000000000000004,3.3,40
+0.3,7,28.000000000000004,3.7,35
+0.4,7,28.000000000000004,4.1,30
+0.5,6,24.0,4.5,25

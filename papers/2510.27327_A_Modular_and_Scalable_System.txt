@@ -1,0 +1,269 @@
+A M ODULAR AND S CALABLE S YSTEM A RCHITECTURE FOR
+H ETEROGENEOUS UAV S WARMS U SING ROS 2 AND
+PX4-AUTOPILOT
+
+arXiv:2510.27327v1 [cs.RO] 31 Oct 2025
+
+A P REPRINT
+Robert Pommeranz
+Electrical Measurement Engineering
+Helmut-Schmidt-University
+Hamburg, Germany
+robert.pommeranz@hsu-hh.de
+
+Kevin Tebbe
+Electrical Measurement Engineering
+Helmut-Schmidt-University
+Hamburg, Germany
+kevin.tebbe@hsu-hh.de
+
+Ralf Heynicke
+Electrical Measurement Engineering
+Helmut-Schmidt-University
+Hamburg, Germany
+ralf.heynicke@hsu-hh.de
+
+Gerd Scholl
+Electrical Measurement Engineering
+Helmut-Schmidt-University
+Hamburg, Germany
+gerd.scholl@hsu-hh.de
+
+November 3, 2025
+
+A BSTRACT
+1
+
+In this paper a modular and scalable architecture for heterogeneous swarm-based Counter Unmanned Aerial Systems (C-UASs) built on PX4-Autopilot and Robot Operating System 2 (ROS 2)
+framework is presented. The proposed architecture emphasizes seamless integration of hardware
+components by introducing independent ROS 2 nodes for each component of a Unmanned Aerial
+Vehicle (UAV). Communication between swarm participants is abstracted in software, allowing the
+use of various technologies without architectural changes. Key functionalities are supported, e.g.
+leader following and formation flight to maneuver the swarm. The system also allows computer
+vision algorithms to be integrated for the detection and tracking of UAVs. Additionally, a ground
+station control is integrated for the coordination of swarm operations. Swarm-based Unmanned
+Aerial System (UAS) architecture is verified within a Gazebo simulation environment but also in
+real-world demonstrations.
+
+1
+
+Introduction
+
+Swarm-based Unmanned Aerial Systems (UASs) pose significant security challenges to critical infrastructure, including government facilities, airports, and military installations. Unlike individual drones, swarms can coordinate to
+evade conventional defenses, execute complex missions, and collect sensitive information, thereby amplifying the potential impact of an attack. Existing Counter Unmanned Aerial System (C-UAS) solutions are primarily designed for
+single drone threats and often lack the capability to address the speed, coordination, and adaptability of swarms [1],
+[2]. To counter these evolving threats, C-UAS platforms must enable coordinated operation across multiple sensors and actuators. Intelligent algorithms are essential for detecting and tracking both individual Unmanned Aerial
+Vehicles (UAVs) and collective swarms in real-time under dynamic conditions, in order to devise effective defense
+strategies [3]. Comprehensive surveys such as [4] provide an overview of C-UASs, detailing key technologies, architectures, and market trends, and emphasize the importance of holistic approaches that integrate sensing, Command and
+Control (C2), and mitigation systems. In [5], the authors present a multi-technology anti-drone system architecture
+1
+
+This is the author’s version of a paper that has been accepted for presentation at the 12th IEEE International Conference on
+Mechatronics and Robotics Engineering (ICMRE), to be held in Oldenburg, Germany, on March 2–4, 2026.
+
+A P REPRINT
+
+and discuss its implementation and associated challenges. They demonstrate the effectiveness of combining passive
+surveillance technologies for detection, localization, and Radio Frequency (RF) jamming.
+Employing a multi-sensor strategy integrating data from sources such as Electro-Optical (EO) / Infrared (IR) cameras,
+radar, and RF analyzers alongside Machine Learning (ML) algorithms—improves detection accuracy, reduces false
+alarms, and enhances the identification of swarm behaviors in diverse environments. Fusing multiple sensor modalities also increases system resilience and adaptability, enabling early threat detection, swarm trajectory forecasting, and
+more effective countermeasures. This approach underscores the importance of modularity, given the diverse functions
+and algorithms that must operate concurrently within robotic systems [6].
+Here, a modular hardware and software architecture for C-UAS applications, utilizing Robot Operating System 2 (ROS
+2) to enable decentralized, real-time swarm operations, will be presented. Each UAV operates containerized ROS 2
+nodes for hardware abstraction, sensor integration, and mission management, facilitating reproducible and scalable
+deployments. The architecture separates flight control, sensor/actuator signal processing, and swarm control into independent modules, enhancing exchangeability, maintainability and adaptability to different hardware platforms. Also,
+advanced swarm behaviors including leader-follower roles with formations are supported to maneuver the swarm.
+Algorithms for processing sensor signals including the camera are implemented as separate ROS 2 nodes. Communication relies on Data Distribution Service (DDS) for reliable, low-latency data exchange, while a ground station
+provides centralized monitoring and control.
+This paper is structured as follows: Section 2 provides related work. Section 3 outlines the proposed architecture,
+while Section 4 describes its implementation in detail. Finally, Section 5 concludes the paper and outlines future
+work.
+
+2
+
+Related Work
+
+The usage of ROS 2 in UASs has been a significant area of research, enabling decentralized, scalable, and reusable
+robotic architectures. Early implementations predominantly utilized Robot Operating System 1 (ROS 1), but recent
+studies have increasingly shifted toward ROS 2 due to the End of Life (EOL) of ROS 1 on May 31st, 2025. Key
+advancements in ROS 2 include an enhanced middleware architecture based on DDS and a decentralized paradigm
+that eliminates the need for a master node [7], [8]. DDS is a publish-subscribe middleware that provides a data-centric
+communication model, enabling efficient and reliable data exchange between distributed systems. Its definition [9]
+is an open standard by the Object Management Group (OMG) and is widely used in various industries, including
+aerospace, automotive, and healthcare. DDS provides features such as data distribution, Quality of Service (QoS)
+settings, and real-time communication.
+The MRS Drone platform introduces a modular UAV system built on ROS 1, emphasizing hardware modularity and
+multi-robot deployment [10]. The authors in [11] present ROS2SWARM as a reusable ROS2-based library for swarm
+robot behaviors, supporting multiple Unmanned Ground Vehicles (UGVs) and demonstrating the versatility of ROS 2
+for swarm robotics.
+Aerostack2 is an open-source ROS2-based framework for multi-robot aerial systems, introducing a modular plugin
+architecture and platform independence [12].
+CrazyChoir provides a lightweight, modular swarm control framework using ROS 2 for Crazyflie nano-UAVs [13].
+CrazySwarm22 is the ROS2-based successor to CrazySwarm, designed for large-scale, coordinated control of Crazyflie
+nano-quadcopters, leveraging ROS2’s decentralized architecture and DDS-based middleware [14].
+However, to the best of our knowledge, a containerized solution in combination of ROS 2, PX4-Autopilot and heterogeneous swarm vehicles in a C-UAS context has not been previously addressed in the literature. The presented
+architecture integrates these technologies to provide a modular platform for further research.
+
+3
+
+System Architecture
+
+This section presents the architecture of the proposed swarm-based C-UAS, using PX4-Autopilot based UAVs in
+combination with the ROS 2 framework. The current hardware platform comprises three distinct UAV classes, GenericUAVModel, ObservationUAVModel and CoordinatorUAVModel, selected based on payload capacity, maneuverability, and required onboard computational resources and should be open for future expansion. The software stack is
+structured as a collection of loosely coupled, reusable components, each implemented as an independent ROS 2 node.
+This design enables flexible configuration of each UAV with various sensors and actuators to meet specific mission
+requirements. Fig. 1 illustrates the software architecture for the UAS, highlighting the integration of various companion computers, such as the Nvidia Jetson Orin NX, Raspberry Pi (AArch64) and the x86 64 as ground station. On
+the left side of the figure a UAV equipped with a companion computer running Jetson Linux 36 is shown. Within the
+2
+
+https://imrclab.github.io/crazyswarm2
+
+2
+
+A P REPRINT
+
+Coordinator
+Node
+
+Gazebo
+Applications / ROS
+2 Workspace
+
+Offboard Node
+
+Offboard Node
+
+PX4-Autopilot
+
+Sensor Nodes
+
+Sensor Nodes
+
+Ground Station
+
+Middleware
+
+Middleware
+
+Middleware
+
+Docker
+
+Docker
+
+Docker
+
+Platform-based
+Docker Image
+
+Jetson Linux 36
+
+Raspberry Pi OS
+
+Ubuntu 22.04
+
+Operating System
+
+WLAN / Celluar Network
+
+Connectivitiy
+
+Hardware Platfrom
+
+UAV with Nvidia
+Jetson
+
+UAV with
+Raspberry Pi
+
+Ground Station
+x86_64
+
+Figure 1: Software architecture of a heterogeneous UAS integrating multiple companion computers and modular
+software components. The ground station enables centralized swarm control and real-time state visualization, when
+autonomous operations are not feasible.
+
+Docker container, the system hosts the DDS middleware and a ROS 2 workspace, which includes the PX4-Autopilot
+and relevant sensor nodes, depending on the specific configuration. The Offboard Node manages communication between the UAV and the PX4-Autopilot flight controller, enabling Offboard mode for external control via commands
+from the companion computer. The coordinator node is responsible for managing the swarm’s leader-follower roles
+and formation flights. In the center column of the figure, a UAV, equipped with a Raspberry Pi 4 CM is shown, which
+can be used for less resource intensive algorithms. The right side of the figure illustrates the ground station, which can
+be implemented on a laptop or desktop computer. The ground station runs a Graphical User Interface (GUI) to control
+the swarm and visualize the current state of sensors and the vehicle. Derived classes extending GenericUAVModel
+implement specialized features for different UAV types, such as the ObservationUAVModel for surveillance missions.
+The main classes and their functionalities are described below:
+GenericUAVModel This class initializes the ROS 2 node and manages the connection to the PX4-Autopilot flight
+controller. In addition, this class holds a Finite State Machine (FSM) for swarm operations or individual missions and
+stores general swarm parameters.
+ObservationUAVModel Extending the GenericUAVModel class, this model incorporates dedicated publish and
+subscribe methods to interface seamlessly with three specific ROS 2 nodes. These nodes handle gimbal control,
+camera management, and video streaming. Onboard processing of video streams is performed by the companion
+computer, which then publishes the processed streams to the ground station.
+3
+
+A P REPRINT
+
+CoordinatorUAVModel The CoordinatorUAVModel is responsible for managing the swarm’s leader-follower roles
+and formation flights. It can manage the swarm’s trajectory and ensure that all participants adhere to the defined
+formation. The CoordinatorUAVModel may be implemented as a ground station on a laptop providing an optional
+GUI, or integrated onto a UAV for decentralized swarm management, allowing any UAV to assume the coordinator
+role if needed.
+In summary, the proposed architecture addresses the challenges outlined in Section 2 by emphasizing modularity,
+scalability, and flexibility. The use of loosely coupled software and ROS 2 nodes enables the integration of diverse
+hardware and software components, supporting heterogeneous swarm based UAS depending on the mission requirements.
+
+4
+
+Implementation
+
+This section outlines the implementation of the architecture, including the hardware platform, swarm communication,
+containerization, and the ROS 2 software stack.
+4.1
+
+Hardware Platform
+
+In Fig. 2, the platform is shown, which consists of two different hardware types depending on the type companion
+computer and payload requirements. The ObservationUAVModel is implemented on a Holybro X650 frame with
+Pixhawk Jetson Baseboard stacked with Pixhawk 6X and Jetson Orin NX 16 GB. A multi-sensor camera with a gimbal
+or other cameras are attached to the companion computer. A lite version, referred to as the GenericUAVModel, is
+realized by a Raspberry Pi 4 as a computation module, which can be used for smaller UAVs. For safety reasons
+there is also always the possibility to control each UAV manually over Remote Control (RC). A Herelink Airunit or
+ExpressLRS is used, which is directly connected to the Flight Control Unit (FCU). The Global Navigation Satellite
+System (GNSS) is used for global position information in PX4-Autopilot Offboard Mode.
+4.2
+
+Swarm Communication
+
+The swarm primarily communicates over a private Wireless Local Area Network (WLAN) network, where all devices
+have access to the ROS 2 topics. Such a setup allows for low-latency communication between the UAVs and the
+ground station. Using WLAN as the physical layer for communication has the advantage that one can transition from
+a simulation environment to a real-world environment very quickly and with minimal effort, as WLAN modules can
+be easily integrated into the hardware or are already built into the controllers. In the future, this layer can be replaced
+with another technology, such as a cellular network (e.g., Fifth Generation Mobile Network (5G)), to provide more
+robust and reliable communication in environments with high interference. The choice of technology depends on the
+specific requirements of the application and the available infrastructure.
+4.3
+
+Containerization
+
+To ensure that the docker container can be used on different hardware platforms, here Nvidia Jetson, Raspberry Pi
+or any x86 64 based system, a slightly adjusted container with the appropriate docker tag is built with the necessary
+dependencies and configurations for each platform. The process of containerization has the advantage of simplifying
+and accelerating deployment, while ensuring consistent operation of the software stack across all platforms. This
+approach enables the same ROS 2 packages to be used across different hardware configurations, ensuring compatibility
+and reducing the risk of software conflicts. As shown in Fig. 1, the container includes all necessary libraries and
+dependencies for the ROS 2 software stack, including the PX4-Autopilot, camera drivers, and other required packages.
+4.4
+
+ROS 2 Software Stack
+
+The software stack is developed using Python 3.10 and ROS 2 Humble, encapsulated within a Docker container for
+portability and consistency. The primary ROS 2 packages utilized in this implementation include:
+• px4 offboard: Provides the core functionalities for controlling the UAV, including flight control, state management, and communication with the PX4-Autopilot.
+• camera gimbal node: UAVs equipped with camera gimbals include this node in the ROS 2 launch file. It
+enables remote gimbal control, lens control, and receiving video streams via ROS topics.
+4
+
+

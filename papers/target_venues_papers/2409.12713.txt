@@ -1,0 +1,387 @@
+© 2025 Elsevier. Accepted for Robotics and Autonomous Systems. Personal use of this material is permitted. Permission from Elsevier must be
+obtained for all other uses, in any current or future media, including reprinting/republishing this material for advertising or promotional
+purposes, creating new collective works, for resale or redistribution to servers or lists, or reuse of any copyrighted component of this work in
+other works.
+
+A Signal Temporal Logic Approach for Task-Based Coordination of Multi-Aerial
+Systems: a Wind Turbine Inspection Case Study
+Giuseppe Silanoa,1,g , Alvaro Caballeroc , Davide Liuzzad,e , Luigi Iannellid , Stjepan Bogdanf , Martin Saskaa
+a Department of Cybernetics, Faculty of Electrical Engineering, Czech Technical University in Prague, Prague, Czech Republic (emails: {giuseppe.silano,
+
+martin.saska}@fel.cvut.cz).
+b Department of Power Generation Technologies and Materials, Ricerca sul Sistema Energetico (RSE) S.p.A., Milan, Italy.
+c GRVC Robotics Laboratory, University of Seville, Seville, Spain (email: alvarocaballero@us.es).
+d Department of Engineering, University of Sannio in Benevento, Benevento, Italy (emails: {davide.liuzza,
+
+luigi.iannelli}@unisannio.it).
+
+e Fusion and Technology for Nuclear Safety and Security Department, Italian National Agency for New Technologies, Energy and Sustainable Economic
+
+Development (ENEA), Frascati, Italy.
+f Faculty of Electrical Engineering and Computing, University of Zagreb, Zagreb, Croatia (email: stjepan.bogdan@fer.hr).
+
+arXiv:2409.12713v2 [cs.RO] 14 Jan 2025
+
+g Corresponding author
+
+Abstract
+The paper addresses task assignment and trajectory generation for collaborative inspection missions using a fleet of multi-rotors,
+focusing on the wind turbine inspection scenario. The proposed solution enables safe and feasible trajectories while accommodating
+heterogeneous time-bound constraints and vehicle physical limits. An optimization problem is formulated to meet mission objectives and temporal requirements encoded as Signal Temporal Logic (STL) specifications. Additionally, an event-triggered replanner
+is introduced to address unforeseen events and compensate for lost time. Furthermore, a generalized robustness scoring method
+is employed to reflect user preferences and mitigate task conflicts. The effectiveness of the proposed approach is demonstrated
+through MATLAB and Gazebo simulations, as well as field multi-robot experiments in a mock-up scenario.
+Keywords:
+Aerial Systems: Applications, Formal Methods in Robotics and Automation, Task and Motion Planning, Multi-Robot Systems.
+
+1. Introduction
+The increasing use of Unmanned Aerial Vehicles (UAVs)
+for civilian infrastructure inspections has paved the way for
+aerial vehicles with greater autonomy, thereby enhancing the
+safety, speed, and accuracy of these inspections [1]. The capacity for repeated operations enables the monitoring of infrastructure changes over time, providing benefits to a variety of
+applications such as inspecting oil and gas pipelines [2], wind
+turbine blades [3], power transmission lines [4], towers and
+bridges [5].
+Presently, the most widespread approach is the use of UAVs
+that are controlled by highly trained operators. These experts
+are knowledgeable about the required information and sitespecific challenges, such as obstacles, weather conditions, and
+time of day. On-board cameras and sensors are utilized to
+gather data which is then processed by specialist teams for further analysis. However, this approach has two major limitations: First, flight operations can be hazardous for operators
+who must maintain continuous visual contact with the UAVs,
+especially in environments at height; Second, the process is
+time-consuming, costly, and prone to human error [6, 7, 8].
+Over time, various methods for automating the inspection task
+have been proposed in the literature [5, 3, 4, 2, 1, 9]. Despite
+Preprint submitted to Robotics and Autonomous Systems
+
+this, significant challenges still exist in making inspections autonomous, including the reliability of navigation systems, radio interference, limited battery life, and unpredictable environmental events, which pose risks to mission success [10, 11].
+Therefore, there is a clear need for safe and effective techniques that can enhance maintenance and inspection operations,
+reduce risks, and decrease costs for companies. Formal methods [12] can address these challenges by offering a concise way
+to express complex mission specifications and time constraints
+by leveraging their similarity to natural language commands
+and the use of connectivity operators. Specifically, constraints
+and objectives are encapsulated within a single temporal formula. Notably, Signal Temporal Logic (STL) [13], particularly
+in its robust formulation [14], employs the concept of quantitative semantics, meaning that it not only verifies that the system execution satisfies desired requirements, but also provides
+a metric of how well these requirements are met, referred to as
+robustness [14]. This results in an optimization problem aimed
+at achieving high robustness scores values through the generation of a trajectory that satisfies the desired specifications while
+ensuring feasibility within dynamic and constraint margins.
+In this paper, wind turbine inspection (see Figure 1) serves
+as a case scenario for presenting a multi-UAV motion planning
+approach leveraging on STL specifications for collaborative inspection missions. This scenario illustrates sophisticated planning, involving the coordination of multi-rotor UAVs to avoid
+January 16, 2025
+
+Research has explored various approaches for endowing UAVs with coordination capabilities [18, 19, 20, 21]. Some
+studies have focused on centralized multi-agent algorithms for
+coordinating and planning safe and dynamically feasible trajectories [18]. Others propose methods to convert the multiagent task allocation problem into a search space that can
+be solved using the Particle Swarm Optimization (PSO) algorithm [19]. Additionally, some approaches employ knowledge
+transfer techniques between agents to achieve collision avoidance and safety [20]. These approaches can efficiently coordinate and compute trajectories for multiple agents [20, 21], but
+do not guarantee that vehicles will complete tasks within specified time windows. Furthermore, encoding possibly different
+complex temporal requirements into the optimization problem,
+such as a requirement for multiple drones to visit designated
+regions at specific times with certain behaviors while ensuring
+safety, requires a systematic approach.
+In addressing the motion planning challenge for multi-robot
+systems, various approaches have been explored in existing literature [21, 22, 23]. Many solutions rely on abstract agent
+dynamics [21] or abstract grid-based environment representations [22], integrating a discrete planner with a continuous
+motion generator. While these methods can swiftly compute
+collision-free motions for numerous agents, they fail to guarantee adherence to physical constraints or task completion within
+specified time frames. Additionally, they do not offer velocity and acceleration references, leaving the controller responsible for generating these signals. Conversely, when considering
+multi-rotor models [23], solutions depend on information exchange among agents, posing difficulties in environments with
+electromagnetic interference, such as in wind turbine inspection
+tasks [24].
+Recently, several studies have explored planning and coordination techniques that incorporate advanced specifications
+and temporal goals [25, 26, 27]. However, these problems often
+prove challenging due to their nonlinear, non-convex optimization max-min nature. Control Barrier Functions (CBFs) [25]
+offer potential for finding robust and computationally efficient
+trajectories, though they are limited to simpler scenarios and
+lack soundness and completeness for the STL syntax. For
+example, if two robots need to visit distinct regions within
+overlapping time windows, CBFs may lead to infeasible problems [28]. Automata-based methods [26] can reduce complexity by assigning specifications to individual agents. However,
+constructing the required transition system is a significant burden. Sampling-based techniques [27], encode STL specifications as linear and boolean constraints, offering a solution to
+the challenge of finding optimal solutions. However, these techniques typically assume that each robot is specialized in specific
+skills. Most of these methods end up with a dynamic programming formulation, which suffer from dependency on the initial
+solution [29].
+
+Figure 1: A multi-rotor UAV conducting an inspection of a wind turbine, capturing videos and pictures of the nacelle, rotor shaft and blades, as well as their
+surrounding environment, to perform a preliminary remote evaluation [3].
+
+collisions with each other and the environment, accomplish diverse time-bound inspection tasks, adhere to the vehicle’s dynamical constraints, and ensure comprehensive infrastructure
+coverage. The mission requirements are formulated as an STL
+formula, and the robustness of the formula is optimized by setting up a nonlinear, non-convex max-min optimization problem. To manage the complexity of this nonlinear optimization, a hierarchical approach is employed, starting with solving
+a Mixed-Integer Linear Programming (MILP) planning problem and subsequently feeding the final STL optimizer.
+1.1. Related work
+Extensive research has been done in the fields of autonomous navigation and coordination capabilities for UAVs [5,
+6, 7, 10]. The primary objectives of this research have been
+to: (i) enable UAVs to navigate autonomously and reach safe
+conditions while avoiding unsafe behaviors (e.g., collisions,
+crashes), and (ii) enhancing the vehicles’ ability to coordinate
+for data collection and executing appropriate actions. Accurate
+trajectory planning and task assignment are crucial in both of
+these areas, not only for individual vehicles, but also for fleets
+of UAVs with varying characteristics and capabilities that must
+cooperate, avoid obstacles, and meet mission requirements simultaneously in the same operational area.
+The literature on autonomous navigation presents a diversity of point-to-point navigation approaches [15], including potential field methods [16] and vehicle-routing problem formulations [17]. Many studies prioritize drone mission endurance to
+maximize coverage area by accounting for flight times. However, these approaches frequently overlook drone dynamics and
+physical constraints, resulting in infeasible paths. The problem
+then becomes a combinatorial optimization challenge, as exemplified by the well-known Vehicle Routing Problem (VRP) [17],
+which becomes increasingly unsolvable within a reasonable
+time frame as the complexity exponentially increases with the
+number of vehicles and variables. In such cases, heuristic methods are often employed to simplify the complexity and identify
+the most viable solution.
+
+1.2. Contributions
+In this paper, we introduce a novel approach to multi-UAV
+task assignment and trajectory generation for collaborative inspection missions, with wind turbine inspection serving as our
+2
+
+case study. Our method utilizes STL as a specification language
+to express the mission’s objectives and time constraints. These
+objectives include collision avoidance between the UAVs and
+the environment, as well as the completion of time-bound inspection tasks, such as reaching specified target areas and ensuring comprehensive coverage of the infrastructure. Addressing these requirements results in a complex nonlinear, nonconvex max-min optimization problem typically solved using
+dynamic programming. However, finding an optimal solution in a reasonable time frame can be challenging due to the
+solvers’ tendency to get stuck in local optima based on the initial guess [29]. To tackle this challenge, we propose a two-step
+hierarchical approach that initially simplifies the mission into
+a Mixed-Integer Linear Programming planning problem formulated on a subset of the inspection objectives and subsequently
+seeds the global STL optimizer. The approach extends our prior
+work [30] by:
+
+Also, one significant advantage of our approach using STL
+over point-to-point navigation and vehicle-routing problem formulations, as listed in Section 1.1, is its ability to encapsulate
+intricate temporal constraints and requirements in a formal and
+expressive manner. By integrating natural language commands,
+temporal and Boolean operators, and task and motion planning,
+we can devise trajectories that fulfill mission objectives while
+considering the dynamics and physical constraints of the multirotor systems. Moreover, the proposed method allows for handling coordination among multiple drones to ensure the completion of all required inspections without specifying the task
+(the paper presents a general method applied to a particular case
+scenario) that a single vehicle must accomplish. Existing methods for planning from STL specifications include abstractionbased methods, mixed-integer optimization, and nonlinear optimization. Abstraction-based methods [33] construct a discrete
+abstraction of the continuous state space, but suffer from scalability issues. Mixed-integer optimization methods [34, 35] provide soundness and completeness (see Section 3.4) guarantees
+but become intractable with longer planning horizons. Nonlinear optimization approaches [36, 37] offer increased generality
+and scalability but are prone to local optima based on initial
+guesses. Our two-step hierarchical approach addresses these
+challenges by initially simplifying the mission into a MILP
+planning problem and then seeding the global STL optimizer.
+
+• Addressing collaborative inspection mission complexities and computing dynamically feasible trajectories with
+diverse time bounds and vehicle constraints (Section 4.1).
+• Introducing a new method for computing the initial guess
+solution (Section 4.2) considering heterogeneous constraints on vehicle velocity and acceleration.
+• Incorporating an event-triggered replanner (Section 4.3)
+to modify the planned trajectory in case of disturbances
+or unexpected events, ensuring the new trajectory aligns
+with the previous optimal solution by compensating for
+lost time.
+
+2. Problem Description
+This paper explores the problem of utilizing a fleet of multirotor UAVs to collaboratively perform inspection missions,
+with a focus on wind turbine inspection as a case study. This
+entails capturing videos and pictures of the wind turbine and its
+surroundings to conduct a preliminary remote evaluation.
+The inspection procedure is divided into two distinct tasks:
+pylon inspection and blade inspection. The pylon inspection
+involves visiting designated areas of interest, modeled as 3D
+spaces, to assess the structural integrity of mechanical components, such as the nacelle and rotor shaft. The objective of
+this inspection is to identify potential hazards, like corrosion or
+damage, that may affect the stability and safety of the pylon.
+In contrast, the blade inspection requires obtaining scans that
+cover the entire surface of the blade. This need arises due to
+external factors, such as wind, rain, hail, or bird strikes, that
+can cause cracks or coating damage, potentially impacting the
+blades’ performance. To ensure inspection accuracy, the UAVs
+must maintain a specific distance from the blade and move at a
+controlled speed to avoid blur effects.
+The time needed to complete both inspections may differ
+based on the wind turbine’s size, which should be considered
+during the planning phase along with the vehicle’s dynamical
+constraints. The UAVs in this scenario are assumed to be multirotors, primarily quadrotors, with heterogeneous velocity and
+acceleration limitations. The objective is to plan trajectories for
+the UAVs to efficiently complete the inspection mission while
+also satisfying the aforementioned constraints and maintaining
+a safe distance from obstacles and other UAVs in the environment. It is assumed that a map of the environment, including a
+
+• Including a weighted generalization of the STL robust semantics [31] to capture user preferences and address issues arising from conflicting tasks when mission accomplishment cannot be achieved (Section 4.4).
+• Assessing the method’s overall performance through
+MATLAB simulations to evaluate its effectiveness in
+meeting mission specifications and the efficiency of incorporating the proposed initialization procedure (Section 5). Additionally, validation is conducted via Gazebo
+simulations [32] and field experiments in a mock-up setting (Section 5.4).
+The advantages our approach are twofold. Firstly, we employ an MILP planning formulation that operates on a simplified version of the problem, eliminating the need for linear or
+linearizable constraints and system dynamics, thereby facilitating the search for a global solution. Secondly, we utilize a concise and unambiguous STL formulation, enabling end-users to
+specify drone behavior in easily understandable terms, such as
+target areas to inspect and infrastructure zones to cover, while
+considering for explicit time requirements. In contrast to existing solutions [25, 26, 27], our approach utilizes a smooth robustness function to incorporate a quantitative robust semantics,
+a feature not achievable with automata-based methods [26].
+Furthermore, our approach addresses the issue of overestimating the dimensions of the robot and obstacles, which can lead
+to more conservative maneuvers with CBFs [25].
+3
+
+Table 1: Notation–System variables, general symbols, and reference frames.
+
+polyhedral representation of obstacles like the pylon and blades,
+is available prior to the inspection mission.
+
+FW , F B
+N, T s , t, tk , δ
+
+3. Preliminaries
+d
+
+This section introduces the fundamental concepts required
+to grasp the contributions of this paper. We will provide a brief
+overview of the key system variables, Signal Temporal Logic,
+and its robustness, smooth robustness approximations, the STL
+weighted generalization, and the STL motion planning framework upon which the current contribution is built. To enhance
+readability, a summary of the notation is also provided in Table
+1.
+
+x, d u
+
+M, AP
+d
+d
+
+p, d v, d a, d ψ,
+•k
+
+d ( j)
+
+S
+
+φ, I, pi , µi , λ
+
+3.1. System definition
+Let us consider a discrete-time dynamical model of a
+drone represented in the general form xk+1 = f (xk , uk ), where
+xk+1 , xk ∈ X ⊂ Rn are the next and current states of the system,
+respectively, and uk ∈ U ⊂ Rm is the control input. Let us
+also assume f : X × U → X is differentiable in both arguments.
+Therefore, given an initial state x0 ∈ X0 ⊂ Rn and a time vector t = (t0 , . . . , tN )⊤ ∈ RN+1 , with N ∈ N>0 being the number of
+samples that describe the evolution of the system with sampling
+period T s ∈ R>0 , we can define the finite control input sequence
+u = (u0 , . . . , uN−1 )⊤ ∈ RN as the input for the system to attain
+the unique sequence of states x = (x0 , . . . , xN )⊤ ∈ RN+1 . Let
+us also introduce the notation FW and FB to denote the world
+frame and body frame reference systems, respectively.
+Hence, we can define the state sequence x and control input sequence u for the d-th multi-rotor UAV
+as d x = (d p(1) , d v(1) , d p(2) , d v(2) , d p(3) , d v(3) )⊤ and d u =
+(d a(1) , d a(2) , d a(3) )⊤ , with d p( j) , d v( j) , and d a( j) representing vehicle’s position, velocity, and acceleration sequences along the
+j-axis of the world frame FW , respectively, with j = {1, 2, 3}.
+Finally, the k-th elements of d p( j) , d v( j) , d a( j) , and t, are denoted
+as d p(kj) , d vk( j) , d a(kj) , and tk .
+The model xk+1 = f (xk , uk ) considered for the drone is
+the one provided in [30], where the motion primitives are encoded with splines, and here simply denoted, for each j-axis,
+j) d ( j) d ( j) ⊤
+as (d p(k+1
+, vk+1 , ak+1 ) = d S( j) (d p(kj) , d v(kj) , d a(kj) ). Next, we will
+use a label in the upper left to indicate a specific drone to which
+the dynamic model refers, while we will not use labels to indicate the vector stack of all drone variables.
+
+¬, ∧, ∨,=⇒
+♢, □, ⃝, U
+ρφ (x, tk ),
+ρ̃φ (x, tk )
+d ( j) d ( j) d ( j)
+v , a , v̄ ,
+d ( j)
+ā
+φws , d φobs , d φdis
+φtr , d φbla
+d
+φhm
+T N , T ins , T bla
+d
+
+d
+
+Nobs , Ntr , Nbla
+p( j) , p̄(•j)
+•
+
+Γdis , Γbla , ε, ζ
+
+G, V, E, W, D,
+T, O
+τ, o• , ei j , wi j , zi j
+
+3.2. Signal temporal logic
+STL concisely and unambiguously describes real-valued
+signal temporal behavior [13]. Unlike most used planning algorithms [38], STL encapsulates all mission specifications in
+a single formula φ. For example, the statement “visit regions
+A and B every 10 s, while always stay at least 1 m away from
+region C” can be expressed as a single STL formula, φ. The
+syntax and semantics of STL are detailed in [13, 14], but is
+omitted here for brevity.
+In brief, an STL formula φ is constructed from a set of predicates pi , where i ∈ N0 , representing atomic prepositions like
+belonging to a region or comparisons of real values. Formally,
+
+Niin , Niout
+d ( j)
+
+v̂ , d â( j) , d v̌( j) ,
+ǎ
+
+d ( j)
+
+t̄, E, η, t¯k , tˆk
+
+ω
+
+d
+
+4
+
+ρφ (ω, x, tk ), ω
+
+T c , d ωc
+
+world and body reference frames
+number of samples, sampling period,
+time vector and its k-th element, members of the UAV fleet
+state and control input sequences of the
+d-th UAV
+Set of real-valued functions and the
+corresponding predicates
+position, velocity, acceleration, and
+heading of the d-th UAV in FW and
+their k-th elements
+splines encoding the drone motion
+primitives
+STL formula, generic time interval, i-th
+predicate and its real-valued function,
+tunable parameter for ρ̃φ (x)
+negation, conjunction, disjunction, and
+implication Boolean operators
+eventually, always, next and until temporal operators
+robustness and smooth robustness values of the STL formula φ
+lower and upper limits for the velocity
+and acceleration of the d-th UAV along
+the j-axis
+STL safety requirements
+STL task requirements
+STL mission completion requirement
+mission duration, pylon and blade coverage time intervals
+number of obstacles, number target areas, and number of blade sides to cover
+generic vertices of the rectangular regions defining safety, task, and mission
+requirements
+mutual distance threshold, minimum
+required distance away from the blade,
+maneuverability and safety margins
+graph, set of vertices, graph edges and
+weights, set of drones, set of target areas and blade extreme points, and set of
+depots
+cardinality of T , generic element of O,
+E and W, integer variable for the MILP
+solution
+in-neighborhood
+and
+outneighborhood sets of nodes
+lower and upper limits for the revised
+velocity and acceleration of the d-th
+UAV along the j-axis
+event-trigger time vector and its dimension, event threshold value, generic entry of t̄, and time instance associated
+with the next task
+weighted version of the STL robustness
+score and corresponding weight vector
+thrust and angular velocities of the d-th
+UAV
+
+

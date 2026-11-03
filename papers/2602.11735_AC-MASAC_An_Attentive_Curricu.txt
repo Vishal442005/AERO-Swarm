@@ -1,0 +1,438 @@
+arXiv:2602.11735v1 [cs.RO] 12 Feb 2026
+
+AC-MASAC: An Attentive Curriculum Learning Framework for
+Heterogeneous UAV Swarm Coordination
+Wanhao Liu
+
+Junhong Dai
+
+Yixuan Zhang
+
+Guangdong University of Technology
+Guangzhou, China
+3123006457@mail2.gdut.edu.cn
+
+Guangdong University of Technology
+Guangzhou, China
+2112304096@gdut.edu.cn
+
+Guangdong University of Technology
+Guangzhou, China
+zhangyixuan58@mails.gdut.edu.cn
+
+Shengyun Yin
+
+Panshuo Li∗
+
+Guangdong University of Technology
+Guangzhou, China
+2832003829@mails.gdut.edu.cn
+
+Guangdong University of Technology
+Guangzhou, China
+panshuoli812@gdut.edu.cn
+
+ABSTRACT
+Cooperative path planning for heterogeneous UAV swarms poses
+significant challenges for Multi-Agent Reinforcement Learning
+(MARL), particularly in handling asymmetric inter-agent dependencies and addressing the risks of sparse rewards and catastrophic
+forgetting during training. To address these issues, this paper proposes an attentive curriculum learning framework (AC-MASAC).
+The framework introduces a role-aware heterogeneous attention
+mechanism to explicitly model asymmetric dependencies. Moreover,
+a structured curriculum strategy is designed, integrating hierarchical knowledge transfer and stage-proportional experience replay
+to address the issues of sparse rewards and catastrophic forgetting.
+The proposed framework is validated on a custom multi-agent simulation platform, and the results show that our method has significant
+advantages over other advanced methods in terms of Success Rate,
+Formation Keeping Rate, and Success-weighted Mission Time. The
+code is available at https://github.com/Wanhao-Liu/AC-MASAC.
+
+KEYWORDS
+Heterogeneous multi-agent systems; Reinforcement learning; UAV
+path planning; Attention mechanisms; Curriculum learning
+
+1
+
+INTRODUCTION
+
+Unmanned Aerial Vehicle (UAV) swarms play an increasingly vital
+role in coordinated tasks such as logistics, inspection, and searchand-rescue [8]. Central to these applications is the challenge of
+cooperative path planning—generating collision-free, dynamically
+feasible trajectories for all agents to achieve a common goal, as
+illustrated in Figure 1. Although this is a widely researched area
+with numerous existing solutions [17, 22, 24], current methods still
+face limitations when addressing specific challenges.
+Historically, approaches to this problem can be broadly divided
+into traditional and learning-based methods. Traditional methods,
+largely derived from robotics research, include techniques such as
+sampling-based planners (e.g., RRT* [11, 13]) and potential field
+methods (e.g., APF [12]). While valuable in certain contexts, these
+approaches often share common limitations: they typically require
+a precise model of the environment, exhibit limited adaptability
+to unforeseen dynamic events, and face significant computational
+scaling challenges as the swarm size grows.
+∗ Corresponding author.
+
+To overcome the challenges of model dependency and poor adaptability, Multi-Agent Reinforcement Learning (MARL) has emerged
+as a powerful paradigm for coordinating UAV swarms. Early approaches often treated agents as independent learners (ILs), where
+each agent learned its policy using standard single-agent RL algorithms like Q-learning or DDPG, considering other agents as part
+of a dynamic environment [21]. However, this method struggles
+with the non-stationarity problem, as the concurrent evolution of
+all agents’ policies makes the environment highly unstable and
+hinders convergence. To address this core challenge, the Centralized Training with Decentralized Execution (CTDE) framework
+has become the dominant paradigm in the field [5, 14]. Within
+this framework, one prominent line of research focuses on valuedecomposition methods. These approaches learn a centralized but
+factorizable value function, starting with foundational techniques
+like Value-Decomposition Networks (VDN) [20] and evolving to
+more expressive methods such as QMIX [16] and QTRAN [18].
+While powerful, these methods are primarily designed for discrete
+action spaces because selecting an optimal action requires finding the argmax over the joint action space, which becomes an
+intractable optimization problem in continuous domains. Consequently, Actor-Critic based methods have proven more effective for
+tasks requiring continuous control. They decouple the problem by
+learning a dedicated policy network (the actor) that directly maps
+states to continuous actions, while the critic evaluates the actions
+provided by the actors. This principle was successfully extended
+to the multi-agent domain by the Multi-Agent Deep Deterministic Policy Gradient (MADDPG) algorithm [14], which builds upon
+DDPG—a method inherently designed for continuous control. Following this line of work, and to address the overestimation bias
+often found in single-critic methods, the MATD3 algorithm was
+proposed in [1]. It extends the clipped double-Q learning and delayed policy updates from the single-agent TD3 algorithm to the
+multi-agent setting, leading to more stable value estimates. These
+foundational Actor-Critic approaches established a powerful and
+flexible framework for tasks involving continuous control in MARL.
+While the above mentioned methods were effective, they often
+faced challenges with training stability and sample efficiency. To
+address these issues, the use of Soft Actor-Critic (SAC) [6] has been
+explored in the multi-agent context. The MASAC algorithm, as
+presented in [4, 7], incorporates the maximum entropy objective to
+encourage more thorough exploration, leading to more robust and
+
+• We propose a heterogeneous attention model within the
+MASAC framework that explicitly models the Leader-Follower
+dynamic. Its role-aware information selection mechanism
+is designed to capture the asymmetric inter-agent dependencies overlooked by homogeneous approaches.
+• We design a structured curriculum learning strategy that
+systematically mitigates the risks of sparse rewards and
+catastrophic forgetting. By combining stage-proportional
+experience replay with a hierarchical policy transfer mechanism, our framework enables stable and efficient learning
+across tasks of increasing complexity.
+The remainder of this paper is organized as follows. Section 2
+presents the problem statement, including the system model and
+formulation. In Section 3, the proposed AC-MASAC framework is
+detailed, covering both the heterogeneous actor-critic architecture
+and the structured curriculum learning strategy. In Section 4, the
+effectiveness of the proposed method is validated through comprehensive simulation experiments and ablation studies. Finally,
+Section 5 provides the conclusion.
+
+2
+
+PROBLEM STATEMENT
+
+This paper addresses the problem of cooperative path planning for
+a heterogeneous multi-UAV swarm operating in a two-dimensional
+environment with dynamic obstacles. This problem is formally modeled as a Partially Observable Markov Decision Process (POMDP)
+[10], which provides a rigorous framework for sequential decisionmaking under uncertainty. The swarm is composed of a designated
+Leader agent and multiple Follower agents. The primary objective
+
+for the Leader is to navigate from a starting position to a target
+location while avoiding collisions. The primary objective for the Followers is to maintain a specified formation relative to the Leader’s
+trajectory.
+To formulate this sequential decision-making problem for a
+learning-based solution, we define the core components of the
+agent-environment interface. Each agent 𝑖 perceives a local observation 𝑧𝑖 based on its role. The Leader’s observation is a vector 𝑧𝑖(𝐿) = [𝑥𝑖 , 𝑦𝑖 , 𝑣𝑖 ,𝜓𝑖 , 𝑥𝐺 , 𝑦𝐺 , 𝑂 flag ], which includes its position
+(𝑥𝑖 , 𝑦𝑖 ), speed 𝑣𝑖 , heading angle 𝜓𝑖 , the target’s coordinates (𝑥𝐺 , 𝑦𝐺 ),
+and a binary obstacle detection flag. In contrast, a Follower’s observation is 𝑧𝑖(𝐹 ) = [𝑥𝑖 , 𝑦𝑖 , 𝑣𝑖 ,𝜓𝑖 , 𝑥 𝐿 , 𝑦𝐿 , 𝑣 𝐿 ], which contains its own state
+alongside the Leader’s position (𝑥 𝐿 , 𝑦𝐿 ) and speed 𝑣 𝐿 . The action
+space for each agent is continuous, where an action 𝑎 = [𝑎𝑐 , 𝜔𝑐 ]
+consists of a linear acceleration command 𝑎𝑐 and an angular velocity command 𝜔𝑐 , each bounded by the UAV’s specific kinematic
+limits. The performance of any policy aimed at solving this problem
+
+UAV 2
+
+Failure to avoid obstacle
+
+Successfully reached
+
+UAV 1
+
+Obstructicon Area
+
+UAV 3
+
+UAV 3
+
+efficient coordination policies. Furthermore, as the research focus
+shifted towards larger-scale swarms, the challenge of effectively
+processing and filtering the vast amount of peer information became prominent. To this end, attention mechanisms were integrated
+into the framework. An attention-based critic was introduced in
+[9], allowing agents to selectively focus on more relevant neighbors
+when evaluating state-values. Going a step further, attention was
+applied to the actor network in [19], enabling agents to learn a
+communication strategy to actively select which peers to broadcast
+their information to. These methods, within a typical homogeneous
+swarm setting, have significantly improved decision-making in
+dense and complex scenarios.
+Despite these significant advances, applying these frameworks
+to more complex, structured swarm scenarios reveals two key open
+challenges. On the one hand, much of the foundational work has
+centered on homogeneous agent systems, where agents are considered interchangeable. This approach, while broadly applicable,
+presents limitations when modeling heterogeneous swarms (e.g.,
+Leader-Follower teams), which are characterized by asymmetric
+inter-agent dependencies that are not explicitly captured by standard models. On the other hand, the risks associated with sparse
+rewards and catastrophic forgetting remain primary obstacles to
+achieving stable and efficient policy convergence when applying
+these algorithms directly to complex tasks. To address these challenges of heterogeneity and training stability, this paper presents
+the AC-MASAC (Attentive Curriculum-driven Multi-Agent Soft
+Actor-Critic) algorithm. The contributions of this work are summarized as follows:
+
+Failure to avoid obstacle
+
+Obstruction Area
+
+UAV 1(Leader)
+
+UAV 2/3/4(Follower)
+
+Leader UAV trajectory
+
+Obstructicon Area
+
+Safe Area
+
+Follower UAV trajectory
+
+Figure 1: Conceptual diagram of the multi-UAV cooperative
+path planning task. The swarm, composed of a Leader and
+multiple Followers, must navigate towards a target while
+avoiding obstacles and maintaining formation. Each UAV
+makes decentralized decisions based on its role-specific local
+observations.
+is evaluated using three key metrics. The Success Rate (SR) is defined as the proportion of episodes in which the Leader successfully
+reaches the target without collision. The Formation Keeping Rate
+(FKR) measures coordination quality, calculated as the proportion
+of time steps during which Followers successfully maintain their
+specified formation constraints. Finally, the Success-weighted Mission Time (SMT), defined as the average episode length multiplied
+by the Success Rate, is used to evaluate the overall efficiency of the
+generated solution.
+
+3 AC-MASAC APPROACH
+3.1 POMDP Formulation
+The cooperative path planning problem under partial observability
+is modeled as a decentralized Partially Observable Markov Decision Process (POMDP) [15, 23], an extension of the traditional
+Markov Decision Process [2, 3]. The POMDP is defined by the tuple
+
+Progressive-Enhancement Curriculum Learning
+
+Maps of Different Curriculums
+
+Figure 2: AC-MASAC framework overview. Top: Curriculum learning module controlling task difficulty. Bottom: Attentionenhanced actor-critic networks processing states for action generation and training via a curriculum-managed replay buffer.
+⟨S, A, P, R, Z, O, 𝛾⟩. Here, S represents the set of true environmental states, which are not directly observable by the agents. A is
+the joint action set composed of individual agent actions, which are
+known to the agents. P is the state transition function, governed by
+the environment dynamics and generally unknown to the agents.
+R is the reward function. Z is the set of joint observations, from
+which each agent draws its local view. O is the observation function
+that maps states to observations, which is also unknown. Finally, 𝛾
+is the discount factor.
+State Space (S): Following the Centralized Training with Decentralized Execution (CTDE) paradigm, the global state 𝑠𝑡 ∈ S
+is defined as the concatenation of all agents’ local observations:
+𝑠𝑡 = {𝑧𝑡(𝐿) , 𝑧𝑡(𝐹1 ) , . . . , 𝑧𝑡(𝐹𝑁 ) }. This global state serves as the input for
+the centralized critic to estimate the joint value function based on
+the swarm’s collective perception.
+Observation Space (Z): The observation for the 𝑖-th agent,
+𝑧𝑖 ∈ Z𝑖 , consists of its own flight status and role-specific information. For the Leader UAV, the observation vector is 𝑧𝑖(𝐿) =
+[𝑥𝑖 , 𝑦𝑖 , 𝑣𝑖 ,𝜓𝑖 , 𝑥𝐺 , 𝑦𝐺 , 𝑂 flag ], where 𝑂 flag is a binary indicator set to 1
+if the nearest obstacle is within 40m, and 0 otherwise. For a Follower UAV, its observation vector is 𝑧𝑖(𝐹 ) = [𝑥𝑖 , 𝑦𝑖 , 𝑣𝑖 ,𝜓𝑖 , 𝑥 𝐿 , 𝑦𝐿 , 𝑣 𝐿 ],
+containing information about the Leader. The observation function O is subject to simulated sensor noise, modeled as an additive
+2
+Gaussian process N (0, 𝜎noise
+), where 𝜎noise = 0.1.
+Action Space (A): The action for the 𝑖-th agent, 𝑎𝑖 ∈ A𝑖 , is a
+continuous two-dimensional vector 𝑎𝑖 = [𝑢𝑖 , 𝜔𝑖 ]𝑇 , representing linear acceleration and angular velocity. These actions are constrained
+by heterogeneous kinematics: the Leader UAV has a velocity range
+
+of [10, 20] m/s and acceleration |𝑢𝑖 | ≤ 3 m/s2 , while Followers have
+a velocity range of [10, 30] m/s and acceleration |𝑢𝑖 | ≤ 6 m/s2 .The
+angular velocity for all agents is constrained to 𝜔𝑖 ∈ [−𝜋/3, 𝜋/3]
+rad/s.
+Transition Function (P): The state transition function 𝑠𝑡 +1 ∼
+P (𝑠𝑡 , 𝑎𝑡 ) is deterministic and governed by the discretized UAV dynamics model[4], with a simulation time step of Δ𝑡 = 0.1𝑠:
+
+𝑥𝑖 (𝑡 + 1) = 𝑥𝑖 (𝑡) + 𝑣𝑖 (𝑡)Δ𝑡 cos𝜓𝑖 (𝑡)
+
+
+
+
+𝑦 (𝑡 + 1) = 𝑦 (𝑡) + 𝑣 (𝑡)Δ𝑡 sin𝜓 (𝑡)
+
+𝑖
+
+𝑖
+
+𝑖
+
+
+𝑣𝑖 (𝑡 + 1) = 𝑣𝑖 (𝑡) + 𝑢𝑖 (𝑡)Δ𝑡
+
+
+
+𝜓 (𝑡 + 1) = 𝜓 (𝑡) + 𝜔 (𝑡)Δ𝑡
+𝑖
+𝑖
+ 𝑖
+
+𝑖
+
+(1)
+
+Reward Function (R): Role-specific reward functions are designed to guide the agents towards their respective objectives. The
+total reward for each agent is the sum of several components, and
+the discount factor is denoted by 𝛾.
+Leader’s Reward (𝑅𝑡𝐿 ):
+Goal Achievement Reward (𝑟𝑔 ): A significant sparse reward
+is provided upon reaching the target. To mitigate the challenge of
+this sparse signal, a dense reward shaping component based on
+the negative Euclidean distance to the goal, denoted as 𝑑𝑔 , is also
+included.
+(
+1000.0,
+if 𝑑𝑔 < 40
+𝑟𝑔 =
+(2)
+−0.001 · 𝑑𝑔 , otherwise
+Obstacle Penalty (𝑟𝑜 ): To ensure a safe distance from obstacles,
+a staged penalty is imposed when the Euclidean distance 𝑑𝑜 to the
+
+nearest obstacle falls below a certain threshold.
+
+ −500.0, if 𝑑𝑜 < 20
+
+
+
+𝑟𝑜 = −2.0,
+(3)
+if 20 ≤ 𝑑𝑜 ≤ 40
+
+
+ 0.0,
+otherwise
+
+Boundary Penalty (𝑟𝑒 ): A penalty is applied when the Manhattan distance 𝑑𝑏 to the nearest boundary is less than 50.
+(
+−1.0, if 𝑑𝑏 < 50
+𝑟𝑒 =
+(4)
+0.0,
+otherwise
+Formation Distance Penalty (𝑟 𝑓 1 ): A linear penalty is imposed
+when the maximum distance to any follower, max 𝑗 (𝑑𝐿,𝑗 ), exceeds
+the ideal formation distance of 50.
+(
+0.0,
+if max 𝑗 (𝑑𝐿,𝑗 ) ≤ 50
+𝑟𝑓 1 =
+(5)
+−0.001 · max 𝑗 (𝑑𝐿,𝑗 ), otherwise
+Velocity Matching Reward (𝑟𝑠1 ): A reward is given for each
+follower where the speed difference with the leader is less than 1.
+The total reward is the sum of these individual rewards over all 𝑁
+followers.
+(
+𝑁
+∑︁
+1.0, if |𝑣 𝐿 − 𝑣 𝐹,𝑖 | < 1
+𝑟𝑠1 =
+(6)
+𝑖=1 0.0, otherwise
+The total reward for the Leader is the sum of these components:
+𝑅𝑡𝐿 = 𝑟𝑔 + 𝑟𝑜 + 𝑟𝑒 + 𝑟 𝑓 1 + 𝑟𝑠1 .
+Follower’s Reward (𝑅𝑡𝐹 ):
+Formation Distance Reward (𝑟 𝑓 2 ): A staged reward is given
+when the distance 𝑑𝐿 to the leader is within the ideal range; otherwise, a linear penalty is imposed.
+
+
+100.0,
+
+
+
+𝑟 𝑓 2 = 10.0,
+
+
+ −0.01 · 𝑑𝐿 ,
+
+
+if 0 < 𝑑𝐿 < 40
+if 40 ≤ 𝑑𝐿 < 50
+otherwise
+
+(7)
+
+Velocity Matching Reward (𝑟𝑠2 ): When within the ideal formation distance and the speed difference is less than 1, a velocity
+matching reward is given.
+(
+100.0, if 𝑑𝐿 < 50 and |𝑣 𝐿 − 𝑣𝑖 | < 1
+𝑟𝑠2 =
+(8)
+0.0,
+otherwise
+The total reward for the Follower is the sum of its components:
+𝑅𝑡𝐹 = 𝑟 𝑓 2 + 𝑟𝑠2 .
+An episode terminates when the Leader reaches the target, or
+when any agent collides with an obstacle.
+
+3.2
+
+Heterogeneous Actor-Critic Architecture
+
+The AC-MASAC algorithm is built upon the Soft Actor-Critic (SAC)
+framework [6], which optimizes a policy 𝜋 to maximize an entropyregularized objective function. The objective is to find a policy
+that balances the maximization of cumulative reward with the
+maximization of its own entropy, which encourages exploration
+and enhances robustness:
+𝑇
+∑︁
+𝐽 (𝜋) =
+E (𝑠𝑡 ,𝑎𝑡 )∼𝜌𝜋 [𝑟 (𝑠𝑡 , 𝑎𝑡 ) + 𝛼H (𝜋 (·|𝑠𝑡 ))]
+(9)
+𝑡 =0
+
+The temperature parameter, 𝛼, serves as a trade-off coefficient.
+Instead of being a fixed hyperparameter, 𝛼 is learned automatically
+
+Figure 3: AC-MASAC architecture diagram.
+
+by minimizing the following loss function, which aims to maintain
+a target entropy level H̄ :
+𝐽 (𝛼) = E𝑎𝑡 ∼𝜋𝑡 [−𝛼 log 𝜋𝑡 (𝑎𝑡 |𝑠𝑡 ) − 𝛼 H̄ ]
+
+(10)
+
+The core of our contribution lies in the design of a heterogeneous
+actor-critic architecture, termed AC-MASAC. Its overall framework
+is depicted in Figure 2, while the detailed network architecture
+is shown in Figure 3. This approach explicitly models the LeaderFollower roles, directly addressing the limitations of the homogeneity assumption identified in the introduction. Instead of using a
+single, monolithic policy structure, we introduce two distinct, rolespecific actor networks and a critic whose structure mirrors this
+heterogeneity. This design provides an inductive bias that facilitates
+the learning of specialized, coordinated behaviors, overcoming the
+challenge of unstructured state representations in prior multi-agent
+actor-critic methods.
+Heterogeneous Actor Networks as illustrated in Figure 4, the
+architecture employs two distinct actor networks, whose designs
+are tailored to the specific informational needs of each role.
+The Leader Actor, whose architecture is detailed in Figure 4(a),
+utilizes a selective cross-entity attention mechanism. The input is
+the Leader’s local observation 𝑧𝑖(𝐿) . It is first passed through an
+embedding layer 𝜙𝑒𝐿 to produce an embedding 𝑒 𝐿 , which serves as
+the query (𝑄). The observations of the followers {𝑧 𝑗(𝐹 ) } are similarly
+embedded via a shared embedding layer 𝜙𝑒𝐹 to produce keys (𝐾) and
+values (𝑉 ). To handle a variable number of followers and partial
+observability, a head-wise attention mask is applied, which allows
+the network to ignore non-existent or out-of-range agents during the attention score calculation. The attention mechanism then
+computes a context vector representing the aggregated follower
+states.
+The Follower Actor(Figure 4(b)) uses a global context-aware attention mechanism. Its local observation 𝑧𝑖(𝐹 ) is embedded via 𝜙𝑒𝐹
+to form the query (𝑄). The context is formed by the Leader’s observation 𝑧𝑖(𝐿) and all other followers’ observations {𝑧 𝑗(𝐹 ) } 𝑗≠𝑖 , which
+are embedded to provide the keys (𝐾) and values (𝑉 ). To improve
+sample efficiency, the Follower Actor networks share parameters
+across all follower agents.
+For both actor networks, the final processed features are projected to produce the parameters of a Gaussian policy, yielding a
+
+

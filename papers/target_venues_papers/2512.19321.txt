@@ -1,0 +1,356 @@
+Learning to Sample in Variable Neighborhood Search Algorithm for
+Urban Cable Routing Optimization
+Wei Liua , Rui Wanga,∗ , Chenhui Linb , Kaiwen Lia , Wenhua Lia and Tao Zhanga
+a National University of Defense Technology, 109 Deya Road, Kaifu District, Changsha, 410073, Hunan Province, China
+
+arXiv:2512.19321v2 [cs.NE] 23 Jul 2026
+
+b Department of Electrical Engineering, Tsinghua University, 30 Shuangqing Road, Beijing, 100084, Beijing Municipality, China
+
+ARTICLE INFO
+
+ABSTRACT
+
+Keywords:
+Distribution network planning
+Cable routing
+Deep reinforcement learning
+Multiple agents
+Variable neighborhood search
+
+Urban underground cable construction is essential for enhancing power grid reliability, yet the high
+construction costs demand systematic optimization. Constrained by road network infrastructure,
+this optimization problem requires consideration not only of connectivity relationships between
+substations but also of specific routing strategies along road networks, constituting a large-scale
+bilevel combinatorial optimization problem. Insufficient attention to specific routing subproblems in
+traditional research and simplistic algorithmic designs that are ill-equipped for large-scale combinatorial optimization leave substantial room for advancement in addressing this complex optimization
+challenge. To navigate the enormous combinatorial search space, we propose a learning-assisted
+variable neighborhood search (L-VNS) algorithm integrating four key components. First, an auxiliary
+task focusing exclusively on the upper-level connectivity subproblem generates high-quality initial
+solutions by employing hybrid genetic search for connection optimization and A* for detailed path
+routing. Subsequently, the algorithm iteratively refines the connectivity topology using variable neighborhood search equipped with three complementary operators. A multi-agent deep reinforcement
+learning module adaptively guides probabilistic neighborhood sampling by jointly encoding both
+upper-level connectivity patterns and lower-level routing structures, effectively exploiting problem
+structure. Finally, a modified A* operator re-plans the lower-level paths affected by neighborhood
+modifications to ensure feasibility and solution completeness. Comprehensive experiments on 12
+benchmark instances and 3 GIS-derived instances demonstrate the superiority of L-VNS, achieving
+total construction cost reductions of 0.92–73.72% compared to representative approaches. Ablation
+studies and sensitivity analyses further validate the effectiveness and robustness of the proposed
+algorithm.
+
+1. Introduction
+As economic development advances and reliability requirements escalate, an increasing number of cities are planning to comprehensively replace all conventional overhead
+lines with underground cables in their core urban areas to
+mitigate the impacts of extreme weather events such as
+typhoons and ice storms [1, 2]. However, given the substantial costs associated with this initiative, systematically
+planning regional cable routing from the ground up in a costeffective and holistic manner presents a critical optimization
+challenge [3].
+In urban distribution systems, the segment spanning
+from the 110/10 kV primary substation (i.e., high-voltage
+(HV) substation) through the 10 kV feeders to the 10/0.4 kV
+distribution transformers (i.e., medium-voltage (MV) substations) constitutes the MV distribution network (DN). The
+associated cable infrastructure is typically designed with
+closed-loop feeder configurations operated in an open-loop
+manner, enabling back-feeding from multiple sources when
+required. Common layouts include interconnected and ring
+feeders, which can be energized from opposite ends or from a
+∗ Corresponding author
+
+weiliu16@nudt.edu.cn (W. Liu); rui_wang@nudt.edu.cn (R. Wang);
+likaiwen@nudt.edu.cn (K. Li); liwenhua1030@aliyun.com (W. Li);
+zhangtao@nudt.edu.cn (T. Zhang)
+ORCID (s): 0000-0002-6526-6526 (W. Liu); 0000-0001-9048-2979 (R.
+Wang); 0000-0001-7455-8793 (C. Lin); 0000-0003-1550-5987 (K. Li);
+0000-0002-0432-2942 (T. Zhang)
+
+Wei Liu et al.: Preprint submitted to Elsevier
+
+Fig. 1: Typical topologies of urban MV distribution cable
+networks: (a) Interconnected network: MV substations are
+linked by feeders that originate from one HV substation and
+terminate at another; (b) Ring network: MV substations are
+linked by feeders that both originate from and terminate at
+the same HV substation.
+
+common source [4], as illustrated in Fig. 1. This arrangement
+supports flexible switching and maintains normal service
+continuity under any single-contingency 𝑁 − 1 conditions,
+thereby enhancing reliability and operational resilience.
+The cable routing problem is typically formulated as a
+bilevel combinatorial optimization problem (COP), wherein
+the objective is to determine the minimum-cost cable routing
+paths between substations while satisfying capacity constraints, connection requirements, and geographical limitations. The upper-level problem seeks to optimize the
+interconnection topology among substations, whereas the
+Page 1 of 19
+
+Learning to Sample in Variable Neighborhood Search Algorithm for Urban Cable Routing Optimization
+
+Fig. 2: Schematic diagrams of the urban cable routing problem
+underscore two key points. First, as shown by panel (a) versus
+panel (b), cables cannot be laid along arbitrary straight-line
+segments; rather, their paths must adhere strictly to the
+existing road network topology. Second, as illustrated by panel
+(c) versus panel (d), planning multiple feeders in parallel along
+the same road segments can exploit spatial overlap to reduce
+road-trenching costs, potentially outperforming designs that
+rely solely on individual shortest-path routes.
+
+corresponding lower-level problem determines the detailed
+cable routing paths given the connectivity configuration
+decisions. A detailed mathematical formulation of this problem is provided in Section 3. In contrast to cable routing
+challenges in wind farms and rural areas [5, 6], urban cables
+can only be installed beneath roads and not through existing
+buildings [7]. This restriction complicates decision-making
+in two key ways: (i) Cable Length Considerations: the feeder
+length between substations cannot be calculated directly by
+Euclidean distance, but depends on specific cable routes
+that strictly along the roads; (ii) Cost Reduction through
+Overlapping Cables: construction costs include not just the
+cable procurement cost but also the road-trenching cost,
+which is much more expensive. Consequently, the shortestpath routing between two substations does not necessarily
+yield the lowest total construction cost. In many cases,
+deploying multiple feeders in parallel along the same road
+segment can reduce the total cost through overlap, even if
+it increases the aggregate length of cable installed [8]. Fig.
+2 gives a schematic diagram to further illustrate these two
+points. These factors make the problem greatly complex:
+2
+2
+the decision-making space expands from 2𝑁𝑠 to 2(𝑁𝑟 +𝑁𝑠 ) ,
+where 𝑁𝑠 is the number of substations and 𝑁𝑟 is the number
+of road junctions. Typically, 𝑁𝑟 exceeds 𝑁𝑠 by one to two
+orders of magnitude.
+Despite decades of research on the cable routing problem, most studies have focused primarily on the connection relationships between equipment, such as substations
+or generators. They simplify the consideration of specific
+cable routes by calculating cable lengths based solely on
+Euclidean distances between geographic coordinates. Such
+simplification is typical in less congested environments, as
+Wei Liu et al.: Preprint submitted to Elsevier
+
+seen in offshore wind farms [6, 9, 10, 11, 12] and old town
+districts [13], greatly easing problem solving. However, such
+simplification is not reasonable in cities, since cables are
+only allowed to be laid under roads. Several studies further
+take the geographic information system (GIS) into consideration when optimizing the cable routes [14, 15, 16, 17]. The
+inclusion of road information significantly complicates the
+problem, making it challenging to address directly with exact
+planning methods. As a result, dividing the original problem
+into multiple stages for sequential optimization paired with
+heuristic approaches has become a common practice [16, 8].
+Instead of connecting substations directly by a straight cable,
+the path planning is generally seen as an inner-layer subproblem or a second-phase sub-problem, where some classical path planning algorithms are applicable, such as the
+Dijkstra’s algorithm [18]. A broader set of exact methods,
+classical heuristics, and artificial intelligence techniques has
+also been explored, including Benders decomposition [19],
+genetic algorithms [20, 21], ant colony optimization [22],
+neighborhood search [6], reinforcement learning [23], and
+imitation learning [24]. Furthermore, to address the limited
+adaptivity in operator selection and parameter configuration of metaheuristic algorithms, recent investigations into
+learning-assisted neighborhood search have emerged and
+demonstrated considerable promise in solving COPs [25, 26,
+27].
+Section 2 provides a detailed review of relevant literature. In summary, despite notable progress in this field, comprehensive research that fully captures the problem structure
+of urban underground cable routing optimization remains
+scarce, and existing algorithmic designs for this problem
+are underdeveloped. On one hand, most existing studies
+employ overly simplified problem formulations, selectively
+overlooking the lower-level optimization subproblem (i.e.,
+path routing optimization strongly coupled with urban road
+networks) while concentrating exclusively on upper-level
+substation connectivity optimization. On the other hand, current algorithmic designs for urban underground cable routing optimization lack precision. These approaches predominantly rely on multi-stage decomposition strategies with
+rudimentary heuristic integration, which exhibit excessive
+greediness and consequently limit optimization accuracy,
+particularly for large-scale instances. Furthermore, state-ofthe-art (SOTA) search algorithms commonly employed in
+other path planning problems primarily emphasize neighborhood operator design or parameter tuning, while lacking
+effective search space reduction strategies that are important
+for addressing such bilevel combinatorial optimization problems characterized by exponentially large search spaces [28].
+To address the aforementioned challenges, this work
+reformulates the urban cable routing problem as a bilevel
+COP that addresses substation interconnections at the upper level and cable routing paths at the lower level, and
+constructs a comprehensive set of standard benchmark instances with varying scales for systematic evaluation. From
+an algorithmic perspective, we propose a learning-assisted
+variable neighborhood search (L-VNS) algorithm to solve
+Page 2 of 19
+
+Learning to Sample in Variable Neighborhood Search Algorithm for Urban Cable Routing Optimization
+
+this problem. The algorithm comprises four integrated modules: (i) solution initialization, (ii) a variable neighborhood
+search (VNS) module dedicated to upper-level optimization,
+(iii) an 𝐴∗ -based re-planning module for lower-level path
+routing optimization, and (iv) a deep reinforcement learning
+(DRL) module for strategic neighborhood sampling in the
+upper level. The operational workflow proceeds as follows:
+We first treat the upper-level subproblem as an auxiliary
+task and apply the hybrid genetic search (HGS) algorithm
+[29] to iteratively optimize and obtain an upper-level-only
+solution. Subsequently, we employ a modified 𝐴∗ (hereafter
+referred to uniformly as 𝔸∗ ) algorithm [30] to determine the
+specific cable routing paths, thereby obtaining a high-quality
+feasible initial solution. Starting from the initial solution, LVNS iteratively optimizes substation interconnections using
+three neighborhood operators: a destruction operator, an
+intra-feeder 2-opt operator, and an inter-feeder 2-opt operator. During it, the selection of neighborhood operators and
+the magnitude of destruction scope are adaptively adjusted
+at each iteration based on historical performance metrics
+and the degree of stagnation. Apart from that, three pretrained DRL agents, each corresponding to one of the aforementioned neighborhood operators, compute position-based
+probability vectors for neighborhood operations conditioned
+on the current solution state. These probability vectors subsequently guide probabilistic sampling to generate the neighborhood scopes, thereby replacing random sampling with
+informed strategic selection. Following neighborhood exploration, a modified 𝔸∗ operator re-plans the cable routing
+paths affected by the neighborhood modifications to ensure
+feasibility and completeness of the resulting solution. Computational experiments demonstrate the advances of the proposed L-VNS: testing on 12 benchmark instances and 3 GISderived instances, L-VNS reduces 0.92–73.72% cost relative
+to SOTA comparison algorithms. Ablation experiments and
+sensitive analysis further validate its effectiveness.
+The main contributions of this work can be summarized
+as follows:
+• We formulate the urban cable routing problem as a
+bilevel optimization framework that decomposes the
+exponentially large decision space into upper-level
+connectivity design and lower-level path planning.
+We additionally provide an open-source standardized
+benchmark suite for reproducible evaluation.
+• We construct an auxiliary optimization task that relaxes bilevel coupling while preserving essential constraints, and solve it using HGS and 𝐴∗ to generate
+high-quality initial solutions that accelerate subsequent search.
+• We develop a bilevel neighborhood search framework
+where the upper level explores alternative connectivity topologies via variable neighborhood search, and
+the lower level performs incremental cable path replanning using a modified trench-sharing-aware 𝔸∗
+
+Wei Liu et al.: Preprint submitted to Elsevier
+
+algorithm. By exploiting neighborhood transition relationships, the framework reduces redundant lowerlevel computations.
+• We integrate a multi-agent DRL module to guide
+probabilistic neighborhood sampling, replacing uniform random exploration with informed operator and
+position selection based on learned connectivity and
+routing patterns.
+The remainder of this study is organized as follows:
+Section 2 surveys related work in detail and concludes our
+research motivation. Section 3 formulates the urban cable
+routing problem. Section 4 presents the proposed L-VNS
+method. Section 5 illustrates the experimental settings. Section 6 reports computational experiments on comparison,
+ablation, and sensitivity.Section 7 presents several highlevel discussions of the proposed method and its limitations.
+Section 8 concludes this study and outlines future research
+directions.
+
+2. Related Work
+2.1. Studies for Cable Routing Optimization
+
+Cable routing optimization is a common task in power
+systems. Two prominent application domains are photovoltaic plants and wind farms, where the layout of cables
+connecting photovoltaic (PV) panels and wind turbines is
+critical for performance and cost efficiency [31, 8, 5, 6,
+10]. In these relatively unobstructed environments, planners
+can prioritize the design of connection relationships among
+devices and often lay cables along near-linear paths. As a
+result, the problem is frequently simplified to a minimum
+spanning tree (MST) formulation, yielding radial network
+structures that satisfy electrical constraints while minimizing total cable length. A range of classical heuristics and
+metaheuristics has been applied in this context, including
+variable-depth large neighborhood search [31], Dijkstra’s
+algorithm [5], simulated annealing, Tabu search, variable
+neighborhood search, ant colony optimization, and genetic
+algorithms [6].
+However, real-world cable routing faces substantial, often non-negligible obstacles. In outdoor HV transmission,
+undulating terrain can significantly complicate construction, while in urban MV distribution networks, buildings
+and other infrastructures may block intended routes. Consequently, it is essential to account not only for connection
+relationships between devices but also for the specific, feasible routing paths of the cables.
+Monteiro et al. [32] and Larsson et al. [33] addressed
+point-to-point HV cable routing in realistic geographic settings. The former proposed a dynamic programming approach validated on small-scale case studies, highlighting
+an iterative and systematic procedure for optimal routing.
+In contrast, the latter offered a comprehensive comparison
+of multiple optimization techniques, including Dijkstra’s
+algorithm, 𝐴∗ search, and ant colony optimization.
+To interconnect urban end-users with substations operating at different voltage levels, cables must be installed
+Page 3 of 19
+
+Learning to Sample in Variable Neighborhood Search Algorithm for Urban Cable Routing Optimization
+
+strictly along designated roadways. Trageser et al. [34] transformed rendered geographic maps into cost maps and used
+a greedy strategy to sequence load connections, while employing the 𝐴∗ algorithm to compute actual route lengths.
+Wang et al. [16] leveraged GIS data to extract street layouts
+and compute shortest-path distances between substations.
+To manage complexity, they decomposed the task into two
+subproblems: closed-loop construction and open-loop operation, solving the former with the Clark–Wright Savings
+(CWS) heuristic and the latter with a mixed-integer linear
+programming (MILP) model. Pavon et al. [35] and Valenzuela et al. [36] used GIS data to formulate urban cable
+routing as a weighted minimum spanning tree and solved it
+with Prim’s algorithm. [36] further applied K-means clustering for simplification. Wang et al. [37] represented the road
+network via a shortest-path adjacency matrix and combined
+Q-learning with ant colony optimization to form a multiagent collaborative learning framework. Bosisio et al. [13]
+and Duvnjak et al. [38] simplified routing by optimizing only
+substation connections, modeling the problem as a mixedinteger program solved with commercial solvers.
+Despite these contributions, research on urban cable
+routing optimization remains limited in depth, characterized
+by excessive problem simplification and insufficient treatment of the bilevel coupling between connectivity decisions
+and routing optimization. Few existing approaches employ
+advanced algorithmic paradigms capable of handling the
+complexity of realistic urban cable routing problems.
+
+operators. Similarly, Guo et al. [42] constructed a multiagent convolutional neural network to select perturbation
+and improvement operators from a low-level heuristic pool,
+jointly guiding neighborhood search strategies for vehicle
+routing problems. Wang et al. [43] developed a DRL framework built upon the LNS paradigm, wherein the DRL model
+adaptively selects destruction and repair operators as well as
+recharging strategies conditioned on the current state of the
+search process.
+On another front, to address the inefficiency of random
+destruction in LNS, Zhou et al. [44] employed imitation
+learning and bipartite graph convolutional networks (GCN)
+to adaptively select variables for destruction, followed by
+repair via off-the-shelf solvers such as CPLEX or OR-Tools.
+Wang et al. [45] simultaneously considered the location and
+magnitude of destruction operations, training an enhanced
+graph attention network to output variable-length destruction node sequences. Additionally, several researchers have
+focused on solution selection among tightly coupled subproblems. For instance, Cao et al. [46] addressed the strong
+coupling among four subproblems in the integrated port
+berth allocation and storage problem (IPBP) by introducing
+a bidirectional long short-term memory (LSTM)-embedded
+autoencoder network that learns automatically rather than
+relying on manual design to identify and retain high-quality
+sub-problem solutions, thereby improving overall solution
+quality more effectively in global search. More comprehensive discussions on learning-assisted neighborhood search
+can be found in recent surveys [47].
+2.2. Studies for Learning-assisted Neighborhood
+In summary, while learning-assisted methods provide
+Search
+promising adaptive adjustment mechanisms for neighborhood search variants, however, several critical gaps persist.
+Neighborhood search methods have demonstrated outFirst, most existing studies focus on operator selection or
+standing performance in COPs, particularly in path planparameter tuning, which does not address the exponentially
+ning problems. Despite the evolution of numerous variants,
+large search space in bilevel optimization: when neighincluding Iterated Local Search (ILS), Variable Neighborborhood spaces are vast, efficiently identifying promising
+hood Search (VNS), Large Neighborhood Search (LNS), and
+solutions within limited sampling budgets imposes strinAdaptive Large Neighborhood Search (ALNS), one of the
+gent demands on model inference performance. Secondly,
+core challenges remains how to adaptively manage operator
+although some researchers have utilized learning methods
+selection, neighborhood scope, and operator parameters durto autonomously select neighborhood operation positions,
+ing the search process. Confronted with the inherent reliance
+there is limited investigation into how bilevel optimization
+on manual tuning inherent in metaheuristic algorithms, an
+can leverage lower-level solution information during upperincreasing body of recent research has been directed toward
+level neighborhood sampling to enhance search efficiency.
+integrating DRL to enhance algorithm performance [39],
+Finally, constructing and training collaborative multi-agent
+yielding promising empirical results.
+systems for multiple neighborhood operators remains chalMany researchers focus on learning-assisted neighborhood operator selection. Lu et al. [40] introduced the “Learning- lenging.
+to-Improve” (L2I) framework, wherein a reinforcement
+2.3. Research Motivation
+learning-based controller iteratively selects improvement
+As stated above, existing studies still show gaps in both
+operators to refine solutions. These operators are drawn
+the problem formulation and algorithm design. To address
+from a robust pool customized for routing problems. Beyond
+the aforementioned weaknesses, we tackle the problem from
+improvement operator selection, Chen et al. [41] further
+two complementary perspectives.
+considered perturbation operator selection within neighborOn the problem formulation level, we formulate the
+hood search and proposed Learning Adaptive Neighborhood
+urban cable routing problem as a bilevel COP that jointly
+Search with Dual operator Selection (LANDS), integrating
+optimizes interconnection topology and cable routing paths.
+two reinforcement learning controllers to simultaneously
+This formulation explicitly: (i) preserves the mandated
+and adaptively select both improvement and perturbation
+single-loop, multi-source feeder architecture; (ii) restricts all
+Wei Liu et al.: Preprint submitted to Elsevier
+
+Page 4 of 19
+
+

@@ -1,0 +1,30 @@
+# Manuscripts & LaTeX files (as requested: strictly excluded from Git repository)
+*.pdf
+*.tex
+*.aux
+*.log
+*.out
+*.spl
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.toc
+*.bbl
+*.blg
+
+# Python & ROS build caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# ROS 2 build artifacts
+build/
+install/
+log/
+
+# System and editor files
+.DS_Store
+*.swp
+*~

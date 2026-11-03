@@ -1,0 +1,698 @@
+Full E(n) Equivariance
+
+Adaptive Symmetry Relaxation
+
+Stabilizer Og (n)
+
+No Preferred Direction
+
+Controlled Symmetry Reduction
+
+Fixed Ambient Direction
+
+Directional conditioning via
+preferred direction g
+xi
+
+λ=0
+
+Learnable λ
+
+Full E(n)
+
+The full O(n) action
+is enforced
+
+λ ̸= 0
+
+g×
+✓
+
+Reduced Eg (n)
+
+Directional influence vanishes
+continuously as λ → 0
+
+Only transformations satisfying
+Qg = g are enforced
+
+(ℓ)
+
+Figure 3: Controlled symmetry relaxation through a preferred ambient direction. When all λg =
+0, the directional pathway is inactive and ESNN retains full E(n)-equivariance. Activating the
+(ℓ)
+directional conditioning λg ⟨rij , g⟩ reduces the guaranteed symmetry to Eg (n) = Og (n) ⋉ Rn ,
+where Og (n) = {Q ∈ O(n) : Qg = g}. The layerwise relaxation coefficients are initialized at zero;
+g may be specified or learned, but is held fixed when the input geometry is transformed.
+
+Theorem 6.1 (Stabilizer Subequivariance). Let g ̸= 0 be held fixed under transformations of the
+input geometry, and define its stabilizer:
+Og (n) = {Q ∈ O(n) : Qg = g}
+
+(26)
+
+An ESNN conditioned on Equation 25 is equivariant under translations and every Q ∈ Og (n),
+with guaranteed symmetry group:
+Eg (n) = Og (n) ⋉ Rn
+
+(27)
+
+(ℓ)
+
+When λg = 0 for every layer, the directional conditioning vanishes and full E(n)-equivariance
+is recovered.
+For any Q ∈ Og (n), we have ⟨Qrij , g⟩ = rij , Q⊤ g = ⟨rij , g⟩, so the directional term is invariant
+under the stabilizer of g. Together with the covariant transport maps of Section 4, this gives the
+subgroup equivariance. The full proof is provided in Appendix D.6.
+(ℓ)
+
+Symmetry-Preserving Initialization. The coefficients λg are initialized at zero, so the directional
+conditioning is inactive at initialization and the model begins in the fully E(n)-equivariant regime.
+During training, these coefficients can become nonzero when the data support directional dependence.
+The preferred direction g can either be specified from known physical structure or learned jointly
+with the rest of the model.
+
+7
+
+E XPERIMENTS
+
+We evaluate ESNN through four questions: Q1 whether richer equivariant transport improves
+dynamics prediction when full E(3) symmetry is appropriate; Q2 whether ESNN can exploit or
+recover a preferred ambient direction; Q3 how the transport mechanisms perform on irregular meshbased physical systems; and Q4 whether the same framework remains robust to unseen rotations in
+point-cloud classification. We consider charged and gravity-augmented N-body dynamics (Kipf et al.,
+2018), three MeshGraphNets benchmarks (Pfaff et al., 2021), and ModelNet40 (Wu et al., 2015).
+Appendix E.5 additionally evaluates invariant QM9 targets, where the best ESNN transport improves
+over EGNN on ten of twelve properties. Full experimental details are provided in Appendix E.
+Q1: Particle Dynamics — Charged N-Body Dynamics. We first consider the standard five-particle
+charged N-body benchmark, where the model predicts future coordinates from positions, velocities,
+8
+
+Table 3: Mesh-based physical dynamics. RMSE (×10−3 ) for one-step, 50-step, and full autoregressive
+rollouts on C YLINDER F LOW, D EFORMING P LATE, and A IRFOIL. Results are mean ± standard
+deviation over five matched runs. Best values are bold; Diverged denotes an unstable autoregressive
+rollout. Lower is better.
+CylinderFlow
+Method
+
+DeformingPlate
+
+Airfoil
+
+1-Step
+
+50-Step
+
+Full
+
+1-Step
+
+50-Step
+
+Full
+
+1-Step
+
+50-Step
+
+Full
+
+MeshGraphNet
+
+4.05 ± 0.08
+
+12.5 ± 0.6
+
+46.14 ± 6.3
+
+0.15 ± 0.02
+
+2.2 ± 0.5
+
+13.6 ± 1.4
+
+1141 ± 68
+
+1529 ± 68
+
+8033 ± 662
+
+EGNN
+ESNN-Id
+ESNN-Diag
+ESNN-Ortho
+ESNN-RadTan
+
+9.20 ± 1.80
+5.35 ± 0.32
+2.77 ± 0.17
+2.56 ± 0.15
+3.16 ± 0.19
+
+40.5 ± 2.5
+20.6 ± 1.0
+8.8 ± 0.4
+8.5 ± 0.4
+10.2 ± 0.5
+
+158.09 ± 2.5
+84.09 ± 3.4
+50.84 ± 2.0
+55.42 ± 2.2
+49.79 ± 2.0
+
+0.35 ± 0.01
+0.15 ± 0.01
+0.17 ± 0.01
+0.13 ± 0.01
+0.08 ± 0.01
+
+1.6 ± 0.1
+1.3 ± 0.1
+1.4 ± 0.1
+1.1 ± 0.1
+1.0 ± 0.1
+
+11.5 ± 0.5
+7.7 ± 0.4
+9.2 ± 0.5
+8.1 ± 0.4
+5.8 ± 0.3
+
+5001 ± 134
+4744 ± 154
+2413 ± 49
+1459 ± 27
+1540 ± 29
+
+18948 ± 609
+7579 ± 287
+4966 ± 126
+2807 ± 66
+2386 ± 59
+
+diverged
+16893 ± 740
+11014 ± 321
+8821 ± 259
+8600 ± 259
+
+and charges. Table 1(a) shows that all three learned transports achieve lower mean error than EGNN,
+whereas ESNN-Id is less accurate and substantially more variable.
+ESNN-Diag achieves the lowest ESNN
+error at 0.0053 ± 0.0002, approximately
+30% below EGNN (0.0076 ± 0.0003),
+followed by ESNN-RadTan at 0.0057 ±
+0.0006 and ESNN-Ortho at 0.0060 ±
+0.0003. The learned transport variants outperform both EGNN and the Identity reference in this setting, supporting the benefit
+of richer edge-wise geometric interactions
+under full Euclidean symmetry.
+
+Table 2: ModelNet40 rotation generalization. Accuracy (%) under z/z, z/SO(3), and SO(3)/SO(3). The
+z/SO(3) result evaluates the same z-trained checkpoint
+under unseen SO(3) rotations. ∆OOD is the absolute
+z/z–z/SO(3) accuracy change in percentage points. Literature baselines follow Lippmann et al. (2025); EGNN
+and ESNN use the same evaluation protocol. Higher
+accuracy and lower ∆OOD are better.
+Method
+
+z/z z/SO(3) SO(3)/SO(3) ∆OOD ↓
+
+Q2: Particle Dynamics — Grav- PointNet
+85.9
+19.6
+74.7
+66.3
+ity N-Body Dynamics. We next in- RS-CNN
+90.3
+48.7
+82.6
+41.6
+90.3
+33.8
+88.6
+56.5
+troduce a uniform gravitational field, DGCNN
+RI-Conv
+86.5
+86.4
+86.4
+0.1
+ag = (0, 0, −9.81)⊤ , with preferred axis GC-Conv
+89.0
+89.1
+89.2
+0.1
+et al. DGCNN 88.4
+88.4
+88.9
+0.0
+btrue = (0, 0, −1)⊤ . We compare the Luo
+g
+LGR-Net
+90.9
+90.9
+91.1
+0.0
+91.6
+91.6
+0.0
+fully E(3)-equivariant None model with Li et al. (w/ TTA) 91.6
+91.8
+91.8
+91.8
+0.0
+two symmetry-relaxed variants: Fixed, CRIN
+TFN
+88.5
+85.3
+87.6
+3.2
+77.5
+77.5
+77.2
+0.0
+which is given the gravity axis, and VN-PointNet
+89.5
+89.5
+90.2
+0.0
+Learned, which estimates it from data VN-DGCNN
+57.6
+66.6
+62.7
+9.0
+using the mechanism of Section 6. Ta- EGNN
+ESNN-Id
+84.7
+85.7
+85.6
+1.1
+ble 1(b) shows that both variants reduce ESNN-Diag
+84.6
+84.3
+84.4
+0.3
+ESNN-Ortho
+84.9
+85.2
+84.7
+0.2
+MSE from approximately 0.10–0.13 to
+ESNN-RadTan
+85.4
+84.6
+86.3
+0.7
+about 0.02 across all three transports. The
+Learned models achieve errors comparable to Fixed while their inferred directions attain sign-invariant alignment Ag that rounds to 1.000
+in every case. ESNN therefore recovers the relevant symmetry-breaking axis from data without
+requiring it to be specified explicitly.
+Q3: Mesh-Based Physical Dynamics. We evaluate ESNN on C YLINDER F LOW, D EFORMING P LATE, and A IRFOIL from MeshGraphNets (Pfaff et al., 2021), covering fluid flow, structural
+deformation, and compressible aerodynamics on irregular meshes. We report RMSE for one-step
+prediction, 50-step autoregressive rollout, and the full trajectory; evaluation details are provided in
+Appendix E.4. Table 3 shows task- and horizon-dependent performance. On D EFORMING P LATE,
+ESNN-RadTan achieves the lowest error at every horizon, reducing full-rollout RMSE from 13.6 for
+MeshGraphNet to 5.8. On C YLINDER F LOW, learned transports improve one- and 50-step prediction,
+while MeshGraphNet remains strongest over the full trajectory. On A IRFOIL, MeshGraphNet remains
+best at all three horizons. Across the three tasks, ESNN consistently improves over EGNN, with the
+largest gains on D EFORMING P LATE.
+Q4: Rotation Generalization — ModelNet40. We evaluate whether the transport framework
+extends beyond physical simulation to point-cloud classification. ModelNet40 shapes are represented
+as local k-nearest-neighbor graphs (Wu et al., 2015), and we consider the z/z, z/SO(3), and
+SO(3)/SO(3) protocols. The z/SO(3) setting evaluates the same z-trained checkpoint under unseen
+9
+
+three-dimensional rotations. Table 2 shows that ESNN remains stable under this shift, with ∆OOD
+between 0.2 and 1.1 percentage points across transport variants, compared with 9.0 points for
+EGNN. Specialized rotation-robust architectures achieve higher absolute accuracy, while ESNN
+retains approximately 84–86% accuracy across all three protocols. These results extend ESNN to
+point-cloud classification while preserving robustness to unseen global rotations.
+
+8
+
+C ONCLUSIONS AND L IMITATIONS
+
+We introduced ESNN, a first-order Cartesian framework that enriches equivariant message passing
+through structured matrix-valued transport of vector features across graph edges. ESNN increases
+geometric expressivity in the edge interactions without requiring higher-order representations. We
+characterize displacement-conditioned linear O(n)-equivariant transport and show how learned
+covariant features enable richer feature-conditioned transformations. We also introduce controlled
+symmetry relaxation for systems with a preferred ambient direction, preserving exact equivariance to
+the remaining symmetry while recovering full E(n)-equivariance as a special case. Across diverse
+geometric learning problems, ESNN improves predictive performance over first-order equivariant
+baselines, learns a preferred direction from data, and remains robust to unseen rotations. The current
+formulation is limited to scalar and first-order vector features; the completeness result applies only to
+displacement-conditioned linear transport, and symmetry relaxation assumes a single global preferred
+direction. Future work could extend ESNN to richer representations, local or gauge-equivariant
+transport, and more general symmetry-breaking fields.
+
+R EFERENCES
+Sarp Aykent and Tian Xia. Gotennet: Rethinking efficient 3D equivariant graph neural networks. In
+The Thirteenth International Conference on Learning Representations, 2025.
+Federico Barbero, Cristian Bodnar, Haitz Sáez de Ocáriz Borde, Michael Bronstein, Petar Veličković,
+and Pietro Liò. Sheaf neural networks with connection laplacians. In Proceedings of Topological,
+Algebraic, and Geometric Learning Workshops 2022, volume 196 of Proceedings of Machine
+Learning Research, pp. 28–36. PMLR, 2022a. URL https://proceedings.mlr.press/
+v196/barbero22a.html.
+Federico Barbero, Cristian Bodnar, Haitz Sáez de Ocáriz Borde, and Pietro Liò. Sheaf attention
+networks. In NeurIPS 2022 Workshop on Symmetry and Geometry in Neural Representations,
+2022b.
+Ilyes Batatia, David P. Kovács, Gregor Simm, Christoph Ortner, and Gábor Csányi. Mace: Higher
+order equivariant message passing neural networks for fast and accurate force fields. In Advances
+in Neural Information Processing Systems, volume 35, pp. 11423–11436, 2022.
+Ilyes Batatia, Simon Batzner, Dávid Péter Kovács, Albert Musaelian, Gregor N. C. Simm, Ralf
+Drautz, Christoph Ortner, Boris Kozinsky, and Gábor Csányi. The design space of E(3)-equivariant
+atom-centred interatomic potentials. Nature Machine Intelligence, 7:56–67, 2025. doi: 10.1038/
+s42256-024-00956-x.
+Claudio Battiloro, Zhiyang Wang, Hans Riess, Paolo Di Lorenzo, and Alejandro Ribeiro. Tangent
+bundle convolutional learning: From manifolds to cellular sheaves and back. IEEE Transactions
+on Signal Processing, 72:1892–1909, 2024. doi: 10.1109/TSP.2024.3379862.
+Claudio Battiloro, Ege Karaismailoğlu, Mauricio Tec, George Dasoulas, Michelle Audirac, and
+Francesca Dominici. E(n) equivariant topological neural networks. In International Conference on
+Learning Representations, 2025.
+Cristian Bodnar, Francesco Di Giovanni, Benjamin Paul Chamberlain, Pietro Lió, and Michael M.
+Bronstein. Neural sheaf diffusion: A topological perspective on heterophily and oversmoothing
+in GNNs. In Advances in Neural Information Processing Systems, volume 35, pp. 18561–18577,
+2022. URL https://arxiv.org/abs/2202.04579.
+Alessio Borgi, Fabrizio Silvestri, and Pietro Liò. Polynomial neural sheaf diffusion: A spectral
+filtering approach on cellular sheaves. arXiv preprint arXiv:2512.00242, 2025.
+10
+
+Luke Braithwaite, Alessio Borgi, Gabriele Onorato, Kristjan Tarantelli, Francesco Restuccia, Fabrizio
+Silvestri, and Pietro Liò. Heterogeneous sheaf neural networks. arXiv preprint arXiv:2409.08036,
+2024.
+Johannes Brandstetter, Rob Hesselink, Elise van der Pol, Erik J. Bekkers, and Max Welling. Geometric
+and physical quantities improve E(3) equivariant message passing. In International Conference on
+Learning Representations, 2022. URL https://arxiv.org/abs/2110.02905.
+Jiacheng Cen, Anyi Li, Ning Lin, Yuxiang Ren, Zihe Wang, and Wenbing Huang. Are high-degree
+representations really unnecessary in equivariant graph neural networks? In Advances in Neural
+Information Processing Systems, volume 37, pp. 26238–26266, 2024. doi: 10.52202/079017-0826.
+Taco S. Cohen, Maurice Weiler, Berkay Kicanaoglu, and Max Welling. Gauge equivariant
+convolutional networks and the icosahedral CNN. In Proceedings of the 36th International
+Conference on Machine Learning, volume 97, pp. 1321–1330. PMLR, 2019. URL https:
+//arxiv.org/abs/1902.04615.
+Weitao Du, Yuanqi Du, Limei Wang, Dieqiao Feng, Guifeng Wang, Shuiwang Ji, Carla P. Gomes, and
+Zhi-Ming Ma. A new perspective on building efficient and expressive 3D equivariant graph neural
+networks. In Advances in Neural Information Processing Systems, volume 36, pp. 66647–66674,
+2023.
+Iulia Duta, Giulia Cassarà, Fabrizio Silvestri, and Pietro Liò. Sheaf hypergraph networks. Advances
+in Neural Information Processing Systems, 36:12087–12099, 2023.
+Alexandre Duval, Victor Schmidt, Alex Hernández-García, Santiago Miret, Fragkiskos D. Malliaros,
+Yoshua Bengio, and David Rolnick. FAENet: Frame averaging equivariant GNN for materials
+modeling. In Proceedings of the 40th International Conference on Machine Learning, volume
+202, pp. 9013–9033. PMLR, 2023. URL https://proceedings.mlr.press/v202/
+duval23a.html.
+Stefano Fiorini, Hakan Emre Aktas, Iulia Duta, Pietro Morerio, Alessio Del Bue, Pietro Liò, and
+Stefano Coniglio. Sheaves reloaded: A direction awakening. In International Conference on
+Learning Representations, 2026.
+Fabian B. Fuchs, Daniel E. Worrall, Volker Fischer, and Max Welling. SE(3)-transformers: 3D
+roto-translation equivariant attention networks. In Advances in Neural Information Processing
+Systems, volume 33, pp. 1970–1981, 2020. URL https://arxiv.org/abs/2006.10503.
+Mustafa Hajij, Lennart Bastian, Sarah Osentoski, Hardik Kabaria, John L. Davenport, Sheik Dawood,
+Balaji Cherukuri, Joseph G. Kocheemoolayil, Nastaran Shahmansouri, Adrian Lew, Theodore
+Papamarkou, and Tolga Birdal. Copresheaf topological neural networks: A generalized deep
+learning framework. In Advances in Neural Information Processing Systems, volume 38, 2025.
+Jiaqi Han, Wenbing Huang, Hengbo Ma, Jiachen Li, Josh Tenenbaum, and Chuang Gan. Learning
+physical dynamics with subequivariant graph neural networks. Advances in Neural Information
+Processing Systems, 35:26256–26268, 2022.
+Jakob Hansen and Thomas Gebhart. Sheaf neural networks. In NeurIPS 2020 Workshop on TDA and
+Beyond, 2020. URL https://arxiv.org/abs/2012.06333.
+Ferran Hernandez Caralt, Mar Gonzàlez i Català, Adrián Bazaga, and Pietro Liò. On the necessity
+of learnable sheaf laplacians. In ICLR 2026 Workshop on Geometry-grounded Representation
+Learning and Generative Modeling, 2026. URL https://arxiv.org/abs/2603.05395.
+Tiny Paper Track.
+Elyssa Hofgard, Rui Wang, Robin Walters, and Tess Smidt. Relaxed equivariant graph neural
+networks. arXiv preprint arXiv:2407.20471, 2024. URL https://arxiv.org/abs/2407.
+20471.
+Bowen Jing, Stephan Eismann, Pratham N. Soni, and Ron O. Dror. Equivariant graph neural
+networks for 3D macromolecular structure. arXiv preprint arXiv:2106.03843, 2021. URL https:
+//arxiv.org/abs/2106.03843.
+11
+
+Sékou-Oumar Kaba, Arnab Kumar Mondal, Yan Zhang, Yoshua Bengio, and Siamak Ravanbakhsh.
+Equivariance with learned canonicalization functions. In Proceedings of the 40th International
+Conference on Machine Learning, volume 202, pp. 15546–15566. PMLR, 2023. URL https:
+//proceedings.mlr.press/v202/kaba23a.html.
+Thomas Kipf, Ethan Fetaya, Kuan-Chieh Wang, Max Welling, and Richard Zemel. Neural relational
+inference for interacting systems. In International conference on machine learning, pp. 2688–2697.
+Pmlr, 2018.
+Miltiadis Kofinas, Erik J. Bekkers, Naveen Shankar Nagaraja, and Efstratios Gavves. Latent field
+discovery in interacting dynamical systems with neural fields. Advances in Neural Information
+Processing Systems (NeurIPS), 2023. URL https://arxiv.org/abs/2310.20679.
+Veljko Kovač, Erik J. Bekkers, Pietro Liò, and Floor Eijkelboom. E(n) equivariant message passing
+cellular networks. In Proceedings of the Geometry-grounded Representation Learning and Generative Modeling Workshop, volume 251 of Proceedings of Machine Learning Research, pp. 173–186.
+PMLR, 2024. URL https://proceedings.mlr.press/v251/kovac-24a.html.
+Daniel Levy, Sékou-Oumar Kaba, Carmelo Gonzales, Santiago Miret, and Siamak Ravanbakhsh.
+Using multiple vector channels improves E(n)-equivariant graph neural networks. In ICML
+Workshop on Machine Learning for Astrophysics, 2023.
+Daiyuan Li, Shreya Arya, and Robert Ghrist. Learning from frustration: Torsor CNNs on graphs. In
+Proceedings of the 4th (2025) and 3rd (2024) NeurIPS Workshops on Symmetry and Geometry in
+Neural Representations, volume 282 of Proceedings of Machine Learning Research, pp. 298–315.
+PMLR, 2026. URL https://proceedings.mlr.press/v282/li26a.html.
+Yi-Lun Liao, Brandon M. Wood, Abhishek Das, and Tess Smidt. Equiformerv2: Improved equivariant
+transformer for scaling to higher-degree representations. In International Conference on Learning
+Representations, volume 2024, pp. 39282–39309, 2024. URL https://openreview.net/
+forum?id=mCOBKZmrzD.
+Peter Lippmann, Gerrit Gerhartz, Roman Remme, and Fred A. Hamprecht. Beyond canonicalization:
+How tensorial messages improve equivariant message passing. In International Conference on
+Learning Representations, 2025.
+Cong Liu, David Ruhe, and Patrick Forré. Multivector neurons: Better and faster O(n)-equivariant
+clifford graph neural networks. arXiv preprint arXiv:2406.04052, 2024a. URL https://arxiv.
+org/abs/2406.04052.
+Yang Liu, Jiashun Cheng, Haihong Zhao, Tingyang Xu, Peilin Zhao, Fugee Tsung, Jia Li, and
+Yu Rong. SEGNO: Generalizing equivariant graph neural networks with physical inductive
+biases. In The Twelfth International Conference on Learning Representations, 2024b. URL
+https://openreview.net/forum?id=3oTPsORaDH.
+Yoshihiro Maruyama. Foundations of equivariant deep learning: Unifying graph and sheaf neural
+networks. arXiv preprint arXiv:2607.03798, 2026. URL https://arxiv.org/abs/2607.
+03798.
+Yuhan Peng, Junwen Dong, Yuzhi Zeng, Hao Li, Ce Ju, Huitao Feng, Diaaeldin Taha, Anna Wienhard,
+and Kelin Xia. Sheaf neural networks on SPD manifolds: Second-order geometric representation
+learning. arXiv preprint arXiv:2604.20308, 2026. URL https://arxiv.org/abs/2604.
+20308.
+Tobias Pfaff, Meire Fortunato, Alvaro Sanchez-Gonzalez, and Peter W. Battaglia. Learning meshbased simulation with graph networks. International Conference on Learning Representations
+(ICLR), 2021. URL https://arxiv.org/abs/2010.03409.
+Omri Puny, Matan Atzmon, Heli Ben-Hamu, Ishan Misra, Aditya Grover, Edward J. Smith, and
+Yaron Lipman. Frame averaging for invariant and equivariant network design. In International
+Conference on Learning Representations, 2022. URL https://openreview.net/forum?
+id=zIU4k8hK3H.
+12
+
+André Ribeiro, Ana Luiza Tenório, Juan Belieni, Amauri H. Souza, and Diego Mesquita. Cooperative
+sheaf neural networks. In International Conference on Learning Representations, 2026.
+Victor Garcia Satorras, Emiel Hoogeboom, and Max Welling. E(n) equivariant graph neural networks.
+In International Conference on Machine Learning, pp. 9323–9332. PMLR, 2021. URL https:
+//arxiv.org/abs/2102.09844.
+Kristof Schütt, Oliver Unke, and Michael Gastegger. Equivariant message passing for the prediction
+of tensorial properties and molecular spectra. In International Conference on Machine Learning,
+pp. 9377–9388. PMLR, 2021.
+Guillem Simeon and Gianni De Fabritiis. TensorNet: Cartesian tensor representations for efficient
+learning of molecular potentials. In Advances in Neural Information Processing Systems, volume 36,
+pp. 37334–37353, 2023.
+Nathaniel Thomas, Tess Smidt, Steven Kearnes, Lusann Yang, Li Li, Kai Kohlhoff, and Patrick Riley.
+Tensor field networks: Rotation- and translation-equivariant neural networks for 3D point clouds.
+arXiv preprint arXiv:1802.08219, 2018. URL https://arxiv.org/abs/1802.08219.
+Tycho F. A. van der Ouderaa, David W. Romero, and Mark van der Wilk. Relaxing equivariance
+constraints with non-stationary continuous filters. In Advances in Neural Information Processing
+Systems, volume 35, pp. 25776–25790, 2022.
+Rui Wang, Robin Walters, and Rose Yu. Approximately equivariant networks for imperfectly
+symmetric dynamics. In Proceedings of the 39th International Conference on Machine Learning,
+pp. 23078–23091. PMLR, 2022. URL https://arxiv.org/abs/2201.11969.
+Rui Wang, Elyssa Hofgard, Han Gao, Robin Walters, and Tess Smidt. Discovering symmetry
+breaking in physical systems with relaxed group convolution. In Proceedings of the 41st International Conference on Machine Learning, volume 235 of Proceedings of Machine Learning
+Research, pp. 50599–50621. PMLR, 2024a. URL https://proceedings.mlr.press/
+v235/wang24y.html.
+Yusong Wang, Tong Wang, Shaoning Li, Xinheng He, Mingyu Li, Zun Wang, Nanning Zheng,
+Bin Shao, and Tie-Yan Liu. Enhancing geometric representations for molecules with equivariant
+vector-scalar interactive message passing. Nature Communications, 15(1):313, 2024b. doi:
+10.1038/s41467-023-43720-2.
+Maurice Weiler, Patrick Forré, Erik Verlinde, and Max Welling. Coordinate independent convolutional
+networks–isometry and gauge equivariant convolutions on riemannian manifolds. arXiv preprint
+arXiv:2106.06020, 2021.
+Zhirong Wu, Shuran Song, Aditya Khosla, Fisher Yu, Linguang Zhang, Xiaoou Tang, and Jianxiong
+Xiao. 3d shapenets: A deep representation for volumetric shapes. In Proceedings of the IEEE
+conference on computer vision and pattern recognition, pp. 1912–1920, 2015.
+
+13
+
+Equivariant Sheaf Neural Networks: Learning
+Geometric Transport on Graphs
+Supplementary Material
+C ONTENTS
+A Extended Related Work
+
+15
+
+A.1 Cartesian and Steerable Equivariant Models . . . . . . . . . . . . . . . . . . . . .
+
+15
+
+A.2 Frames, Gauges, and Topological Domains . . . . . . . . . . . . . . . . . . . . .
+
+15
+
+A.3 Sheaf Learning and Directionality . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+16
+
+A.4 Symmetry Relaxation and Subequivariant Inductive Biases . . . . . . . . . . . . .
+
+16
+
+B Algebraic Foundations of Equivariant Spatial Transport
+
+17
+
+B.1 Tensor-Product Structure of Vector Transport . . . . . . . . . . . . . . . . . . . .
+
+17
+
+B.2 Completeness Under Displacement-Only Conditioning . . . . . . . . . . . . . . .
+
+17
+
+B.3 Feature-Conditioned Spatial Operators . . . . . . . . . . . . . . . . . . . . . . . .
+
+19
+
+C Cellular Sheaves, Directed Transport, and Connections
+
+20
+
+C.1 Cellular Sheaves and Induced Node-to-Node Coupling . . . . . . . . . . . . . . .
+
+21
+
+C.2 Directed Transport as a Quiver Representation . . . . . . . . . . . . . . . . . . . .
+
+21
+
+C.3 Adjoint-Consistent and Connection-Sheaf Specializations . . . . . . . . . . . . . .
+
+22
+
+C.4 Ambient Equivariance and Local Gauge Transformations . . . . . . . . . . . . . .
+
+24
+
+D Proofs of Equivariance and Symmetry Results
+
+25
+
+D.1 Proof of Proposition 3.2: O(n)-Equivariance of the Transport Map . . . . . . . . .
+
+25
+
+D.2 O(n)-Equivariance of Orthogonal Transport . . . . . . . . . . . . . . . . . . . . .
+
+25
+
+D.3 O(n)-Equivariance of Radial–Tangential Transport . . . . . . . . . . . . . . . . .
+
+26
+
+D.4 Completeness of Displacement-Conditioned Linear Transport . . . . . . . . . . . .
+
+27
+
+D.5 Proof of Theorem 5.1: E(n)-Equivariance of the ESNN Layer . . . . . . . . . . .
+
+27
+
+D.6 Proof of Theorem 6.1: Stabilizer Subequivariance . . . . . . . . . . . . . . . . . .
+
+28
+
+E Experimental Details
+
+28
+
+E.1 Charged N-Body Dynamics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+29
+
+E.2 Gravity-Augmented N-Body Dynamics . . . . . . . . . . . . . . . . . . . . . . .
+
+29
+
+E.3 ModelNet40 Point-Cloud Classification . . . . . . . . . . . . . . . . . . . . . . .
+
+30
+
+E.4 Mesh-Based Physical Dynamics . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+31
+
+E.5 QM9 Molecular-Property Prediction . . . . . . . . . . . . . . . . . . . . . . . . .
+
+32
+
+E.6 Implementation, Model Selection, and Evaluation . . . . . . . . . . . . . . . . . .
+
+33
+
+14
+
+A
+
+E XTENDED R ELATED W ORK
+
+This appendix extends the discussion in Section 2 by placing ESNN within three closely related areas:
+equivariant geometric learning, sheaf-based representation learning, and methods that relax or reduce
+symmetry in the presence of external structure. We focus on approaches that act on geometric vector
+features, learn edge-dependent transformations between local representations, or adapt the symmetry
+imposed on message passing.
+A.1
+
+C ARTESIAN AND S TEERABLE E QUIVARIANT M ODELS
+
+A central distinction among E(n)-equivariant graph networks lies in the geometric representations
+they propagate and how these representations are coupled across neighboring nodes. One broad
+family works directly with invariant scalars and low-order Cartesian features. EGNN (Satorras et al.,
+2021) constructs coordinate updates from invariant edge functions acting on relative displacement
+vectors, while PaiNN (Schütt et al., 2021) and GVP-based models (Jing et al., 2021) maintain
+scalar and vector channels coupled through equivariant operations. Subsequent architectures have
+expanded this Cartesian design space through richer scalar–vector interactions (Wang et al., 2024b),
+multiple vector channels (Levy et al., 2023), and Cartesian tensor features (Simeon & De Fabritiis,
+2023). More recent models such as GotenNet (Aykent & Xia, 2025) similarly seek greater geometric
+expressivity while avoiding explicit Clebsch–Gordan contractions. A complementary family uses
+steerable features transforming under higher-order group representations. Tensor Field Networks
+(Thomas et al., 2018), SE(3)-Transformers (Fuchs et al., 2020), SEGNN (Brandstetter et al., 2022),
+MACE (Batatia et al., 2022), and EquiformerV2 (Liao et al., 2024) represent angular structure through
+spherical harmonics and tensor-product or related steerable operations. Higher representation degrees
+can capture increasingly rich angular information, but also increase the cost of the representations
+and their couplings. Recent work has therefore investigated how much high-degree information is
+needed and how it can be processed more efficiently (Cen et al., 2024). ESNN instead retains a
+first-order scalar–vector representation and increases geometric expressivity through matrix-valued
+transport of vector features across graph edges.
+A.2
+
+F RAMES , G AUGES , AND T OPOLOGICAL D OMAINS
+
+Another route to equivariance is to resolve orientation dependence through the choice or averaging
+of reference frames. Frame Averaging (Puny et al., 2022) constructs exactly equivariant models
+by averaging a backbone over an equivariant frame, with FAENet (Duval et al., 2023) adapting
+this idea to atomistic systems. Learned canonicalization (Kaba et al., 2023) instead predicts a
+canonical representative before applying a generic backbone, while subsequent work has examined
+the benefit of retaining tensorial messages beyond canonicalized scalar representations (Lippmann
+et al., 2025). Local gauge equivariance addresses a related but distinct setting, in which different
+sites may use independently chosen reference frames. Gauge-equivariant CNNs (Cohen et al., 2019)
+and coordinate-independent convolutions (Weiler et al., 2021) require the network to transform
+consistently under changes of these local frames. Tangent-bundle convolutional networks connect this
+viewpoint to connection Laplacians and cellular sheaves through vector-field diffusion on Riemannian
+manifolds (Battiloro et al., 2024), while Torsor CNNs extend local group-valued transport to arbitrary
+graphs through edge potentials relating neighboring frames (Li et al., 2026). These models concern
+local gauge equivariance, whereas ESNN enforces equivariance under a common ambient O(n)
+action. Its Orthogonal Transport therefore has a connection-like geometric interpretation, but is not
+a general gauge-equivariant construction. A separate line of work extends Euclidean equivariance
+to richer combinatorial domains. E(n)-Equivariant Topological Neural Networks (Battiloro et al.,
+2025) generalize equivariant message passing from graphs to combinatorial complexes, while E(n)equivariant message-passing cellular networks (Kovač et al., 2024) develop related constructions on
+cellular structures. These approaches enrich the underlying domain through higher-order cells. ESNN
+is complementary: it remains graph-based and instead enriches the transport between geometric
+feature spaces. A related theoretical perspective is provided by (Maruyama, 2026), who formulates
+order-equivariant neural networks on equivariant vector bundles over face posets and recovers graph
+and sheaf layers within a common framework. Their construction organizes equivariance over the
+combinatorial structure of the domain, whereas ESNN focuses on the continuous Euclidean action on
+15
+
+

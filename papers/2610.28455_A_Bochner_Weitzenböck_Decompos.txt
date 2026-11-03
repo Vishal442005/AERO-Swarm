@@ -1,0 +1,269 @@
+A Bochner–Weitzenböck Decomposition for Cellular Sheaf
+Laplacians,
+Curvature and Neural Sheaf Diffusion
+Francesco Maria Guadagnuolo1,2∗
+Alessio Borgi1,3
+Pietro Liò3
+
+Dorina Thanou4
+
+arXiv:2610.28455v1 [cs.CG] 20 Oct 2026
+
+1
+
+Sapienza University of Rome, Rome, Italy
+Italian Institute of Artificial Intelligence (AI4I), Turin, Italy
+3
+University of Cambridge, Cambridge, United Kingdom
+4
+École Polytechnique Fédérale de Lausanne (EPFL), Lausanne, Switzerland
+2
+
+Abstract
+We extend the Bochner–Weitzenböck decomposition to cellular sheaf Laplacians, splitting
+it into a positive semidefinite term, the Bochner sheaf Laplacian, and a block diagonal term,
+the Forman curvature. We show that the Bochner Laplacians form a class of cellular sheaves
+that extends both connection and matrix-weighted Laplacians, and generalizes signed graphs to
+d dimensions. We give a holonomy characterization of their kernel, prove the related Cheeger
+inequalities, and attach to them a random walk that generalizes the Gremban expansion. For
+the Forman term, we prove a discrete Bochner theorem, which bounds the first cohomology of a
+cellular sheaf with nonnegative curvature, and we read the whole decomposition as an opiniondynamics model. We then apply this machinery to Sheaf Neural Networks, whose learnt Laplacian
+is otherwise unobserved. The Bochner interpretation yields a node-level conviction score that acts
+as an operational importance measure under frozen-model interventions, while the Forman profile
+provides a local descriptor of the learnt operator.
+
+1
+
+Introduction
+
+A sheaf prescribes how local data glue into global data, and turns the obstruction to gluing into a
+cohomological invariant [1–4]. On a graph or a simplicial complex, a cellular sheaf [5, 6] attaches
+a vector space to each cell and a linear map to each incidence, so that the theory becomes finite
+linear algebra. In this form sheaves have been used for fusing sensor readings [7], for distributed
+coordination and optimization [8, 9], and in topological data analysis [10–12], wherever a relation
+on a graph needs more than a scalar weight. Their central operator is the sheaf Laplacian, which
+has the foundations of a spectral theory [13] and a signal processing theory [14], and which models
+opinion dynamics, the stalks carrying private opinions and the restriction maps the discourse between
+agents [15].
+In machine learning, where topology has entered from geometric deep learning [16] to higher-order
+domains such as simplicial complexes and hypergraphs [17, 18], the most notable application of
+sheaves is the Sheaf Neural Network [19, 20]. A graph neural network diffuses node features along
+the edges, and fails on heterophilic graphs, where neighbours tend to carry different labels. A Sheaf
+Neural Network learns a sheaf over the graph and diffuses with its sheaf Laplacian, so that each node
+transforms its message differently for each neighbour, which restores separation power on heterophilic
+data. The sheaf is then an object produced by training. The limiting behaviour of sheaf diffusion is
+described by the Hodge decomposition, which identifies the kernel of the sheaf Laplacian with sheaf
+cohomology. Three questions that are standard for the graph Laplacian, however, remain open for
+a general sheaf Laplacian. The first is spectral : a general spectral theory of cellular sheaves is still
+far from complete [13, 14], and Cheeger-type bounds, classical for graphs [21], are available only in
+special cases, notably connection Laplacians [22, 23]. The second is probabilistic: it is not clear how
+∗ Corresponding author: guadagnuolo.2315644@studenti.uniroma1.it
+
+1
+
+to attach to a sheaf Laplacian a vector-valued random walk, a question left open in [13]. The third
+is combinatorial : cellular sheaves lack an analogue of Forman’s Bochner decomposition [24], a local
+curvature, cheaper to compute than the spectrum and easier to interpret.
+We address the three at once with a Bochner decomposition for cellular sheaves. Forman splits the
+Hodge Laplacian of a complex into a positive semidefinite term and a diagonal curvature term,√using
+the absolute value of the off-diagonal entries; replacing it by the matrix absolute value |A| := AA⊤
+extends the construction to every symmetric block matrix, hence to every sheaf Laplacian, on a
+graph or on a complex. We call Bochner matrices the class of Laplacians the first term belongs to. It
+extends the connection Laplacians, the matrix-weighted Laplacians [25, 26] and the weighted signed
+graphs [27]: a Bochner matrix is an anisotropic connection Laplacian, in which a positive semidefinite
+matrix replaces the scalar weight of an edge. We show that its kernel admits the same holonomy
+characterization known for connection Laplacians.
+We then prove Cheeger inequalities for Bochner matrices, extending those of Bandeira, Singer and
+Spielman for connection Laplacians [22]: they relate the low eigenvalues of the normalized Bochner
+Laplacian to three frustration constants, the residuals of synchronization over Sd−1 , partial or full,
+and over O(d). We also attach to a Bochner matrix a random walk on V × Sd−1 , whose jump law
+depends on the orientation the walker carries. In the language of signed graphs it is a generalized
+Gremban expansion, each node being lifted to a whole sphere instead of two copies, and in the isotropic
+case it recovers the vector-valued walk of the connection Laplacian [23]. These two results answer the
+spectral and the probabilistic question.
+The Forman term answers the combinatorial one. It is block diagonal, each block computed from the
+restriction maps at a single node. On 1-cells we call it the sheaf Forman Ricci curvature, and we prove
+a Bochner theorem for cellular sheaves: under nonnegative curvature, the first sheaf cohomology of a
+compact connected combinatorial n-manifold with d-dimensional stalks has dimension at most nd for
+n ≤ 3, and at most d · D(M ) in any dimension, with D(M ) the local homological dimension of the
+complex. Together, the two terms give the decomposition a dynamical reading that generalizes [28]:
+sheaf diffusion can be seen as a reaction-diffusion process, the Bochner term diffusive and the Forman
+term reactive. On a graph this is an opinion dynamics model, in which the Bochner term drives the
+agents towards a common conviction, the norm a stalk carries, and the Forman block measures how
+loudly an agent speaks relative to its neighbours, its relative volume.
+We then return to Sheaf Neural Networks. The available theory describes what they can represent:
+convergence of sheaf diffusion, and a universal approximation theorem by which a network can learn
+any sheaf on a graph. What is missing is a description of what the learning mechanism does: which
+region of the sheaf space a training pipeline reaches, and whether different pipelines are biased towards
+different regions. From the decomposition we derive two diagnostics of neural sheaf diffusion, one
+per term: the conviction and the Forman profile. The conviction is an operational score of node
+importance: on a frozen trained network, removing the highest-conviction nodes is the most damaging
+intervention at every budget and in every perturbation mode, while removing the lowest-conviction
+ones costs less than removing arbitrary nodes of the same graph. The Forman profile tracks, layer
+by layer, how a learning mechanism navigates the sheaf space, and each of the three mechanisms
+we test leaves its own signature: normalized general sheaf learning converges to local alignment
+with the normalized graph Laplacian, unnormalized learning aligns with neither reference, and joint
+diffusion [29] reverses the role of normalization. Evaluated without normalization, the profile of the
+same learnt maps stays far from that of the identity sheaf, so we read the alignment as an inductive
+bias towards one region of the sheaf space.
+
+1.1
+
+Related work
+
+Sheaves on directed and undirected graphs have recently been given a differential calculus [30], formalized for the Grothendieck topology and developed in the spirit of noncommutative geometry,
+where a Bochner Laplacian is defined as ∇∗ ∇ for ∇ the connection of a bundle over a graph. We
+work instead with cellular sheaves, hence over the Alexandrov topology, and our starting point is
+the decomposition of an existing sheaf Laplacian. A recent work also brings Forman curvature and
+sheaves together [31], building restriction maps as a function of the Forman curvature of the edges
+and using the resulting sheaf Laplacian for community detection; the direction there is the opposite
+of ours: we define a curvature from a cellular sheaf, while they use a graph curvature to define a
+2
+
+particular sheaf. Finally, dynamical processes on connection Laplacians have received considerable
+attention lately [32–35], with a focus on Kuramoto models, Turing patterns and network coherence,
+and our framework opens the possibility of carrying those results to the anisotropic setting while
+still controlling the balance of the system through holonomy. We note that these works use the term
+“matrix-weighted graph” to mean a connection Laplacian, whereas we reserve it for the sense of [25].
+Curvature has also been studied on connection Laplacians independently of sheaves. Liu, Münch and
+Peyerimhoff [36] define a Bakry–Émery curvature for connection graphs and derive higher-order Buser
+inequalities from it, with Cheeger constants mixing the expansion of the underlying graph with the
+frustration index of the signature. This notion of curvature was moreover reformulated in [37]. Such
+curvatures are available on a connection Laplacian because it generates a random walk, with scalar
+transition rates. For a general sheaf Laplacian it is not clear how to obtain one, and that failure is
+exactly the Forman term, which measures how far the diagonal is from the sum of the magnitudes of
+the off-diagonal blocks. Sheaf Laplacians with vanishing Forman term are the Bochner matrices, and
+these, as we show in this work, do carry a random walk, so we believe a Bakry–Émery curvature can
+be built for them, and we leave this to future work.
+Sheaf Neural Networks were introduced by Hansen and Gebhart [19] on a sheaf fixed in advance;
+Bodnar et al. [20] learn the sheaf from the data, and prove that a network can learn any sheaf
+on a graph. Several works have since studied the parametrization of the restriction maps, through
+connection Laplacians aligned with the data manifold [38], equivariant transport [39], or a diffusion
+process on the restriction maps themselves, run jointly with the one on the node features [29]. Others
+have extended the architecture, to features on SPD manifolds [40] and to message diffusion over
+flat vector bundles [41]. The sheaf formalism has also been used to generalize attention in graph
+neural networks [42]. On the theoretical side, oversmoothing has been related to a degeneration of
+the representation underlying the learnt sheaf [43]. On the other hand, Hernandez Caralt et al. [44]
+showed empirically that identity restriction maps perform similarly to learnt ones, which questions
+to what extent learning the sheaf matters. Finally, crucial features of graph neural networks such
+as over-squashing have been related to the curvature of the graph [45]. While we build a notion
+of Forman curvature for cellular sheaves, we do not pursue this direction, which would involve the
+Forman term of the sheaf Hodge Laplacian in degree 1; in Section 6.4 we compute instead the Forman
+term of the graph sheaf Laplacian, in degree 0, which to avoid ambiguity we call Forman term and
+not curvature. Studying over-squashing in Sheaf Neural Networks from this curvature perspective is
+left for future work. We refer to Sections 6.2 and 6.4 for a further discussion.
+
+1.2
+
+Organization of the paper
+
+The paper is organized as follows. Section 2 fixes notation and recalls cellular sheaves, signed graphs
+and Forman’s decomposition. Section 3 introduces the Bochner decomposition for sheaf Laplacians,
+and Sections 4 and 5 study its two terms in turn: within the first, Section 4.2 proves the Cheeger
+inequalities and Section 4.3 attaches the random walk. Section 6 develops the dynamical reading
+and the applications to Sheaf Neural Networks. We conclude in Section 7. Proofs deferred from the
+body are collected in Appendix A, each statement being restated before its proof, further properties
+of Bochner matrices are in Appendix B, and the experimental protocols with the additional material
+are in Appendices C and D.
+
+2
+
+Background
+
+This section fixes notation for cellular sheaves and their Laplacians, and recalls the facts on signed
+graphs and on Forman’s Bochner decomposition that the paper builds on.
+
+2.1
+
+Cellular sheaves on simplicial complexes
+
+We follow [46, 47] for simplicial cochain complexes and [5, 6] for cellular sheaves. Let X be a finite
+simplicial complex, Xk its set of k-simplices and n := |X0 |. We write σ ⊴ τ for inclusion of simplices,
+with no restriction on the difference in dimension, so that the simplices of X form the face poset; the
+words face and coface are reserved for the codimension-one case, the only one entering the formulas
+below. Fixing an orientation of each simplex, ϵστ ∈ {−1, 0, +1} is the relative orientation of a
+codimension-one pair, and vanishes when σ is not a face of τ .
+3
+
+Definition 2.1 (Cellular sheaf). A cellular sheaf F on X assigns to every simplex σ a finitedimensional real vector space F(σ), its stalk, and to every pair σ ⊴ τ a linear restriction map
+Fσ⊴τ : F (σ) → F(τ ), with Fσ⊴σ = idF (σ) and Fρ⊴τ = Fσ⊴τ Fρ⊴σ whenever ρ ⊴ σ ⊴ τ .
+Equivalently, F is a functor from the face poset to finite-dimensional real vector spaces [5], and
+it is determined
+L by the maps attached to faces. Throughout, every stalk has dimension d. On
+C k (X; F) = σ∈Xk F(σ) the coboundary δk : C k (X; F) → C k+1 (X; F) is:
+X
+ϵστ Fσ⊴τ cσ ,
+(2.1)
+(δk c)τ =
+σ⊴τ
+dim σ=k
+
+it satisfies δk+1 δk = 0, and Hk (X; F) := ker δk / im δk−1 is the sheaf cohomology of F; the constant
+sheaf R recovers the simplicial cochain complex of X. With the standard inner product on each
+∗
+C k (X; F) and δk∗ the adjoint of δk , the Hodge sheaf Laplacian HkF = δk−1 δk−1
++ δk∗ δk is a positive
+semidefinite matrix with d×d blocks indexed by Xk , and ker HkF ∼
+= Hk (X; F). We write ∂ := δ ∗ for the
+∗
+boundary operator, with the degree left implicit, so that ∂ = δ. At k = 0 we write
+H0F = δ0∗ δ0
+P LF :=
+⊤
+for the graph sheaf Laplacian; on a graph G = (V, E) its blocks are (LF )vv = e: v⊴e Fv⊴e Fv⊴e and,
+⊤
+on an edge e = (v, u), (LF )vu = −Fv⊴e
+Fu⊴e .
+√
+Two classes of graph sheaf Laplacians recur below. Taking Fv⊴e = wvu Ov⊴e with Ov⊴e orthogonal
+⊤
+⊤
+⊤
+and wvu > 0 gives off-diagonal blocks −wvu Wvu
+, with Wvu
+:= Ov⊴e
+Ou⊴e ∈ O(d): these are the
+connection Laplacians [22, 23], called bundle sheaves in Sheaf Neural Networks [19, 20]. Taking
+1/2
+Fv⊴e = Mvu with Mvu ⪰ 0 gives off-diagonal blocks −Mvu ,without rotation: these are the matrixweighted Laplacians [25, 26]. With D := blockdiag (LF )vv v∈V the degree matrix, the normalized
+sheaf Laplacian ∆F := D−1/2 LF D−1/2 has spectrum in [0, 2] [13]. We work with unweighted sheaves:
+every weighted sheaf Laplacian, and in particular every normalized one, is the Laplacian of some
+unweighted sheaf [13], a fact Sections 3 and 6.4 use directly.
+
+2.2
+
+Signed graphs, balance and holonomy
+
+A signed graph Γ = (V, E, W ) carries aPsymmetric weighted adjacency matrix W whose entries may
+be negative [27]. With degrees dv := u |wvu |, D := diag(dv ), and W = W + − W − split into its
+nonnegative parts, the signed Laplacian is LΓ := D − W = D − W + + W − , and its quadratic form is:
+X
+2
+x⊤ LΓ x =
+|wvu | xv − sgn(wvu ) xu ,
+(2.2)
+vu∈E
+
+so LΓ ⪰ 0. Unlike the unsigned case, the kernel may be trivial, and its dimension is a structural
+invariant [48], controlled by balance. A cycle is positive if it carries an even number of negative edges.
+Definition 2.2 (Balance and antibalance). Γ is balanced if every cycle is positive, and antibalanced
+if the signed graph obtained by reversing every edge sign is balanced.
+Theorem 2.1 (Structure theorem for balance [49, 50]). Γ is balanced if and only if there is a partition
+V = V1 ⊔ V2 such that every edge within V1 or within V2 is positive and every edge between V1 and
+V2 is negative. It is antibalanced if and only if the same holds with the two signs exchanged.
+The partition is visible in the spectrum [49, 51, 52]. Writing 1V1 for the indicator vector of V1 :
+Theorem 2.2 (Kernel of a signed Laplacian). Let Γ be connected. Then Γ is balanced if and only if
+dim ker LΓ = 1, in which case the kernel is spanned by 1V1 − 1V2 for the partition of Theorem 2.1.
+At the other end of the spectrum, the normalized signed Laplacian I − D−1/2 W D−1/2 has spectrum
+in [0, 2] and attains 2 when Γ is antibalanced [53]; a connected non-bipartite signed graph cannot be
+both balanced and antibalanced, since an odd cycle would be positive and negative at once. When Γ
+is not balanced, its frustration index, the minimal number of edges whose removal makes it balanced,
+measures how far it is from balance [54, 55]. Other quantitative measures of balance have also been
+proposed, together with related Cheeger inequalities for signed graphs [52, 56]. In the Gremban
+expansion [57–59] each vertex is split into a positive and a negative copy, a walker crossing a negative
+edge switching copy, so that LΓ becomes an unsigned graph Laplacian on 2n vertices [27].
+On a connection Laplacian, balance becomes holonomy. Every walk γ : v0 → · · · → vk carries the
+transport map Tγ := Wvk−1 vk · · · Wv0 v1 ∈ O(d), the connection has trivial holonomy when Tγ = I for
+4
+
+

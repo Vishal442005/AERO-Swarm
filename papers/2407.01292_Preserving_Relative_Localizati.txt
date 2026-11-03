@@ -1,0 +1,419 @@
+Preserving Relative Localization of FoV-Limited Drone Swarm via
+Active Mutual Observation
+
+arXiv:2407.01292v1 [cs.RO] 1 Jul 2024
+
+Lianjie Guo1,† , Zaitian Gongye1,2,† , Ziyi Xu1,2 , Yingjian Wang1,2 , Xin Zhou1,2,∗ , Jinni Zhou3 , and Fei Gao1,2,∗
+
+Abstract— Relative state estimation is crucial for vision-based
+swarms to estimate and compensate for the unavoidable drift
+of visual odometry. For autonomous drones equipped with the
+most compact sensor setting — a stereo camera that provides a
+limited field of view (FoV), the demand for mutual observation
+for relative state estimation conflicts with the demand for
+environment observation. To balance the two demands for FoVlimited swarms by acquiring mutual observations with a safety
+guarantee, this paper proposes an active localization correction
+system, which plans camera orientations via a yaw planner
+during the flight. The yaw planner manages the contradiction
+by calculating suitable timing and yaw angle commands based
+on the evaluation of localization uncertainty estimated by
+the Kalman Filter. Simulation validates the scalability of our
+algorithm. In real-world experiments, we reduce positioning
+drift by up to 65% and managed to maintain a given formation
+in both indoor and outdoor GPS-denied flight, from which the
+accuracy, efficiency, and robustness of the proposed system are
+verified.
+
+I. I NTRODUTION
+Micro vision-based aerial swarms have become popular
+for their low cost, agility, and independence of bulky external
+sensors. For some swarm missions like formation flight [1],
+coordinated object handling [2], and collaborative mapping
+and exploration [3], accurate alignment of the reference
+frames maintained by each agent is a basic requirement.
+However, due to the unavoidable drift of vision-based localization, the alignment breaks during mission execution,
+requiring continuous relative state estimation among vehicles
+for frame re-alignment.
+To conduct continuous relative state estimation in visionbased swarms, mutual observation is adopted for its
+environment-independence. In existing methods, mutual observation is achieved through drone detection via onboard
+cameras. Then relative position can be derived from the drone
+detection [4]–[6]. Vision-based mutual observation requires
+drones to be captured by cameras of others, hence some
+works add extra sensors like multiple fisheye cameras with
+an omnidirectional sensing range to capture all nearby drones
+[7]. However, for micro aerial vehicles, the limited payload
+capacity makes it tough to install additional sensors. This paper aims to preserve relative localization with a minimum set
+† Equal contributors.
+1 Huzhou Institute, Zhejiang University, Huzhou 313000, China.
+2 Institute of Cyber-Systems and Control, College of Control Science and
+Engineering, Zhejiang University, Hangzhou 310027, China.
+3 The Hong Kong University of Science and Technology (GZ).
+∗ Corresponding authors: Xin Zhou and Fei Gao.
+E-mail:{iszhouxin, fgaoaa}@zju.edu.cn
+
+Fig. 1: Leverage active mutual observation for localization
+correction in the field experiment. (A) The drones are
+disorganized due to the drift of the VIO. (B) The mutual
+observation tasks are assigned, drone 0 observes drone 1,
+and drone 1 observes drone 2 (white arrows). The yaw
+rotation (black arrows) can be seen more clearly in the closeup views. (C) After mutual observation, relative localization
+is corrected. Drones fly in the predefined line formation.
+(D) Drones conduct environment observation and deform the
+formation to avoid the tree obstacles. The red curves are the
+approximate flight paths.
+of sensors widely applied in autonomous drone navigation:
+a field-of-view-limited (FoV-limited) stereo camera with an
+IMU.
+For FoV-limited swarms, when estimating the relative
+localization with the only camera, there exists a contradiction
+between two observations: 1) the environment observation
+for obstacle avoidance; 2) the mutual observation for relative
+state estimation (Fig. 2). To guarantee flight safety, the drone
+should be oriented toward an area near its future trajectory
+to get obstacle information. However, mutual observation
+requires that the drone be oriented toward the others. Com-
+
+In simulation, we tested the scalability and the robustness of the proposed system. In real-world experiments,
+we conducted indoor and outdoor experiments to verify the
+capacity to preserve accurate relative localization in both
+experimental and field environments. The code is released
+1 for the reference of the community.
+II. R ELATED W ORKS
+
+Fig. 2: The contradiction between mutual observation and
+environment observation. If the blue drone chooses environment observation (ψ1 ), the mutual measurement cannot be
+obtained due to the black drone out of the FoV of the black
+drone. If the blue drone chooses mutual observation (ψ2 ),
+the drone may collide with the ellipse-shaped obstacle that
+has not been seen.
+monly, those two requirements cannot be satisfied at the same
+time due to limited FoV, for example in situations when
+two drones fly side by side. Faced with this dilemma, some
+methods [8] choose to prioritize the demand for environment
+observation while leaving mutual observation to be satisfied
+passively and randomly. This means mutual observation is
+achieved only when a drone happens to fly into the FoV
+of others, otherwise, the uncertainty grows continuously,
+and may finally lead to mutual collisions. Without sufficient
+mutual observation, safety cannot be guaranteed.
+To guarantee the flight safety of the swarms, we propose
+an active localization correction system to balance the two
+demands in the FoV-limited swarm. The core inside is a
+yaw planner that decides the time point, duration, target
+drone, and yaw angle command to perform an observation.
+Inspired by Roumeliotis et al. [9], a Kalman Filter is implemented for swarm state estimation. It takes the position
+drifts of all the drones as system states, and combines the
+information of the VIO(Visual-Inertial Odometry) and the
+relative measurement to calculate corrected localization. The
+covariance maintained by the Kalman Filter encodes the
+uncertainty between different drones, which is then used
+by the yaw planner to determine which kind of observation
+to choose. A yaw planning process starts from determining
+a pair of drones with relative localization covariance that
+satisfies some given criteria. Then the selected drone pair
+is tasked to perform mutual observation. Before rotating, the
+required yaw rotation is calculated to make the camera cover
+a confidence area of the other drone derived from relative
+localization covariance to ensure the drone is observed. To
+avoid collision during rotation and ensure that the drone
+is not blocked by obstacles, we further propose continuous
+safety and visibility checks.
+
+Relative localization approaches for robot swarms can
+be primarily categorized into two methods: environmentalfeature-based and mutual observation. The environmentalfeature-based method is commonly employed in Multi-robot
+SLAM, where agents estimate the relative transformations
+between robots’ map frames by matching common features
+in their maps. This can be achieved either in a centralized manner [10], [11] or distributed [12], [13] fashion.
+However, due to the exchange of map information and
+feature-matching requirements, this method is limited in
+its application to micro-robot swarms due to the increased
+communication and computational load. On the other hand,
+mutual observation is a relatively lightweight approach that
+directly utilizes robot-to-robot range and bearing measurements through methods such as UWB measurement [14]–
+[16], set markers [6], [17], [18] or reflective tapes detected
+by LiDAR [19] to estimate relative localization.
+Utilizing image measurements as a means of mutual
+observation for vision-based swarms is an intuitive approach.
+Cutler [17] proposes a lightweight solution for estimating
+range and bearing relative to a known marker, which comprises three IR LEDs in a fixed pattern. Nguyen et al.
+[5] propose a visual-inertial multi-drone localization system,
+and the MAVNet is employed to detect other teammate
+drones. To further enhance the mutual observation, Xu et al.
+[20] introduce a visual-inertial-UWB relative state estimation system that utilizes YOLOv3-tiny for teammate drone
+detection. In this system, the UWB module is employed
+as a complementary sensor to provide distance constraints
+alongside the camera. Nonetheless, all the aforementioned
+systems may encounter potential failure or drift when the
+teammate drones are out of the FoV of the camera. This
+limitation restricts their applicability in scenarios involving
+formation flight. The objective of this article is to achieve
+relative localization using the most compact sensor setup
+commonly employed for aerial navigation: a pair of forwardplaced stereo cameras.
+Upon observing each other, the utilization of acquired relative state measurements varies among different approaches.
+Early works [9], [21], combining bearing and range measurements, use the Kalman Filter(KF) to simultaneously localize
+a group of mobile robots capable of sensing one another.
+These methods assume that robots can uniquely identify each
+of the observed robots in their field of view and measure
+their relative ranges and bearing vectors, which is frequently
+not applicable in real-world scenarios. To further address
+1 https://github.com/ZJU-FAST-Lab/
+Active-Relative-Localization
+
+Fig. 3: The system architecture of the active localization correction framework. The notation can be referred to the
+nomenclature in Sec. IV-A. The system consisting of n drones has one leader with a yaw planner and a Kalman Filter
+deployed. The desired yaw calculated by the leader ψdes , the localization result X̂, and mutual observation measurements z
+of every drone are transmitted over the wireless network. Based on the covariance P and the corrected localization X̂ from
+the Kalman Filter, the yaw planner selects a target and an observer for mutual observation, then calculates the expected
+yaw ψdes , and performs validity checks. After passing the checks, the expected yaw is sent to the drone to execute mutual
+observation. The drone captured during mutual observation is identified by comparing the estimated position of other drones
+with the observation measurement. Then the observation measurement is sent to the Kalman Filter for drift estimation.
+Finally, the estimated drift is used to correct localization information from the VIO.
+
+the issue of anonymous observations, Nguyen [5] extended
+the coupled probabilistic data association filter to cope with
+nonlinear measurements. Wang [22] presented a certifiably
+optimal algorithm that uses anonymous bearing measurements to formulate a mixed-integer quadratically constrained
+quadratic problem (MIQCQP) to determine bearing-pose correspondences. However, these approaches still struggle with
+the challenge of partial observations. In this paper, inspired
+by [9], we propose a novel system where the Kalman Filter is
+extended to trigger extra observations and incorporate mutual
+position measurements.
+III. ACTIVE L OCALIZATION C ORRECTION S YSTEM
+The complete active localization correction system is
+shown in Fig. 3. A yaw planner considering the covariance
+of the relative localization of every drone is deployed to
+the leader among the swarm. The yaw planner selects a
+pair of drones that should conduct mutual observation, then
+determines the observer and the target in this pair, and calculates the yaw angle required for the observer to trigger the
+detector, i.e., make the target be in the FoV of the observer.
+Once the target is captured by the observer, the continuously
+working detector detects the target and outputs the relative
+position of the drones in the FoV, and the observed drones
+are identified using the shared odometry of each drone. The
+observation measurement is transmitted over the wireless
+network to the leader of the swarm. Then the localization
+correction is achieved by a Kalman Filter leveraging the
+estimated relative position derived from odometries and the
+measurement from the detector, and the newly estimated drift
+is sent back to every drone in the swarm.
+
+IV. L OCALIZATION C ORRECTION VIA K ALMAN F ILTER
+Inspired by Roumeliotis et al. [9], we apply Kalman Filter
+which takes the position drifts of all the drones as the states
+of the system, leveraging its ability to estimate the drift and
+model the uncertainty of the odometry.
+A. Notation
+In order to help understand the localization correction
+framework, the following notations are defined below and
+followed by the rest of the paper.
+NOMENCLATURE
+ˆ
+(·)
+the estimated state
+f
+(·)
+the error state
+(·)(tk ) the state at discrete-time tk
+(·)(tk− ) the state at discrete-time tk before update
+(·)(tk+ ) the state at discrete-time tk after update
+xi
+the state of drone i, xi = [xi yi zi ]T
+X
+the state of all the drones, X = [xT0 ... xTn ]T
+Pi j
+the covariance between drone i and j
+P
+the covariance of the whole system
+wi
+the zero-mean Gaussian noise in the VIO measurement of drone i, wi ∈ R3
+W
+the zero-mean Gaussian noise of the VIO measurement from n drones, W ∈ R3n
+n
+the zero-mean Gaussian noise in the detector measurement, n ∈ R3
+Q
+the corresponding covariance matrix of the noise W
+N
+the corresponding covariance matrix of the noise n
+
+The covariance propagation equation is
+−
+P(tk+1
+) = P(tk+ ) + Q(tk ).
+
+(3)
+
+We assume that for any drone i and j, wi and w j are
+independent, so we have Q = diag(Q1 , Q2 , ...Qn ), yielding
+that the covariance between different drones does not change
+in propagation.
+2) Update: The measurement from the detector is used
+in the update process. If no observation measurement is
+received at time tk , We have:
+e + ) = P(t
+e − ).
+P(t
+k
+k
+
+e + ) = X(t
+e − ),
+X(t
+k
+k
+
+Fig. 4: A schematic description of the notation. Frame {G}
+means the global frame. Drone i is selected as the observer,
+and drone j is the target. The estimated global frames of
+the two drones are not aligned due to the drift e
+xi and e
+x j.
+With the estimated position of itself x̂i , and the mutual
+observation measurement zi j , drone i calculates the true
+position of drone j in the estimated global frame of drone
+i. Then the difference between the true position and the
+estimated position of drone j, e
+zi j , is the difference between
+the estimated global frame of two drones.
+
+When drone j is in the FoV of drone i, the detector
+measures the relative position of drone j in frame {i}. The
+measurement is
+e
+zi j = x̂i + zi j − x̂ j ,
+(5)
+where zi j is the detection measurement of drone i, x̂i is the
+odometry information of drone i, and x̂ j is the odometry
+information shared by drone j.
+And the measurement model of the error state, i.e., the
+drift, is
+e
+zi j = RG
+xj −e
+xi ) + n
+i (e
+
+Rij
+ri j
+Si j
+
+the frame attached to drone i
+the measurement of the relative position of drone j
+in the frame {i}
+the rotation matrix transforming frame {i} to frame
+{ j}
+the residual of the relative measurement zi j
+the covariance of the residual ri j
+
+B. Problem Formulation
+As shown in Fig. 4, considering an aerial swarm system
+consisting of n drones and each one applying VIO for
+localization in an initially aligned common frame (the true
+{G}), the alignment will be broken due to the drift of VIO
+(see the estimated {G} of drone i and j). The localization
+correction aims to re-align the global frame by estimating the
+e = [e
+drift, i.e. the error state of all the drones, X
+xT0 ... e
+xTn ]T =
+T
+3n
+z1 ... xen yen e
+zn ] ∈ R .
+[e
+x0 ye0 e
+z0 xe1 ye1 e
+C. Relative State Estimator
+The Kalman Filter estimates the position drifts of every
+e in propagation and uses the measuredrone in the swarm X
+ment from mutual observation zi j for update.
+1) Propagation: We describe the propagation equations
+for the Kalman Filter using the assumption that the drift
+of VIO accumulates in its each update, so the discrete-time
+propagation for drone i is
+e
+xi (tk+1 ) = e
+xi (tk ) + wi (tk ).
+
+(1)
+
+Based on (1), the discrete-time error-state propagation
+equation for the system is
+e − ) = X(t
+e + ) + w(tk ).
+X(t
+k
+k+1
+
+(2)
+
+j−th
+
+i−th
+
+= RG
+i [0 0 ...0
+{i}
+zi j
+
+(4)
+
+z}|{
+z}|{
+e +n
+−I 0...0 I 0...0]X
+
+(6)
+
+e + n,
+= HX
+where
+H = RG
+i [0 0 ...0 − I 0...0 I 0...0],
+and {G} refers to the global frame.
+Then the residual of the relative position measurement and
+its covariance can be calculated:
+e − ),
+ri j = e
+zi j − H(tk )X(t
+k
+Si j = H(tk )P(tk− )HT (tk ) + N.
+Then the Kalman gain, the updated error state, and the
+updated covariance can be calculated as below:
+K(tk ) = P(tk− )HT (tk )S−1
+i j (tk ),
+
+(7)
+
+e + ) = X(t
+e − ) + K(tk )ri j (tk ),
+X(t
+k
+k
+
+(8)
+
+P(tk+ ) = P(tk− ) − K(tk )H(tk )P(tk− ).
+
+(9)
+
+Observations between drone i and j can help improving
+drift estimation of other drones like drone p and drone q, as
+long as p, q have observations with i, j before, i.e., one of
+P pi,p j,qi,q j ̸= 0. Then after updating, the covariance between
+drone p and drone q is
+P pq (tk+ ) = P pq (tk− ) − (−P pi (tk− ) + P p j (tk− ))
+T
+
+−1 G
+−
+−
+(RG
+i Si j Ri )(P jq (tk ) − Piq (tk )).
+
+(10)
+
+Then the covariance between each pair of drones are used
+in active yaw planning to select the observer and the target
+for mutual observation.
+
+

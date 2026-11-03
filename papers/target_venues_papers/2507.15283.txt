@@ -1,0 +1,505 @@
+1
+
+Event-Triggered Resilient Consensus of Networked
+Euler-Lagrange Systems Under Byzantine Attacks
+
+arXiv:2507.15283v1 [math.OC] 21 Jul 2025
+
+Yuliang Fu, Guanghui Wen, Dan Zhao, Wei Xing Zheng, Fellow, IEEE, and Xiaolei Li
+
+Abstract—The resilient consensus problem is investigated in
+this paper for a class of networked Euler-Lagrange systems
+with event-triggered communication in the presence of Byzantine
+attacks. One challenge that we face in addressing the considered
+problem is the inapplicability of existing resilient decision algorithms designed for one-dimensional multi-agent systems. This
+is because the networked Euler-Lagrange systems fall into the
+category of multi-dimensional multi-agent systems with coupling
+among state vector components. To address this problem, we
+propose a new resilient decision algorithm. This algorithm constructs auxiliary variables related to the coordinative objectives
+for each normal agent, and transforms the considered resilient
+consensus problem into the consensus problem of the designed
+auxiliary variables. Furthermore, to relax the constraints imposed on Byzantine agent behavior patterns within continuoustime scenarios, the event-triggered communication scheme is
+adopted. Finally, the effectiveness of the proposed algorithm is
+demonstrated through case studies.
+Index Terms—Resilient consensus, Byzantine attacks, networked Euler-Lagrange systems, event-triggered communication,
+robust graph.
+
+I. I NTRODUCTION
+In the past decade, the coordination of multi-agent systems
+(MASs) has attracted much attention from various scientific
+communities, owing primarily to its wide range of practical
+applications [1]. In this context, agents exchange their local
+information through communication networks to accomplish
+desired collective tasks [2]. As one of the most basic coordinative tasks, consensus has garnered increasing attention in
+recent years [3].
+It is noteworthy that the openness of communication networks exposes MASs to various cyber attacks. The presence
+of cyber attacks makes MASs difficult to achieve desired
+coordinative objectives. Recently, quite a few results on how
+to achieve consensus of MASs under several kinds of cyber
+This work was supported in part by the National Natural Science Foundation of China through Grant Nos. 62325304, U22B2046, U24A20279,
+62306071, in part by the Jiangsu Provincial Scientific Research Center of
+Applied Mathematics under Grant No. BK20233002, and in part by the SEU
+Innovation Capability Enhancement Plan for Doctoral Students under Grant
+No. CXJH SEU25240. (Corresponding authors: Guanghui Wen; Wei Xing
+Zheng.)
+Y. Fu is with the School of Cyber Science and Engineering, Southeast
+University, Nanjing 211189, China (e-mail: yuliang fu@163.com).
+G. Wen is with the School of Automation, Southeast University, Nanjing
+211189, China (e-mail: ghwen@seu.edu.cn).
+D. Zhao is with the Department of Systems Science, Southeast University,
+Nanjing 211189, China (e-mail: danzhao@seu.edu.cn).
+W. X. Zheng is with the School of Computer, Data and Mathematical
+Sciences, Western Sydney University, Sydney, NSW 2751, Australia (e-mail:
+w.zheng@westernsydney.edu.au).
+X. Li is with the School of Electrical Engineering, Yanshan University,
+Qinhuangdao 066004, China (e-mail: xiaolei@ysu.edu.cn).
+
+attacks have been established [4]. Classical attacks include
+deception attacks, denial-of-service (DoS) attacks, false-datainjection attacks, replay attacks, and others. Yet Byzantine
+attacks considered in this paper represent a worse case due
+to their full capability to manipulate the behaviors of agents
+to launch more general and difficult class of attacks.
+To achieve the consensus of MASs in the presence of
+Byzantine attacks, some resilient control schemes have been
+developed. Existing techniques can be generally divided into
+two categories: the Mean-Subsequence Reduced (MSR)-based
+approach [5] and the Resilient Vector Consensus (RVC)based approach [6]. In [7], the resilient cooperative output
+regulation problem under Byzantine attacks was addressed.
+The resilient consensus problem of switched MASs composed
+of continuous-time and discrete-time subsystems was solved
+in [8]. Furthermore, [9] and [10] respectively considered the
+resilient consensus problem of MASs with state constraints
+and differential privacy requirements. The majority of the
+aforementioned MSR-based algorithms pertain to MASs with
+each agent being described by a one-dimensional dynamical
+system. Note that the MSR-based approaches become intricate when dealing with multi-dimensional MASs exhibiting
+coupling among state vector components.
+For the RVC-based approach, some interesting results have
+been given in [6], [11], [12]. Nevertheless, as noted therein,
+the graph robustness required by such an approach increases
+with the dimensions of the agents’ dynamics. Particularly, as
+indicated in [5], the achievable robustness is limited for any
+graph with a fixed number of agents. This means that such
+a method is incapable of dealing with the resilient consensus
+problem of MAS when the dimensions of each agents’ dynamics exceed a specific value. The central point was used in
+[13] to calculate the security point to improve the resilience of
+the RVC-based approach. However, the required computational
+resources increase significantly along with the increase of the
+system dimension. In light of these considerations, this paper
+focuses on exploring resilient consensus of networked EulerLagrange (EL) systems, driven by their widespread practical
+applications (such as rigid spacecraft, planar elbow manipulators, and marine vessels [18]). Despite their broad utility, the
+potential multi-dimensionality and intricate coupling among
+state vector components make it challenging to extend the
+aforementioned algorithms to effectively address the resilient
+consensus problem of networked EL systems.
+Furthermore, an additional challenge in achieving consensus
+in MASs is that the aforementioned algorithms cause changes
+in their communication topologies. As mentioned in [5], the
+existence of a minimum dwell time for these topologies cannot
+
+2
+
+even be ensured in continuous-time systems. To address this,
+the study on continuous-time systems, including [5], [7]–[9],
+constrains the information transmitted by Byzantine agents to
+normal agents to be continuous, and does not allow Byzantine
+agents to sever connections with their out-neighbors, which actually limits the capabilities of attackers. Noticeably, the eventtriggered (ET) communication scheme provides a potential
+solution to this problem due to the existence of the minimum
+triggering interval and the open-loop estimation mechanism.
+Recently, there have been some reported results on the consensus problem of MASs under ET communication schemes
+[14]–[17]. For example, the work in [14] proposed a velocityfree ET scheme to deal with the consensus problem of
+networked EL systems with communication delays. In [15],
+a dynamic ET scheme was designed to achieve consensus
+in networked EL systems with uncertain parameters. The
+fault-tolerant consensus problem of nonlinear MASs with ET
+communication was solved in [16] by using the dynamic ET
+scheme. Additionally, an ET scheme was devised in [17] based
+on the axis-angle attitude representation to solve the finite-time
+attitude consensus problem of MASs under switching topologies. Nevertheless, these results are generally inapplicable to
+the resilient consensus problem, as the presence of Byzantine
+attacks inhibits normal agents from accessing reliable global
+information and may even lead to different global information
+in different dimensions.
+Motivated by the above discussions, this paper focuses
+on solving the resilient consensus algorithm for networked
+EL systems with state coupling under Byzantine attacks in
+a continuous-time scenario. The inherent state coupling in
+these systems, along with the potential for Byzantine agents to
+withhold transmissions or transmit discontinuous information
+to their out-neighbors, makes existing algorithms unsuitable.
+The main contributions of this paper are threefold. First,
+a new resilient decision algorithm is proposed for multidimensional MASs with state coupling. This algorithm transforms the considered problem into the consensus problem
+of the designed auxiliary variables, whose dimensions are
+independent of one another, thereby simplifying the analysis in
+scenarios with state coupling and reducing the computational
+resources required. The reduced execution frequency of the
+proposed algorithm resulting from the ET communication
+scheme further conserves the computational resources. These
+technical innovations make the proposed algorithm more feasible for multi-dimensional MASs with state coupling than those
+in [6]–[12], which either fail to handle state coupling, impose
+strict constraints on attacks, or exhibit high demands on graph
+robustness and computational resources. Second, by utilizing
+the ET communication scheme, the communication topologies
+used in the consensus problem of auxiliary variables are
+ensured to be connected, and their Laplacian matrices are guaranteed to be piecewise continuous, regardless of the behavior
+of Byzantine agents. Compared to [5]–[12], the proposed
+algorithm neither requires the information transmitted by
+Byzantine agents to lie on a continuous trajectory, nor requires
+the agents to maintain continuous connections with their outneighbors, thus relaxing the constraints on Byzantine attacks.
+Finally, a fully distributed resilient consensus algorithm with
+
+ET communication under a digraph is devised, ensuring the
+system security even in scenarios of heterogeneous topologies
+with different dimensions, further enhancing the technical
+feasibility of the proposed algorithm.
+Notations: Let Rn be the set of real column vectors with
+dimension n and Rn×m be the set of n × m real matrices. R
+and N represent set of real numbers and non-negative integers,
+respectively. 0n ∈ Rn and 1n ∈ Rn are n-dimensional column
+vectors with all elements being 0 and 1, respectively. And
+In ∈ Rn×n is the identity matrix with dimension n. Let ⊗
+be the Kronecker product, ◦ be the Hadamard product and
+O be the Bachmann-Landau notation. || · || is the Euclidean
+norm of a vector or the Frobenius norm of a matrix. X T is the
+transpose of X, where X can be a vector or a matrix. Denote
+by block diag(X1 , X2 , · · · , XN ) a block diagonal matrix with
+the entries Xi , where i = 1, · · · , N , and Xi can be a scalar
+or a matrix. When X is a scalar, define ⌈X⌉ = min{m ∈
+N+ | m ≥ X}, where N+ is the set of positive integers. For a
+function g(t) : [0, +∞) → R, define its upper Dini derivative
+. For any two sets A
+as D+ g(t)T= limS
+supδ→0+ g(t+δ)−g(t)
+δ
+and B, A B, A B, and A\B represent their intersection
+set, union set, and difference set, respectively. Additionally,
+|A| is the number of elements in a set A.
+II. P RELIMINARIES AND P ROBLEM S TATEMENT
+A. Graph Theory
+This paper considers a networked EL system comprising
+N agents. In such a system, the information exchange among
+agents is assumed to be represented by a digraph, denoted as
+G = {V, E}, where V = {vi | i = 1, · · · , N } is the vertex
+set and E ⊂ V × V is the edge set. The edge (vi , vj ) ∈ E
+signifies that agent i can receive the information transmitted
+by agent j, and the in-neighbor set of agent i is defined as
+Ni = {j | (vi , vj ) ∈ E}. Define A = [aij ] ∈ RN ×N as the
+adjacency matrix, where aij = 1 if j ∈ Ni and aij = 0
+N ×N
+otherwise. Similarly, D = [dij
+is defined as the inP] ∈ R
+degree matrix, where dij = j∈Ni aij if i = j and dij = 0
+otherwise. Accordingly, the Laplacian matrix L of digraph G
+can be defined as L = D − A.
+In general, the robustness of a communication topology
+is crucial to guarantee the achievement of consensus in
+MASs under Byzantine attacks. Accordingly, the following
+definitions are introduced to characterize the communication
+topology robustness [7].
+Definition 2.1 (r-reachable): Consider a nonempty subset
+S0 of the vertex set V in a digraph G = {E, V}. For an r ∈ N,
+if there exists an agent i ∈ S0 such that |Ni \S0 | ≥ r, then S0
+is referred to as an r-reachable set.
+Definition 2.2 (r-robust): Suppose that S1 and S2 are any
+pair of nonempty disjoint subsets of V. The digraph G is said
+to be r-robust if at least one of S1 and S2 is r-reachable.
+To help understand these two definitions, Fig. 1(a) presents
+a 2-robust digraph consisting of 5 agents. In this figure, let
+us choose S0 ={1, 5}. Since N1 ={2, 3, 5} and N5 ={1, 4},
+one can get |N1 \S0 |=|{2, 3}|=2 and |N5 \S0 |=1. Therefore,
+according to Definition 2.1, we can say that S0 is a 2-reachable
+
+3
+
+1
+
+1
+
+2
+
+5
+
+3
+
+4
+
+(a) A 2-robust digraph
+
+2
+
+5
+
+3
+
+C. Attack Model
+
+1
+
+4
+
+2
+
+5
+
+3
+
+4
+
+(b) Under
+1-total (c) Under
+1-local
+Byzantine attack
+Byzantine attack
+
+Fig. 1. An example of 2-robust digraph with 5 agents, where the red agents
+are Byzantine agents.
+
+set because |N1 \S0 |=2. Additionally, since |N1 \S0 |>1, S0 is
+also 1-reachable.
+Moreover, based on the rule in Definition 2.2 that the sets S1
+and S2 are nonempty and disjoint, we observe that when one
+of these sets contains 3 or 4 agents, the other must contain 1 or
+2 agents. Therefore, we only need to analyze the reachability
+of all possible subsets of V that contain 1 or 2 agents. From
+Fig. 1(a), it is evident that when either S1 or S2 contains
+only one agent, it is always 2-reachable, as each agent has
+no fewer than two in-neighbors. When S1 or S2 contains two
+agents, if one of the agents is not an in-neighbor of the other,
+then this conclusion is also straightforward. For the remaining
+cases, where the set is one of {1, 2}, {2, 3}, {3, 4}, {4, 5},
+or {5, 1}, it is also 2-reachable according to Definition 2.1.
+Therefore, the topology in Fig. 1(a) is 2-robust.
+B. Euler-Lagrange Systems
+The dynamics of each agent i ∈ V can be described by the
+following EL equation:
+Mi (qi )q̈i + Ci (qi , q̇i )q̇i + gi (qi ) = τi ,
+n
+
+(1)
+
+n
+
+where qi ∈ R and τi ∈ R are the generalized position
+and the control input of agent i, respectively. Mi (qi ) ∈ Rn×n
+is the inertia matrix, Ci (qi , q̇i ) ∈ Rn×n is the Coriolis and
+centripetal matrix, and gi ∈ Rn is the gravity vector of agent
+i. Some useful properties of EL dynamics are given below.
+Property 2.1: The inertia matrix Mi (qi ) is a bounded,
+symmetric positive-definite matrix.
+Property 2.2: For any vector p ∈ Rn , there holds
+T
+p (Ṁi (qi ) − 2Ci (qi , q̇i ))p = 0.
+Property 2.3: Let φi ∈ Rl be a vector composed of system
+parameters, with the elements of φi being all unknown. Let
+Ωi (qi , q̇i , xi , yi ) ∈ Rn×l be a regression matrix, which can
+be obtained directly. Then, for any measurable xi ∈ Rn and
+yi ∈ Rn , (1) can be rewritten as
+Mi (qi )xi + Ci (qi , q̇i )yi + gi (qi ) = Ωi φi .
+
+(2)
+
+Remark 2.1: EL dynamics are widely used to model
+practical systems, including rigid spacecrafts, planar elbow
+manipulators, and marine vessels [18]. However, the multidimensionality and complex nonlinearity of EL dynamics
+pose challenges for extending the existing resilient consensus
+algorithms to such systems. As a consequence, addressing the
+resilient consensus problem in networked EL systems becomes
+meaningful.
+
+Byzantine attacks aim at degrading the algorithm’s performance by preventing the achievement of global objectives. In
+general, to guarantee the achievement of resilient consensus of
+normal agents in a worst-case network environment, attackers
+are assumed to be omniscient and can have full capability
+to manipulate specific agents, referred to as Byzantine agents
+[19]. The possible behavior pattern of Byzantine agents can
+be summarized as follows.
+• Byzantine agents do not adhere to the algorithms designed for normal agents.
+• Byzantine agents can arbitrarily update their states and
+information transmitted to each of their out-neighbors
+according to the schemes planned by the attackers to disrupt the consensus of normal agents, perhaps by colluding
+with each other to do so.
+The aforementioned model finds widespread adoption in
+modeling Byzantine agents, as observed in [7]–[10]. However,
+launching such attacks requires significant resource consumption, constraining the maximum number of Byzantine agents
+that attackers with limited resources can manipulate. Without
+this constraint, this problem could become overly pessimistic
+and inconsequential [7]. To model the number and distribution
+of Byzantine agents, we define F as the set of Byzantine
+agents and H = V\F as the set of normal agents. Then we
+introduce the following two models.
+Definition 2.3 (f -total and f -local attack [7]): For an f ∈
+N, an MAS is said to be under an f -total attack if there exist
+at most
+T f Byzantine agents in it, i.e., |F| ≤ f . Further, if
+|Ni F| ≤ f holds for any normal agent i, then the system
+is said to be under an f -local attack.
+The above two models were initially proposed in [20] and
+have since been widely adopted in [7]–[10]. In addition, in this
+paper, we have relaxed the assumption in [5], [7]–[9], allowing
+that the information transmitted by Byzantine agents to their
+out-neighbors in continuous-time systems can be discontinuous and Byzantine agents can arbitrarily sever connections
+with their out-neighbors. This enables the proposed algorithm
+to withstand more aggressive Byzantine attacks.
+Remark 2.2: It is noteworthy that attacks satisfying the f total attack model always satisfy the f -local attack T
+model, but
+not vice versa. This is because, even though
+|N
+F| ≤ f
+i
+T
+holds for any normal agent
+i,
+when
+|N
+N
+|
+≤
+f , there
+i
+j
+T
+S
+T
+may be cases where |(Ni F) (Nj F)| ≥ f . Therefore,
+there may exist more than f Byzantine agents within the
+entire network. In other words, the f -total attack model is
+a specific case of the f -local attack model. Based on the
+aforementioned discussion, this paper concentrates on the
+resilient consensus problem of networked EL systems in the
+presence of f -local Byzantine attacks. Additionally, to make
+this conclusion evident, Fig. 1(b)–(c) present an example of a
+2-robust digraph subject to 1-total Byzantine attack and 1-local
+Byzantine attack.
+D. Problem Formulation
+This paper is devoted to developing a fully distributed eventtriggered resilient consensus algorithm for networked EL sys-
+
+4
+
+tems under Byzantine attacks. Unlike the traditional consensus
+problem in [14]–[17], the resilient consensus problem requires
+consensus among normal agents rather than all agents, as
+described in [5]–[13], since Byzantine agents do not follow the
+preset algorithm. The control objectives can be summarized as
+follows.
+Problem 2.1: To achieve the resilient consensus of networked EL systems, how to design the resilient consensus
+algorithm for each normal agent so as to guarantee that
+lim (qj (t) − qi (t)) = 0n , lim (q̇j (t) − q̇i (t)) = 0n ,
+
+t→∞
+
+t→∞
+
+(3)
+
+as well as to ensure that qi (t) and q̇i (t) remain bounded for
+any t, where i, j ∈ H. Additionally, owing to the utilization of
+the ET communication scheme, it is imperative to guarantee
+elimination of the Zeno behavior.
+III. M AIN R ESULTS
+In this section, a new resilient decision algorithm is first
+proposed for networked EL systems, addressing their resilient
+consensus problem in the presence of Byzantine attacks.
+Meanwhile, a fully distributed consensus algorithm is designed
+for each agent to complement the proposed resilient consensus
+algorithm. Additionally, the ET communication scheme is also
+adopted to reduce the communication resource consumption.
+A. Design of Resilient Consensus Algorithm
+In this subsection, a resilient consensus algorithm for
+networked EL systems under ET communication is proposed. This algorithm includes a new resilient decision algorithm, named as the auxiliary-variable-based resilient decision
+(AVBRD) algorithm, and a fully distributed consensus algorithm. We begin by detailing the proposed AVBRD algorithm.
+The AVBRD algorithm guarantees the achievement of consensus in networked EL systems under Byzantine attacks by
+introducing an auxiliary variable Ŵi ∈ Rn related to the
+preset control objectives, transforming the resilient consensus problem of networked EL systems into the consensus
+problem of Ŵi . Given that Byzantine agents aim to prevent
+the achievement of preset control objectives in networked EL
+systems, the auxiliary variable should be designed to gradually
+achieve consensus as the global objectives tend towards being
+achieved. For example, for the consensus algorithm with
+absolute velocity damping of network EL systems, Wi can be
+constructed based on yi or xi , which are defined in [21]; for the
+static scalar consensus problem, Ŵi can be constructed based
+on ki qi with ki being the scaled scalar. After constructing the
+auxiliary variable, agent i calculates the mean of the (f +1)th and the (|Ni |−f )-th smallest or largest values of Ŵjl (t)
+in each dimension l for all j ∈ Ni , where Ŵjl (t) is the l-th
+dimension of Ŵj (t). Then, it uses the difference between the
+obtained value and Ŵi to drive the control input. The global
+objectives are thus transformed into the consensus problem of
+the auxiliary variables. The algorithmic details are presented
+in Algorithm 1.
+Obviously, the introduction of the resilient decision algorithm may lead to changes in the global information. Therefore, it is necessary to design a fully distributed consensus
+
+Algorithm 1 The AVBRD Algorithm from the Viewpoint of
+Normal Agent i
+1: Agent i calculates Ŵj (t) for each of its in-neighbors,
+
+based on the information it stored.
+2: For jk ∈ Ni with k = {1, 2, · · · , |Ni |}, agent i constructs
+
+matrix [Ŵj1 (t), Ŵj2 (t), · · · , Ŵj| Ni | (t)] ∈ Rn×|Ni | , and
+sorts each dimension on the same rule to obtain Ŵ i (t).
+3: Agent i calculates the mean of Ŵ(t) of the (f +1)-th and
+the (|Ni |−f )-th columns on each of its corresponding row
+independently, and the result is given as W̄i (t).
+
+algorithm without using any global information for each agent.
+However, the complex nonlinearities present in networked EL
+systems make the development of such an algorithm challenging with ET communication under the digraph. To combat
+this challenge, we adopt the output regulation technique. The
+designed algorithm comprises a fully distributed ET observer
+and a distributed dynamic control law. Next, we introduce the
+following observer to generate a common reference trajectory
+for normal agents:
+η̇i (t) = Sηi (t) − µ1 (η̂i (t) − η̄i (t)),
+
+(4)
+
+where µ1 > 0 is a constant gain, and S ∈ Rn×n is a semisimple system matrix whose eigenvalues all have zero real
+parts, implying the state coupling in the observer. η̄i (t) is
+derived based on the value of W̄i (t), which has been defined in
+Algorithm 1. Their specific mapping depends on that between
+Wi and ηi (t). Ŵi (t) and Ŵj (t) are the auxiliary variable
+deigned based on η̂i (t) and η̂j (t), where η̂i (t) and η̂j (t) are
+the open-loop estimates of ηi (t) and ηj (t), respectively, and
+they are defined as
+i
+
+j
+
+η̂i (t) = eS(t−tk ) ηi (tik ), η̂j (t) = eS(t−tm ) ηj (tjm ),
+
+(5)
+
+in which, tik is the k-th triggering instant of agent i, and tjm
+is the latest triggering instant of agent j before t.
+It is worth mentioning that the above closed-loop estimation
+can be completed locally by agent i, as agent j only needs to
+transmit information to agent i at its triggering instants. In this
+paper, obtaining the state qj (t) of its in-neighbor j in real-time
+is challenging for normal agents. Fortunately, by applying (6)
+and (7) to be given, achieving the control objective (3) will also
+ensure that limt→∞ (ηj (t)−ηi (t)) = 0n , ∀i, j ∈ H. Therefore,
+we construct Wi (t) = e−St ηi (t) and Ŵi (t) = Wi (tik ), which
+can be re-expressed as Ŵi (t) = e−St η̂i (t). Accordingly, we
+devise η̄i (t) = eSt W̄i (t). Inspired by [23], the following fully
+distributed ET scheme is designed:
+o
+n
+α1
+≥
+0
+, (6)
+tik+1 = inf t > tik ∥eηi (t)∥ −
+α
+(t − t0 + α2 ) 3
+where α1 > 0, α2 > 1 and α3 > 1 are all constant gains,
+t0 is the initial instant, and eηi (t) = η̂i (t) − ηi (t) is the error
+variable. The distributed dynamic control law is devised as
+
+ τi = −ki si + Ωi (qi , q̇i , vi , v̇i )φ̂i ,
+vi = Sηi − µ2 (qi − ηi ),
+(7)
+ ˙
+T
+φ̂i = −Fi Ωi si ,
+
+

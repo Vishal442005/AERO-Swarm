@@ -1,0 +1,329 @@
+1
+
+Distributed Stochastic Optimal Control for
+Pattern-Oriented Swarms
+
+arXiv:2609.12959v2 [cs.RO] 14 Sep 2026
+
+Qingrui Zhang, Chenghao Yu, Feng Xue, and Xintong Wang
+
+Abstract—While offering significant promise for diverse applications, pattern-oriented swarms encounter multifaceted challenges
+in distributed geometric control, autonomous self-organization,
+and safe navigation through dynamic environments. In this paper,
+we present a Gibbs Random Field (GRF)-based stochastic optimal
+control framework to address these challenges within a unified
+probabilistic architecture. By extending the GRF into the temporal
+domain, the proposed framework casts collective coordination
+as a Bayesian inference task, enabling swarms to accommodate
+environmental uncertainty, satisfy non-convex constraints, and
+reconcile heterogeneous dynamics across diverse platforms. Within
+this framework, we develop an uncertainty- and safety-aware
+collision avoidance module for navigation in the presence of
+stochastic obstacle motion. The unscented transform is employed
+to propagate state uncertainty for both dynamic obstacles and
+neighboring agents, yielding principled confidence bounds for
+collision avoidance. In addition, a density-guided pattern control
+strategy is introduced, which encodes geometric patterns as
+implicit density fields using signed distance functions. This
+representation decouples pattern specification from explicit agentto-target assignments, thereby facilitating intrinsic self-healing
+and elastic reconfiguration in a distributed manner. The proposed
+framework and its principal modules are extensively evaluated
+through Monte Carlo simulations across diverse scenarios. Its
+model-agnostic nature is demonstrated on both quadrotor and
+fixed-wing UAV swarms, highlighting its generalizability across
+platforms with heterogeneous dynamics. Finally, the efficacy
+and robustness of the proposed method are validated through
+indoor experiments with a 15-quadrotor swarm and outdoor
+deployments involving 4 custom-built autonomous quadrotors.
+These experiments substantiate the proposed framework’s capacity
+to maintain reliable geometric pattern transitions and safety-aware
+navigation within real-world environments.
+Index Terms—Robot swarms, stochastic optimal control, Gibbs
+random field, pattern control, collision avoidance.
+
+I. I NTRODUCTION
+
+R
+
+OBOT swarms have demonstrated significant potential
+across a wide range of application domains, including
+environmental monitoring, search and rescue, and cooperative
+transportation [1]–[4]. These missions inherently hinge on
+the coordinated pattern formation of robots, giving rise to
+pattern-oriented swarms, defined as robot swarms that maintain
+coordinated spatial patterns to achieve mission objectives under
+dynamic and uncertain conditions. For example, environmental
+monitoring tasks typically benefit from grid or sweep patterns
+that provide consistent sensor coverage; search and rescue
+operations require robot swarms with dynamically adjustable
+formation patterns to enable efficient area exploration; and
+All authors are with the School of Aeronautics and Astronautics, Shenzhen
+Campus of Sun Yat-sen University, Shenzhen 518107, P.R. China. Corresponding author: Qingrui Zhang (e-mail: zhangqr9@mail.sysu.edu.cn).
+
+cooperative transportation relies on tight geometric configurations to effectively distribute loads among multiple robotic
+carriers. In many applications, the operating environments
+are dynamic and uncertain [5], often populated with diverse
+obstacles exhibiting unknown or partially observable motions,
+including other vehicles, humans, and moving objects. Consequently, a pattern-oriented swarm must simultaneously maintain
+desired geometric patterns for task execution while ensuring
+collision-free navigation and adapting to diverse environmental
+conditions [3], [6]. These demands pose fundamental challenges
+for the design of pattern-oriented swarm control systems.
+Beyond pattern maintenance and collision avoidance, patternoriented swarms must incorporate additional attributes to
+enhance system reliability, operational flexibility, and environmental adaptability. From a functional perspective, swarms
+must possess self-healing and self-organizing capabilities,
+analogous to those observed in biological systems, to ensure
+operational resilience against fluctuations in swarm population
+[2], [7], [8]. When individual robots experience failures, communication disruptions, or are deliberately removed from the
+swarm, the remaining robots should autonomously redistribute
+to maintain pattern integrity without requiring centralized
+replanning or predefined recovery protocols. Furthermore,
+when mission objectives change or environmental conditions
+require pattern adjustments, the swarm should demonstrate
+elastic reconfigurability that accommodates varying swarm
+sizes and enables transitions among diverse spatial patterns
+[9]. From a deployment perspective, real-world environments
+often present demanding conditions, characterized by dense
+dynamic obstacles with diverse motion modalities. These
+settings are inherently uncertain due to the presence of
+diverse moving entities—such as pedestrians, ground vehicles,
+and other autonomous agents—each exhibiting distinct, nondeterministic behaviors. Such environmental uncertainties are
+further amplified by limited sensing ranges, measurement noise,
+and the stochasticity of obstacle motions, which are difficult to
+capture within deterministic planning frameworks and thus pose
+a significant barrier to achieving provable safety guarantees
+[10]–[13].
+Existing solutions for the coordination of pattern-oriented
+swarms can generally be categorized into non-learning and
+learning-based methods. Non-learning approaches are driven
+by either rule-based or optimization-based paradigms, which
+exhibit certain architectural limitations in addressing the
+aforementioned challenges. Rule-based methods are built upon
+predefined behavioral primitives, such as separation, alignment,
+and cohesion rules, which are manually combined to produce
+collective behaviors [14]–[16]. While computationally efficient,
+
+2
+
+these methods lack formal guarantees regarding multiple objectives [30], rather than treating them as independent
+swarm performance requirements and often struggle to adapt additive components. Building on this theoretical foundation,
+when operating conditions deviate from the underlying design we establish an equivalence between probability maximization
+assumptions. Optimization-based methods, including model and path integral control, enabling the employment of samplingpredictive control [17]–[20], characterize swarm behavior via based methods–e.g., Model Predictive Path Integral (MPPI)
+cost functions that encode multiple competing objectives. [31] or Cross-Entropy Methods (CEM) [32]–to solve the
+These frameworks typically formulate the global objective as a resulting stochastic optimal control problem. To mitigate the
+linear combination of decoupled cost terms–such as collision stochasticity inherent in dynamic operational environments,
+avoidance, pattern maintenance, or goal tracking. However, such the proposed framework integrates unscented transform-based
+modular compositions are often governed by heuristic weight trajectory prediction with risk-aware optimization, providing
+tuning and lack a unified theoretical framework to characterize formal probabilistic safety guarantees against non-deterministic
+the swarm’s emergent collective behavior as a monolithic sys- obstacle motions. Furthermore, a density-guided pattern control
+tem. Consequently, the intrinsic correlations among competing strategy is developed, which characterizes geometric patterns
+objectives—specifically the adaptive coupling between pattern as a continuous density field. This formulation facilitates
+constraints and safety maneuvers, or the impact of stochastic self-healing and elastic reconfiguration by decoupling the
+propagation on cooperative behaviors—remain unmodeled, collective manifold from explicit robot assignments, thereby
+relegated instead to implicit balancing via empirical parameter obviating the need for centralized coordination. Collectively,
+adjustment.
+these components constitute a theoretically unified architecture
+Learning-based techniques, specifically those leveraging deep that simultaneously addresses the core challenges of modeling
+reinforcement learning and imitation learning, have demon- cohesive swarm behavior and ensuring safe, uncertainty-aware
+strated remarkable efficacy in swarm coordination by directly navigation.
+learning control policies from data [21]–[25]. These methods
+The main contributions are summarized as follows:
+effectively capture complex, non-linear interaction topologies
+that elude analytical modeling, offering promising scalability
+1) A unified GRF-based stochastic optimal control framefor multi-robot systems. However, their inherent black-box
+work is proposed for the distributed pattern-oriented
+nature poses significant hurdles to deployment in safety-critical
+swarm. Within this architecture, a robot swarm is moddomains [26], [27]. This lack of transparency precludes formal
+eled as a GRF via probabilistic graphical models, where
+safety guarantees and renders swarm behavior unpredictable
+the optimal control is synthesized via the Maximum
+in out-of-distribution scenarios. Furthermore, learning-based
+A Posteriori (MAP) estimation of the joint probability
+frameworks often struggle to achieve a principled balance
+distribution. Rather than a single-step estimation, the
+within multi-objective regimes involving competing constraints
+control inference is performed via the MAP estimation of
+[28], such as goal acquisition, collision avoidance, and pattern
+joint GRFs over a finite prediction horizon. This formulaintegrity. In highly dynamic environments, these deficiencies
+tion establishes a principled bridge between probabilistic
+can lead to brittle or overly aggressive trajectories that prioritize
+inference and path integral control, enabling the problem
+task completion over safety margins, thereby exacerbating the
+to be efficiently resolved using sampling-based methods
+risk of catastrophic constraint violations [12], [13]. Consesuch as MPPI. By extending the GRF into the temporal
+quently, existing learning-based methods fail to effectively
+domain, the proposed framework offers a theoretically
+manage the interdependencies of competing objectives, which
+unified approach to managing collective coordination
+leads to inconsistent performance in the case of conflicting
+under stochastic conditions. The proposed framework
+constraints in dynamic settings [29].
+inherently facilitates distributed optimization for swarmTo address these limitations, this paper presents a Gibbs Ranlevel objectives, enabling robot swarms to accommodate
+dom Field (GRF)-based stochastic optimal control framework
+environmental uncertainty, satisfy non-convex constraints,
+for pattern-oriented swarms, providing a unified, samplingand reconcile heterogeneous dynamics across diverse
+based solution to bridge the gap between swarm collective
+platforms.
+behavior modeling and stochastic optimal control. The key
+2) An uncertainty- and risk-aware collision avoidance apinsight of our framework is to reformulate swarm coordination
+proach is developed for safe navigation in dynamic envias inference on a GRF. Specifically, we model the swarm as
+ronments with stochastic obstacle motion. The unscented
+a probabilistic graphical model in which interactions among
+transform is employed to propagate state estimates for
+robots are represented by clique potentials. Under this represendynamic obstacles and neighboring agents, yielding timetation, optimizing swarm behavior corresponds to maximizing
+indexed uncertainty distributions over the prediction
+the joint probability distribution over the GRF, effectively transhorizon. We thereafter integrate a unified probabilityforming multi-objective swarm coordination into a probabilistic
+based collision avoidance framework within the Gibbs
+inference problem. This formulation naturally accommodates
+energy formulation, facilitating two distinct representacomplex interactions and stochastic uncertainties, allowing us to
+tions for handling uncertainty: (1) a chance-constrained
+encode various constraints such as collision avoidance, pattern
+formulation and (2) a risk-sensitive formulation levermaintenance, and cooperative objectives within the probabilistic
+aging Conditional Value-at-Risk (CVaR). This approach
+framework. It provides a principled mechanism to explicitly
+provides formal probabilistic safety guarantees against
+model and regulate the interdependency between competing
+non-deterministic motions. Simulation benchmarks across
+
+3
+
+scenarios with varying obstacle densities demonstrate the demonstrated remarkable efficacy in distilling sophisticated
+efficacy of the proposed method in achieving superior control policies directly from high-dimensional experience,
+survival rates and safety performance.
+enabling robots to address intricate interaction patterns that
+3) A density-guided pattern control method is proposed, defy analytical modeling [21], [22]. In particular, multi-agent
+endowing pattern-oriented swarms with self-healing reinforcement learning (MARL) frameworks have further adcapabilities and elastic reconfigurability. By representing vanced swarm coordination. Methods such as asymmetric selfgeometric patterns as implicit density fields characterized play and curriculum learning have been developed to facilitate
+by signed distance functions (SDFs), the approach robust cooperation among heterogeneous robots [24]. Notably,
+fundamentally decouples pattern formation from explicit recent work by [25] demonstrated that integrating Gibbs random
+robot-to-target assignments. In the event of robot loss, fields with MARL can achieve impressive flocking control, with
+the remaining individuals spontaneously redistribute to success rates approaching 99% in challenging environments at
+fill the vacated regions in a distributed manner, thereby significantly lower computational cost than MPC methods. In
+achieving emergent self-organization behavior analogous addition, [33] proposed multi-fidelity reinforcement learning,
+to that observed in biological swarms. The pattern scale which co-trains planning policies with reward estimators,
+adapts autonomously to varying swarm populations, thereby achieving real-time trajectory updates for time-optimal
+while arbitrary compositions enable fluid reconfigu- replanning. Despite these advances, learning-based methods
+ration for dynamic mission requirements. Simulation face inherent limitations that hinder their deployment in
+benchmarks across diverse non-convex geometries and safety-critical applications [26], [27]. Their black-box nature
+robot-loss scenarios validate the effectiveness of the precludes formal safety guarantees, making it difficult to certify
+method. Furthermore, indoor and outdoor experiments system behavior or predict performance in novel scenarios.
+with quadrotors demonstrate the method’s capacity in The generalization capabilities of learned policies to outsuccessful pattern control, dynamic transitions, sponta- of-distribution conditions remain fragile, while the sample
+neous self-healing, and safe navigation in real-world inefficiency of training often necessitates extensive simulation
+deployment.
+prior to deployment in the real world.
+Model Predictive Path Integral (MPPI) control represents a
+compelling
+synthesis of optimization and learning paradigms
+II. R ELATED W ORKS
+that addresses several limitations of purely learning-based
+A. Swarm Control Methods
+approaches. Originally developed from integral path control
+Swarm robotic control has undergone significant develop- [34], [35], MPPI was introduced by [36], [37] as a samplingment over the past decades through several distinct paradigms. based approach to aggressive autonomous driving. It iteratively
+Early methodologies were predominantly rule-based, drawing samples control sequences, evaluates them using a cost function,
+inspiration from biological collective behaviors, as exempli- and updates the control sequences based on Kullback–Leibler
+fied by Reynolds’ Boids model [14]. This seminal work (KL) divergence and importance sampling [31]. Hence, MPPI
+demonstrated that complex flocking phenomena can emerge can be interpreted as an online reinforcement learning method.
+from three simple local rules—e.g., separation, alignment, [31] has demonstrated that MPPI can effectively perform
+and cohesion—thereby laying the foundation for decentralized model-based policy optimization in real-time, bridging the gap
+swarm coordination without centralized planning. Subsequently, between model-free RL flexibility and model-based control
+[15] formalized flocking control within a rigorous control- predictability. [38] extended a similar path integral framework
+theoretic framework, providing stability guarantees through to constrained stochastic optimal control with learned imporpotential-based interactions.
+tance sampling, demonstrating real-time control on quadrupedal
+While rule-based methods offer simplicity and scalability, robots. In light of the sampling-based architecture, MPPI can
+they are inherently myopic, lacking the capacity to opti- natively accommodate non-convex cost landscapes without
+mize task-specific objectives or manage complex constraints. requiring gradient computation and leverage massive GPU parThis limitation motivated the shift toward optimization-based allelization to ensure real-time performance in high-dimensional
+paradigms. In particular, distributed MPC (DMPC) formulations robotic systems. Recent extensions have applied MPPI to
+have subsequently demonstrated significant efficacy in multi- multi-agent scenarios with explicit uncertainty propagation
+robot coordination, as evidenced by the online trajectory [18], [39], demonstrating its potential for swarm coordination.
+generation in [17] and the large-scale differential dynamic [40] further advanced sampling-based MPC through products
+programming in [19]. More recently, [20] proposed a scalable of experts, enabling more efficient exploration in constrained
+DMPC framework capable of coordinating up to ten thousand optimization problems. However, existing formulations do not
+robots. However, these optimization-based approaches gener- fully exploit the spatial structure inherent in swarm coordination
+ally necessitate high-fidelity system models and often face problems, treating inter-agent interactions as independent cost
+challenges regarding computational tractability when deployed terms rather than as correlated random variables. Our proposed
+in real-time, high-dimensional environments.
+GRF-MPPI framework addresses this gap by encoding interThe advent of deep learning has introduced a data-driven agent spatial dependencies through GRFs, enabling more
+swarm control paradigm, with reinforcement learning (RL) effective coordination in large-scale swarms while preserving
+emerging as a particularly promising approach for synthe- the advantages of sampling-based control and providing a
+sizing complex collective behaviors. Deep RL methods have principled mechanism for uncertainty-aware decision making.
+
+4
+
+B. Geometric Pattern Control
+
+dynamic formation in obstacle-dense environments. Building upon this foundation, the GRF-based stochastic optimal
+control framework proposed in this paper addresses existing
+limitations through a unified probabilistic architecture. By
+encoding formation objectives as Gibbs energy functions,
+our approach explicitly captures spatial correlations between
+neighboring agents within a GRF, representing a fundamental
+departure from coverage-based methods that model robots as
+independent, uncorrelated entities. This formulation endows the
+swarm with intrinsic self-healing capability. The robot swarm
+autonomously reorganizes in response to fluctuating agent
+populations, without requiring the explicit and computationally
+intensive reconfiguration mandated by traditional graph-based
+methods. Consequently, our framework preserves permutation
+invariance, ensuring that the global objective remains satisfied
+regardless of individual robot identities or local membership
+changes.
+
+Geometric pattern control aims to coordinate multi-robot
+systems to achieve and maintain desired spatial configurations.
+Traditional approaches are primarily based on formation control
+paradigms, including leader–follower, virtual structure, and
+behavior-based methods [3]. The leader–follower approach
+formulates pattern control as a tracking problem, in which a
+designated leader governs the motion while the remaining
+robots maintain predefined relative positions or distances
+[41]. The virtual structure approaches, pioneered by [42],
+model the geometric pattern as a rigid entity, assigning
+each robot a specific and fixed position on that structure.
+[43] extended this concept to quadrotor swarms, enabling
+agile interleaved maneuvers through differential flatness-based
+control augmented with layered potential fields for collision
+avoidance. However, the aforementioned formation control
+methods are intrinsically based on predefined rigid structures
+with fixed geometries. This structural dependency necessitates
+explicit centralized re-indexing or assignment reconfiguration C. Uncertainty-Aware Collision Avoidance
+whenever swarm membership changes dynamically–a process
+Conventional collision avoidance frameworks for robot
+that becomes computationally prohibitive as the system scales. swarms have achieved remarkable computational efficiency
+[44] reported that collision-aware reconfiguration algorithms under idealized assumptions. Artificial potential field methods
+require substantial computational overhead, achieving only 49% [54] synthesize repulsive forces to deflect robots away from
+time reduction compared to naive approaches. Similarly, [45] obstacles, while velocity obstacle-based approaches [55], [56]
+observed that adaptive reconfiguration in confined environments leverage geometric reasoning in the velocity space to identify
+demands complex online replanning. Consequently, these reachable, collision-free control inputs. Additionally, Control
+methods exhibit limited resilience due to the absence of Barrier Functions (CBFs) [12], [57], [58] provide formal
+topological flexibility required for swarm self-organization, safety guarantees by encoding collision-free regions as forward
+motivating the transition toward more flexible density-guided invariant sets. However, these paradigms fundamentally rely on
+paradigms.
+the assumption of deterministic motion and perfect state inforIn contrast, coverage control offers a fundamentally dif- mation, necessitating precise knowledge of positions, velocities,
+ferent perspective on geometric pattern formation, providing and future trajectories. In practice, these assumptions are
+significantly greater topological flexibility than conventional frequently violated by sensor noise, communication latencies,
+formation control approaches. [46] proposed a gradient-descent stochastic obstacle motion, and non-cooperative behaviors.
+algorithm to coordinate robots into centroidal Voronoi configu- When deployed under such uncertainties, deterministic methods
+rations without requiring explicit agent-to-position assignments. face a critical trade-off: they either fail to account for collisions
+Subsequent advancements by [47] addressed the coupled chal- arising from estimation errors or resort to overly conservalenges of formation stabilization and connectivity maintenance tive safety margins, which significantly degrade navigation
+through navigation functions, while [48] leveraged nonsmooth efficiency [59]. These fundamental limitations necessitate the
+control barrier functions to ensure continuous visual coverage development of probabilistic approaches that explicitly reason
+and eliminate sensing gaps in aerial swarms. The mean-field about uncertainty to maintain both safety and agility.
+approach by [49] established the theoretical foundations for
+To address the inherent uncertainty in real-world scenarios,
+density-based control via continuous-time Markov chains, a uncertainty-aware collision avoidance methods have evolved
+framework recently extended by [50] using Fokker-Planck along several complementary directions. Reactive approaches
+equations to characterize the dynamic evolution of density. focus on the immediate response to moving obstacles with
+These methods have demonstrated impressive scalability, for uncertain trajectories. [60] developed globally optimal velocity
+example, [51] achieving formations with 1024 robots through fields enabling navigation to arbitrary positions among moving
+local task swapping and [52] realizing complex formation obstacles, while [61] proposed topology-aware motion planning
+assembly—including regeneration and cargo transportation. that accounts for both robot state uncertainty and obstacle
+However, existing solutions typically assume quasi-static motion estimates. Game-theoretic methods offer an alternative
+density functions and treat robots as independent entities, failing paradigm by modeling interactions between agents as strategic
+to capture the spatial correlations among neighboring robots. decision-making. [62] formulated crowd navigation as a mixed
+Furthermore, environmental stochasticity inherent in real-world strategy Nash equilibrium, achieving human-level navigation
+deployments remains largely unaddressed in the state of the performance through Bayesian recursive updates. Beyond these
+art methods.
+reactive and game-theoretic approaches, probabilistic constraint
+Our recent work [53] demonstrated that GRFs can facilitate methods have emerged. Chance-Constrained (CC) optimization,
+geometric pattern control via mean-shift techniques, enabling originated from the seminal work of [63], bounds collision
+
+

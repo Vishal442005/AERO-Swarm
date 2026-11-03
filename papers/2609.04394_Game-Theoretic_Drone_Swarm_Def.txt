@@ -1,0 +1,244 @@
+Game-Theoretic Drone Swarm Defense
+A Case Study in Applied Differential Game Theory
+Ross E. Allen
+MIT Lincoln Laboratory
+
+arXiv:2609.04394v1 [cs.GT] 3 Sep 2026
+
+August 2026
+
+Executive Summary
+This technical report is a study of the use of differential game (DG) theory to solve the target-assignment
+and midcourse guidance problems of drone swarms tasked with intercepting opposing swarms in defense
+of high-value assets. The game-theoretic tactics—which treat the intruder swarm as a rational agent and
+seek a Nash equilibrium between defenders and intruders—are compared against baseline tactics that model
+the defense problem as a unilateral optimization of the defenders’ maneuvers. Monte Carlo simulation and
+Bayesian analysis show that the game-theoretic approach has a higher probability of successfully intercepting
+all intruders than the baseline techniques. This improvement in successful defense probability is most pronounced when the intruder swarm is capable of evasive maneuvers: relative to baseline optimization tactics,
+differential-game tactics increase estimated defense success from 94.6% to 96.8%, closing approximately 41%
+of the remaining gap to perfect defense. To add statistical credibility to this result, a paired-trial Bayesian
+analysis assigns a 99.9% posterior probability that differential-game tactics have a higher probability of
+successful asset defense than baseline tactics in this scenario.
+
+DISTRIBUTION STATEMENT A. Approved for public release. Distribution is unlimited.
+This material is based upon work supported by the Under Secretary of War for Research and Engineering under Air Force
+Contract No. FA8702-15-D-0001 or FA8702-25-D-B002. Any opinions, findings, conclusions or recommendations expressed in
+this material are those of the author(s) and do not necessarily reflect the views of the Under Secretary of War for Research and
+Engineering.
+© 2026 Massachusetts Institute of Technology.
+Delivered to the U.S. Government with Unlimited Rights, as defined in DFARS Part 252.227-7013 or 7014 (Feb 2014). Notwithstanding any copyright notice, U.S. Government rights in this work are defined by DFARS 252.227-7013 or DFARS 252.227-7014
+as detailed above. Use of this work other than as specifically authorized by the U.S. Government may violate any copyrights
+that exist in this work.
+
+1
+
+Contents
+1 Problem Formulation
+1.1 Teams, State, and Information . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+1.2 Objectives and Solution Concepts . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+3
+3
+4
+
+2 Guard/Defender Tactics
+2.1 Baseline Tactics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.1.1 Heading Error Midcourse Guidance . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.2 Differential Game Tactics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.2.1 Dynamic Target Soft-Assignment . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.2.2 Game Theoretic Midcourse Guidance . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.2.3 Terminal Guidance . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+4
+5
+6
+6
+6
+8
+9
+
+3 Simulation Environment
+10
+3.1 Interception Adjudication . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+3.2 Bandit/Intruder Tactics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+4 Experiment Design
+11
+4.1 Monte Carlo Trials . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+4.2 Performance Metrics & Bayesian Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+5 Results & Discussion
+
+13
+
+6 Limitations & Future Work
+
+18
+
+A Appendices
+19
+A.1 Discounted-Redundancy Assignment Reformulation . . . . . . . . . . . . . . . . . . . . . . . . 19
+
+2
+
+Bj
+
+Lℓ
+
+Gi
+Figure 1: Conceptual drone swarm defense problem posed as a many-agent Lady-Bandit-Guard problem [7].
+The guard drone Gi , which is one of a large set of guard drones, attempts to intercept a particular bandit
+drone Bj before it reaches a high-value asset Lℓ , while considering the trade-offs of potentially pursuing
+different bandits.
+
+1
+
+Problem Formulation
+
+The drone swarm defense problem is posed as a many-agent variant of the Lady-Bandit-Guard problem
+described by Rusnak [7]. A team of NG guard drones (also referred to as defenders or interceptors) is tasked
+with intercepting an incoming swarm of NB bandit drones (also referred to as intruders or threats) before
+any of them reach the set of NL high-value assets (HVAs, called “ladies” in Rusnak’s terminology [7]).
+The problem is multi-faceted, generally requiring optimization of both the assignment of specific guards
+to intercept specific bandits and guidance laws that generate dynamically-feasible trajectories that achieve
+those interceptions. Fig. 1 gives a conceptual illustration of an engagement with a small number of drones.
+
+1.1
+
+Teams, State, and Information
+
+Let G ≜ {0, . . . , NG − 1}, B ≜ {0, . . . , NB − 1}, and L ≜ {0, . . . , NL − 1} index the guards, bandits, and
+high-value assets (HVAs), respectively. The total population sizes NG , NB , and NL are fixed for an episode.
+At any time, GA ⊆ G and BA ⊆ B denote the active guard and bandit index sets, with NGA ≜ |GA |
+and NBA ≜ |BA |. Inactive vehicles remain represented in the full environment state but are omitted from
+active-roster planning problems.
+Guards are modeled as fixed-speed, planar Dubins vehicles. For guard i ∈ G, the state, control, and
+equations of motion are
+
+T
+
+T
+pG,i = px,G,i py,G,i , xG,i = pT
+,
+G,i ψG,i
+uG,i = ωG,i ∈ UG ,
+
+
+VG cos ψG,i
+ẋG,i =  VG sin ψG,i  .
+ωG,i
+
+UG ≜ [−ω̄G , ω̄G ],
+
+(1)
+
+Here pG,i is planar position, ψG,i is heading, VG is the guard-team constant forward speed, and ω̄G is
+the maximum turn rate. The corresponding inertial velocity is vG,i = VG [cos ψG,i , sin ψG,i ]T . Bandits are
+defined analogously by replacing (G, i) with (B, j) and using VB , ω̄B , and uB,j . Thus each vehicle state is
+three-dimensional and each control is a scalar heading rate. Stacking the dynamics over both teams defines
+ẋ = f (x, uG , uB ). We ignore altitude changes and assume VG > VB ; the rationale for excluding faster-bandit
+cases is discussed in Sec. 6.
+3
+
+The full-team and active-roster guard stacks are
+
+T
+xG (t) ≜ xG,0 (t)T · · · xG,i (t)T · · · xG,NG −1 (t)T ,
+
+T
+uG (t) ≜ uG,0 (t) · · · uG,i (t) · · · uG,NG −1 (t) ,
+
+
+xGA (t) ≜ xG,i (t) i∈G ,
+A
+
+
+uGA (t) ≜ uG,i (t) i∈G .
+
+(2)
+
+A
+
+with analogous definitions for xB , uB , xBA , and uBA . Brackets indexed by a set indicate a stack over that
+set in ascending index order. Thus xG and xB have fixed dimensions 3NG and 3NB , whereas xGA and xBA
+are compact active-roster stacks. The joint propagated vehicle state is x(t) = [xG (t)T , xB (t)T ]T ; the active
+T T
+T
+T T
+state and control used by a game solve are xA = [xT
+GA , xBA ] and uA = [uGA , uBA ] . Superscripts 0 : T and
+0:T
+0 : T − 1 denote planning-horizon state and control sequences; for example, xGA = (xGA ,0 , . . . , xGA ,T ) and
+−1
+u0:T
+= (uGA ,0 , . . . , uGA ,T −1 ).
+GA
+The HVAs are fixed at positions collected in PL ∈ RNL ×2 and are scenario context rather than dynamicstate components. Every guard receives the common global observation
+OG ≜ (xG , xB , PL , VG , VB , σG , σB , σL , t),
+
+(3)
+
+where VG and VB are fixed vehicle-speed vectors and the status vectors preserve fixed observation dimensions
+after entities become inactive. The implemented bandit behavior uses the guard-blind projection OB ≜
+(xB , PL , VB , σB , σL , t); its actions do not respond to guard state.
+
+1.2
+
+Objectives and Solution Concepts
+
+Guards are modeled as a cooperative team with common cost JG , while bandits share cost JB . The detailed
+NG
+and γB : OB →
+terminal-handoff and control-effort costs are specified in Sec. 2.2.2. Let γG : OG → UG
+NB
+UB denote guard and bandit feedback policies—also called “strategies” in game-theory literature [2] and
+colloquially as “tactics” in this report. A unilateral formulation of the swarm defense problem selects the
+guard tactics that minimize JG :
+⋆
+γG
+= arg min JG (γG ; γB ) ,
+γG
+
+such that
+
+(4)
+
+ẋ = f (x, γG (OG ), γB (OB )) ,
+
+x(0) = x0 .
+
+where f (x, γG (OG ), γB (OB )) describes the physical dynamics of the drone swarm.
+Equation 4 is the unilateral formulation used by the baseline tactics in Sec. 2.1: it optimizes the guard
+policy for a prescribed bandit policy. The differential-game formulation instead solves for mutually responsive
+strategies.
+⋆
+⋆
+⋆
+JG (γG
+, γB
+) ≤ JG (γG , γB
+),
+⋆
+⋆
+⋆
+JB (γG
+, γB
+) ≤ JB (γG
+, γB ) ,
+
+(5)
+
+Equation 5 defines a Nash equilibrium, from which neither team benefits by unilaterally changing its
+strategy [2, Chapter 6]. The planned bandit strategy is an adversarial model rather than a prediction of
+the simulated guard-blind bandit behavior. Receding-horizon replanning lets the guard team respond as
+observed behavior departs from that model.
+
+2
+
+Guard/Defender Tactics
+
+In this section we develop 3-phase tactics used by the team of guard drones; the phases being target assignment, midcourse guidance (MG), and terminal guidance (TG). Fig. 2 provides an illustrative diagram
+of the control flow between these phases. Generally speaking, the target assignment phase is responsible for
+assigning to each guard drone a bandit that it is nominally intended to intercept. This phase is generally
+executed by a centralized planner—mimicking how a command and control node in the real-world would be
+4
+
+

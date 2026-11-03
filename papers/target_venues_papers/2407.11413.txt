@@ -1,0 +1,585 @@
+1
+
+Achieving Distributed Convex Optimization
+within Prescribed Time For High-Order
+Nonlinear Multi-Agent Systems
+
+arXiv:2407.11413v3 [math.OC] 25 Mar 2026
+
+Gewei Zuo, Lijun Zhu, Yujuan Wang, Zhiyong Chen and Yongduan Song, Fellow, IEEE
+
+Abstract— This paper addresses the distributed
+prescribed-time convex optimization (DPTCO) problem
+for high-order nonlinear multi-agent systems (MASs) under
+undirected connected graphs. A cascade design framework
+is proposed that divides the DPTCO implementation into
+distributed optimal trajectory generator design and
+local reference trajectory tracking controller design. The
+DPTCO problem is then transformed into the prescribedtime stabilization problem of a cascaded system. Using
+changing Lyapunov functions and time-varying state
+transformations with sufficient conditions, we establish
+criteria for prescribed-time stabilization and prove the
+boundedness of internal signals in closed-loop MASs. The
+framework addresses robust DPTCO for chain-integrator
+MASs with disturbances through the introduction of
+novel sliding-mode variables and time-varying gains. It
+also solves adaptive DPTCO for strict-feedback MASs
+with parameter uncertainty via backstepping method and
+descending power state transformation. Two numerical
+examples verify the theoretical results.
+Index
+Terms— Distributed
+convex
+optimization,
+stabilization of cascaded systems, prescribed-time
+control, and time-varying gains.
+
+I. I NTRODUCTION
+Distributed convex optimization (DCO) has gained
+widespread attention due to its numerous applications in
+multi-agent systems (MASs). These applications include
+reliable communications in wireless networks, collision
+avoidance among multiple robots, economic dispatch in
+power systems, distributed optimal power flow, traffic
+management for large-scale railway networks, and traffic
+This work was supported in part by the National Natural Science
+Foundation of China under Grant 62173155 and Grant 52188102; in
+part by the Program for Huazhong University of Science and Technology
+(HUST) Academic Frontier Youth Team; and in part by the Taihu Lake
+Innovation Fund for Future Technology, HUST. (Corresponding Author:
+Lijun Zhu)
+Gewei Zuo and Lijun Zhu are with School of Artificial Intelligence and
+Automation, Huazhong University of Science and Technology, Wuhan
+430072, China. Lijun Zhu is also with Key Laboratory of Imaging
+Processing and Intelligence Control, Huazhong University of Science
+and Technology, Wuhan 430074, China (Emails: gwzuo@hust.edu.cn;
+ljzhu@hust.edu.cn).
+Yujuan Wang and Yongduan Song are with School of
+Automation, Chongqing University, Chongqing, 400044, China (Email:
+yjwang66@cqu.edu.cn; ydsong@cqu.edu.cn).
+Zhiyong Chen is with School of Engineering, The University of
+Newcastle, Callaghan, NSW 2308, Australia (Email: chen@newcastle.
+edu.cn).
+
+metering in urban street networks. In a typical DCO scenario,
+each agent has a local objective function that is private to
+itself. The global objective function is the sum of these local
+functions. The goal is to design distributed controllers that,
+using only limited local information, enable the output or
+state of each agent to converge to the optimum of the global
+objective function. The earliest work on DCO can be tracked
+back to [1], and it has attracted increasing interest in the last
+decade after the pioneer works in [2].
+Research in DCO focuses on four key areas: broadening
+the scope of objective functions [3]–[6] and systems [7]–[12],
+enhancing convergence rates [11], [13]–[17], and improving
+disturbance rejection [9], [12], [18]–[20]. Optimization
+algorithms have been devised for time-invariant objective
+functions [3], time-varying ones [4], and those with constraints
+[5], [6]. In [21], the convexity of local objective function and
+strong convexity of global objective function are respectively
+removed. Some works aim to achieve DCO for more general
+systems, such as single-integrator systems in [7], linear
+systems in [8], Euler-Lagrange systems in [9], and strictfeedback systems in [10], [22]. Using sliding-mode control
+and backstepping methods, the DCO controller can handle
+systems that are high-order and nonlinear [12]. A common
+approach to solving DCO for high-order systems is the cascade
+design where the solution to the DCO problem is divided into
+two parts. The first is distributed optimum seeking, which by
+utilizing local information interaction generates local optimal
+references for each agent that asymptotically converge to the
+optimum of the global objective function. The second is to
+design local tracking controllers to make the output or state
+asymptotically converge to the local optimal references.
+Convergence rate and disturbance rejection are pivotal
+concerns in DCO. Studies such as [11], [17] explore finitetime convergence, where agents reach consensus within a finite
+time frame while optimizing the global objective function.
+The finite-time DCO for chain integrator MASs facing
+mismatched disturbances is addressed in [19]. Furthermore,
+fixed-time convergence, wherein the finite settling time does
+not depend on initial conditions, is demonstrated in [13],
+[15], [16]. In [14], predefined-time DCO is accomplished by
+designing specific time-based functions, allowing solutions
+to converge to a neighborhood of the optimum within a
+specified period and to the exact optimum as time approaches
+infinity. However, this approach is not extendable to scenarios
+
+2
+
+involving disturbances and high-order systems.
+In this paper, we address the DPTCO for high-order
+nonlinear MASs with uncertainties, for which the solution
+converges to the optimum within any prescribed time. The
+prescribed-time control is proposed to ensure that the settling
+time does not depend on the initial values and control
+parameters [23]–[25]. The main contributions of this paper
+are summarized as follows.
+First, a DFTCO framework for a class of nonlinear MASs
+with disturbances is proposed. By embedding a cascade
+design, the DFTCO implementation is divided into two parts,
+namely, distributed optimal trajectory generator design and
+local reference trajectory tracking controller design. The
+DPTCO problem is then transformed into the prescribed-time
+stabilization problem of two cascaded subsystems. The first
+one is for the error of the distributed estimation towards the
+global optimum, and the second one is for local tracking errors.
+Changing Lyapunov function and time-varying state methods,
+along with some sufficient conditions, are proposed to prove
+the prescribed-time stabilization of the cascaded system as
+well as the uniform boundedness of internal signals in the
+closed-loop system. A specific distributed optimal trajectory
+generator is constructed to show that the distributed estimation
+errors converge to zero within a prescribed time.
+Second, under the DPTCO framework, we propose a
+robust DPTCO algorithm for a class of nonlinear chainintegrator MASs with external disturbances. We design a
+novel sliding-mode variable and introduce a new timevarying state transformation, which converts the prescribedtime stabilization problem of local tracking error and other
+states unrelated to the output into the boundedness of the
+new variable. Unlike traditional sliding-mode control in [26]
+and the prescribed-time work in [23], our approach does not
+require the high-order derivatives of the reference trajectory for
+tracking. Moreover, our proposed algorithm is robust against
+any bounded external disturbances.
+Third, we consider adaptive DPTCO for a class of strictfeedback MASs with parameter uncertainty. We introduce
+a time-varying state transformation of a descending power
+to compensate for the growth of increasing rate induced
+by the derivative of time-varying gains in recursive steps.
+The backstepping method with prescribed-time dynamic filters
+is adopted to avoid the utilization of high-order derivatives
+of reference trajectory, and an adaptive law is designed to
+compensate for parameter uncertainty.
+The rest of the paper is organized as follows. Section II
+presents the notation and problem formulation. Section III
+introduces the DPTCO framework for a type of nonlinear
+systems, for which Section IV elaborates on the optimal
+trajectory generator design. Given the DPTCO framework
+and optimal trajectory generator, robust DPTCO for chainintegrator MASs and adaptive DPTCO for strict-feedback
+MASs are discussed in Sections V and VI, respectively.
+Numerical simulation is conducted in Section VII, and the
+paper is concluded in Section VIII.
+II. N OTATIONS AND P ROBLEM F ORMULATION
+
+A. Notations
+R, R≥0 , and Rn denote the set of real numbers, the
+set of non-negative real numbers, and the n-dimensional
+Euclidean space, respectively. t0 denotes the initial time, T
+the prescribed-time scale, and Tp := {t : t0 ≤ t < T + t0 }
+the corresponding time interval. The symbol 1N ∈ RN (or
+0N ∈ RN ) denotes an N -dimensional column vector whose
+elements are all 1 (or 0). For α ∈ K∞ , (α(s))−1 = 1/α(s)
+for s ∈ R≥0 /0, while α−1 (s) is the inverse function of α(s)
+for s ∈ R≥0 .
+An undirected graph is denoted as G = (V, E), where V =
+{1, · · · , N } is the node set and E ⊆ V ×V is the edge set. The
+existence of an edge (i, j) ∈ E means that nodes i and j can
+communicate with each other. Denote by A = [aij ] ∈ RN ×N
+the weighted adjacency matrix, where (j, i) ∈ E ⇔ aij > 0
+and aij = 0 otherwise. A self-edge is not allowed, i.e., aii = 0.
+The Laplacian matrix L of graph G is denoted as L = [lij ] ∈
+PN
+RN ×N , where lii = j=1 aij , and lij = −aij for i ̸= j. If G
+is connected, then the null space of L is spanned by 1N , and
+all the other N − 1 eigenvalues of L are strictly positive.
+B. Problem Formulation
+Consider the nonlinear MASs
+ẋi = gxi (xi , y i , ui , di (t)),
+ẏ i = gyi (xi , y i , ui , di (t)), i ∈ V,
+
+(1)
+
+where xi ∈ Rn , y i ∈ Rm , ui ∈ Rq are the system state,
+output, and control input of thei-th agent, respectively. di :
+[t0 , ∞) → D ⊂ Rnd denotes the system’s uncertainties or
+external disturbances, where D is a compact set belonging to
+Rnd and is possibly time-varying. gxi : Rn × Rm × Rq ×
+D → Rn , gyi : Rn × Rm × Rq × D → Rm are smooth
+functions of their arguments, satisfying gxi (0, y i , 0, di ) = 0 and
+gyi (0, y i , 0, di ) = 0 for any y i ∈ Rm and di ∈ Rnd . The output
+feedback system (1) encompasses various specific types [27],
+such as chain-integrator systems [23], strict-feedback systems
+[28], and feedforward systems [29].
+In this paper, we consider the following convex optimization
+problem
+PN i i
+min
+s.t. y i = y j , ∀i ̸= j,
+(2)
+i=1 f (y ),
+y
+
+T T
+where y = [y1T , · · · , yN
+] is the lumped output of MASs in
+i i
+(1), and f (y ), i ∈ V is the local scalar objective function,
+which is convex and known only to agent i. Motivated by
+the results in [9], this paper assumes that gradient function
+∇f i (·) of local objective function is available. Due to equality
+constraints, the optimum y ∗ of optimization problem (2) has
+the form y ∗ = 1N ⊗ z ∗ for some z ∗ ∈ Rm .
+The objective of the DPTCO is, for any prescribed time T >
+0, using local information interactions to design distributed
+controllers ui , i ∈ V such that the outputs y converge to the
+optimum y ∗ within T + t0 , i.e.,
+
+lim y(t) − y ∗ = 0
+
+t→T +t0
+
+(3)
+
+irrespective of system’s initial value and any other
+control parameters besides T . Moreover, the state xi , the
+
+3
+
+output y i , and control input ui must be bounded, i.e.,
+∥[(xi (t))T , (y i (t))T , (ui (t))T ]∥ < ∞ holds for i ∈ V and
+t ∈ Tp .
+A few discussions are needed to distinguish the distributed
+finite-time, fixed-time, predefined-time, and prescribed-time
+convex optimization. Let us call t0 + T in the objective
+(3) the settling time. When the objective (3) is modified to
+y i (t) = z ∗ , ∀t ≥ T (x(t0 ), c), i ∈ V where the function
+T (x(t0 ), c) depends on the initial condition x(t0 ) and the
+parameter vector c = [c1 ; · · · , cN ] ∈ RN mc with ci ∈ Rmc
+being the control parameters for ith agent, the problem is
+called distributed finite-time convex optimization. In other
+words, the settling time t0 +T is upper bounded by T (x(t0 ), c)
+[11], [17], [19]. When the upper bound of the settling time
+is rendered to be independent of the initial condition, i.e.,
+T + t0 ≤ T (c), then the problem is called distributed fixedtime convex optimization [13], [15], [16]. If the settling time
+satisfies T + t0 ≤ T ∗ with a given T ∗ , then the problem is
+called distributed predefined-time convex optimization [30]. In
+comparison to predefined-time control where the upper bound
+of settling time can be prescribed, T + t0 is the exact settling
+time of system in prescribed-time control [23]–[25]. In the
+predefined-time control for MASs, the actual settling time
+T (xi (t0 ), ci , T ∗ ) of agent i is affected by initial values and
+control parameters. Therefore, even though T ∗ is given a priori
+for the whole MASs, the actual settling time is inconsistent
+since initial values and control parameters of each subsystem
+might be different.
+In order to achieve the DPTCO, the function
+µ(t) = 1/(T + t0 − t)
+
+(4)
+
+is used throughout the paper as the time-varying gain.
+The function µ(t) increases to infinity as t approaches the
+prescribed time T + t0 and is commonly used in prescribedtime control. For t ∈ Tp , one has µ ∈ Rp := [1/T, ∞).
+We simplify µ(t) as µ throughout this paper if no confusion
+occurs. For any α ∈ K∞ and ι ∈ R, define
+
+Rt
+κι (α(µ)) = exp ι t0 α(µ(τ ))dτ , t ≥ t0 ,
+(5)
+
+Rτ
+κι (α(µ(τ ))) = exp ι t0 α(µ(s))ds , τ ≥ t0 ,
+where we note that κι (α(µ)) converges to zero as t → T + t0
+for any ι < 0 and α ∈ K∞ . We study the problem under these
+two common assumptions.
+Assumption 2.1: The undirected graph G is connected.
+Assumption 2.2: For each i∈ V, the function f i is firstorder differentiable, and f i as well as its gradient ∇f i are
+only known to i-th agent. Moreover, it is ρc -strongly convex
+and has ϱc -Lipschitz gradients, i.e., for x, y ∈ Rm , (∇f i (x) −
+∇f i (y))T (x − y) ≥ ρc ∥x − y∥2 and ∥∇f i (x) − ∇f i (y)∥ ≤
+ϱc ∥x − y∥, where ρc and ϱc are positive constants.
+Under Assumption 2.2, f is strongly convex as f i is for
+i ∈ V. Therefore, if the optimization problem (2) is solvable,
+the optimum is unique. We need the following assumption for
+the optimization problem to be sensible.
+Assumption 2.3: The optimal value of global objection
+function (2), denoted as f ∗ , is finite and the optimum set
+PN
+Yopt = {Y = 1N ⊗ z ∗ | i=1 f i (z ∗ ) = f ∗ }
+(6)
+
+is nonempty and compact.
+Definition 2.1: A function α : [0, ∞) → [a, ∞) is said to
+e
+belong to class K∞
+, it is strictly increasing and α(0) = a ≥ 0.
+A continuous function β : [0, c) × [0, T ) → [0, ∞) is said to
+belong to class KLeT if, for each fixed s, the mapping β(r, s)
+e
+belongs to class K∞
+with respect to r and, for each fixed r, the
+mapping β(r, s) is decreasing with respect to s and satisfies
+β(r, s) → 0 as s → T . The function β is said to belong to
+class KLT if β belongs to class KLeT and for each fixed s,
+the mapping β(r, s) belongs to class K∞ with respect to r.
+Definition 2.2: [31] Consider the system χ̇ = g(t, χ, d(t))
+where χ ∈ Rn is the state and d(t) : [t0 , ∞) → Rnd is the
+external input. For any given T > 0, the χ-dynamics is said
+to be prescribed-time stable if there exists β ∈ KLeT such that
+for χ0 ∈ Rn and d ∈ Rnd , ∥χ(t)∥ ≤ β(∥χ0 ∥, t − t0 ) holds
+for t ∈ Tp where χ0 = χ(t0 ).
+Definition 2.3: The continuously differentiable function
+V (x) : Rn → R≥0 is called the prescribed-time stable
+Lyapunov function for the system ẋ = f (x, µ), if V (x) and
+its derivative along the trajectory of the system satisfy, for all
+x ∈ Rn and t ∈ Tp ,
+α(∥x∥) ≤ V (x) ≤ ᾱ(∥x∥),
+
+V̇ ≤ −α̃(µ)V,
+
+(7)
+
+where α, ᾱ, α̃ are K∞ functions and µ is defined in (4). The
+term α̃(µ) is referred to as the prescribed-time convergent
+gain. The inequalities in (7) are simplified as V (x) ∼
+{α, ᾱ, α̃|ẋ = f (x, µ)}. The continuously differentiable
+function V (x) : Rn → R≥0 is called the prescribed-time
+input-to-state stable (ISS) Lyapunov function for the system
+ẋ = f (x, d, µ) with d ∈ Rnd being the external input, if V (x)
+and its derivative along the trajectory of the system satisfy, for
+all x ∈ Rn and t ∈ Tp ,
+α(∥x∥) ≤ V (x) ≤ ᾱ(∥x∥),
+V̇ ≤ −α̃(µ)V + σ̃(µ)σ(∥d∥)
+
+(8)
+
+e
+with α, ᾱ, α̃, σ̃ ∈ K∞ and σ ∈ K∞
+. α̃(µ), σ̃(µ) and σ(∥d∥)
+are called prescribed-time convergent, prescribed-time ISS
+gain and (normal) ISS gain, respectively. The inequalities in
+(8) are simplified as V (x) ∼ {α, ᾱ, α̃, [σ, σ̃]|ẋ = f (x, d, µ)}.
+When d contains multiple inputs as d = [dT1 , · · · , dTn ]T
+where di ∈ Rni ,Pthe second inequality of (8) becomes
+n
+V̇ ≤ −α̃(µ)V + i=1 σ̃i (µ)σi (∥di ∥), and the inequalities
+are simplified as V (x) ∼ {α, ᾱ, α̃, [σ1 , σ̃1 ], · · · , [σn , σ̃n ]|ẋ =
+f (x, d, µ)}.
+Definition 2.4: For functions x1 (s) : R≥0 → R≥0 and
+x2 (c, s) : R≥0 × R≥0 → R≥0 , we denote x1 (s) =
+S[x2 (c, s)] to mean that, for any c < ∞, the following holds
+sups∈R≥0 [x1 (s)/x2 (c, s)] < ∞.
+
+III. A C ASCADE D ESIGN A PPROACH
+The cascade design approach has been used for the
+distributed convex optimization problem in [9], [10], [12].
+Following the cascade design principle, the optimal agreement
+can be decomposed into two subproblems, namely distributed
+optimum seeking and local reference trajectory tracking. To
+this end, we propose the controller in the general form of
+
+ζ̇ i = hiζ ζ i , χi , µ , ς˙i = hiς (ς i , ζ i , ξ i , µ)
+(9)
+
+4
+
+B. Prescribed-time Stabilization of Cascaded System
+
+Fig. 1.
+Cascaded system Σ
+ 1 T
+T
+(d ) , · · · , (dN )T .
+
+=
+
+[ΣT1 , ΣT2 ]T with d
+
+
+ui = hiu ς i , ζ i , ξ i , µ , i ∈ V,
+
+=
+
+(10)
+
+where χi = Σj∈Ni aij (ζ j − ζ i ) is the relative information
+received by i-th agent from its neighbors and ξ i =
+[(xi )T , (y i )T ]T . ζ i -dynamics is designed to estimate z ∗ in (6).
+The state of ζ i can be decomposed as ζ i = [(ϖi )T , (pi )T ]T
+where pi -dynamics can be designed to adaptively find the
+gradient of the local objective function ∇f i (z ∗ ). ζ i -dynamics
+is similar to a PI controller and designed to admit the
+equilibrium point ζ i = ζ ∗,i := [(z ∗ )T , (pi0 (z ∗ ))T ]T with some
+known function pi0 . ς i ∈ Rmς is the local controller state used
+to construct the actual control input ui for tracking.
+A. Coordinate Transformation and Cascaded Error
+System
+
+(11)
+
+Note that eiϖ and eip are the errors from the distributed optimal
+value seeking, ei is the optimal tracking error and eiy is the
+local tracking error towards the local estimated
+T
+ 1 T optimalNvalue
+ϖi . Define
+the
+lumped
+vectors
+e
+=
+(eϖ ) , · · · , (eϖ )T ,
+ϖ
+
+ 1 T
+T
+T
+, eir = [(eiϖ )T , (eip )T ]T and er =
+ep = (ep ) , · · · , (eN
+p )
+T
+T T
+[(eϖ ) , (ep ) ] . Note that ξ i = [(xi )T , (y i )T ]T = [0, (z ∗ )T ]T +
+[(xi )T , (eiy )T ]T +[0, (eiϖ )T ]T and ζ i = ζ ∗,i +eir . Then the closedloop system composed of (1), (9), and (10) can be cast into
+the error dynamics as follows
+
+(12)
+ėr = h̃ζ (er , µ) , ėis = gci eis , er , di , µ ,
+ei = [0, I, 0]eis + [I, 0]eir ,
+
+ui = h̃iu (eis , er , µ), i ∈ V. (13)
+
+gci
+
+where h̃ζ
+and
+in (12) can be derived
+from
+the
+definition,
+and
+gci (eis , er , di, µ)
+=
+ i i
+T
+i
+T
+i i
+i
+T
+i i
+g̃x (es , er , d , µ) , g̃y (es , er , d , µ) , h̃ς (es , er , µ)T .
+As illustrated in Fig. 1, the error system is in a cascaded
+form. With the decomposition of ei in (13), in order to show
+(3), it suffices to prove the prescribed-time stability of er - and
+eis -dynamics, i.e., there exist KLeT functions βr , βsi such that
+∥er (t)∥ ≤ βr (∥er (t0 )∥, t − t0 ),
+∥eis (t)∥ ≤ βsi (∥eis (t0 )∥, t − t0 ),
+
+i ∈ V.
+
+showing that the state of the first subsystem goes to zero at
+the prescribed time t0 + T and the first inequality in (14) is
+achieved. In order to investigate how the er -dynamics affects
+the convergence of eis -dynamics, we introduce the change of
+the Lyapunov function for the eis -dynamics as
+W i (µ, eis ) = σsi (µ)Vsi (eis )
+
+For i ∈ V, define the error states
+eiϖ = ϖi − z ∗ , eip = pi − pi0 (z ∗ ), ei = y − z ∗ ,
+
+T
+eiy = y i − ϖi , eis = (xi )T , (eiy )T , (ς i )T .
+
+1) Changing Lyapunov Function Method: We propose three
+conditions sufficient for prescribed-time stabilization of the
+cascaded system (12)-(13).
+C1 : The er -dynamics in (12) admits a prescribed-time
+Lyapunov function Vr (er ) : RmN → R≥0 such that Vr (er ) ∼
+{αr , ᾱr , α̃r |ėr = h̃ζ (er , µ)} holds;
+C2 : The eis -dynamics in (12) admits a prescribed-time ISS
+Lyapunov function Vsi (eis ) : Rs → R≥0 such that Vsi (eis ) ∼
+{αis , ᾱsi , α̃si , [σri , σ̃ri ], [σdi , σ̃di ]|ėis = gci (eis , er , di , µ)}, i ∈ V
+e
+and σri ∈ K∞ ;
+holds for some σdi ∈ K∞
+C3 : The function h̃ζ in (12) satisfies ∥h̃ζ (er , µ) ∥ ≤
+γζ (µ)∥er ∥ for some γζ ∈ K∞ ; h̃iς in gci and h̃iu in (13) satisfy
+∥h̃iς (eis , er , µ)∥ ≤ γςi (µ)∥[(eis )T , eTr ]∥ and ∥h̃iu (eis , er , µ)∥ ≤
+γui (µ)∥[(eis )T , eTr ]∥ for i ∈ V and some γςi , γui ∈ K∞ .
+Note that condition C1 implies that V̇r ≤ −α̃(µ)Vr .
+Invoking comparison lemma leads to Vr (er (t))
+≤
+Vr (er (t0 ))κ−1 (α̃r (µ)) where κ−1 (α̃(µ)) is denoted in
+(5). Due to Vr (er ) ≥ αr (∥er ∥), it gives
+
+ᾱr (∥er (t0 )∥)κ−1 (α̃r (µ)) ,
+(15)
+∥er (t)∥ ≤ α−1
+r
+
+(14)
+
+(16)
+
+with σsi ∈ K∞ . Then, the prescribed-time convergence result
+for the whole system is given in the following theorem.
+Theorem 3.1: Consider the system composed of (1), (9)
+and (10). Suppose the closed-loop system (12)-(13) after
+the state transformation satisfies conditions
+Define
+R s −2 C1 -C3 . 
+functions ϱr (c, s) = α−1
+c
+exp
+−
+τ
+α̃
+(τ
+)dτ
+and
+r
+r
+0
+e
+e,i
+i
+e,i
+∈
+K
+(s)))
+with
+some
+γ
+(c)/(σ
+ϱis (c, s) = αi,−1
+(γ
+∞ and
+s
+s
+s
+s
+c ≥ 0. Suppose
+max{γζ (s), γςi (s), γui (µ)} = S[1/(ϱr (c, s))]
+
+(17)
+
+and there exists a K∞ function σsi for (16) such that
+dσsi (s)
+≤ s−2 σsi (s)α̃si (s)/2,
+ds
+max{γςi (s), γui (s)} = S[1/(ϱis (c, s))],
+σsi (s)σ̃di (s) = S[exp(c)α̃si (s)],
+σsi (s)σ̃ri (s) = S[α̃si (s)/σri (ϱr (c, s))]
+
+(18)
+(19)
+(20)
+(21)
+
+hold. Then, the problem of DPTCO is solved for any bounded
+initial condition.
+Proof: Due to C2 , one has V˙si (eis ) ≤ −α̃si (µ)Vsi (eis ) +
+σ̃di (µ)σdi (∥di ∥) + σ̃ri (µ)σri (∥er ∥). Taking time derivative of
+W i (µ, eis ) in (16) and using (18) yields Ẇ i ≤ −α̃si (µ)W i /2+
+γ̃di (µ)σdi (∥di ∥) + γ̃ri (µ)σri (∥er ∥), where γ̃di (µ) = σsi (µ)σ̃di (µ)
+and γ̃ri (µ) = σsi (µ)σ̃ri (µ). Invoking comparison lemma yields
+
+1
+W i (t) ≤ W i (t0 )κ− 2 α̃si (µ)
+Z t
+1
+− 12
+i
++κ (α̃s (µ))
+κ 2 (α̃si (µ(τ )))γ̃di (µ(τ ))σdi (∥di (τ )∥)dτ
+t0
+
+

@@ -1,0 +1,646 @@
+Proposition 4.1 (Kernel). Let B satisfy (H1)–(H2). Then x ∈ ker(B) iff xu = Wvu xv for every
+edge (v, u); in particular ∥xv ∥ is constant on each connected component.
+⊤
+An immediate corollary: each summand vanishes iff xv = Wvu
+xu , and the orthogonal Wvu then
+preserves the norm along every edge.
+
+With the kernel in hand, the same evaluation-map argument used for the Connection Laplacian [20, 22]
+applies verbatim (proof in Appendix A):
+Proposition 4.2 (Kernel and holonomy). Let B satisfy (H1)–(H3), and for a walk γ : v0 → · · · → vk
+let Tγ := Wvk−1 vk · · · Wv0 v1 ∈ O(d). Then dim ker(B) ≤ d, with equality iff Tγ = I for every closed
+walk γ.
+While the technique is unchanged from the connection-Laplacian case, the result is novel: despite
+carrying the extra radial data Mvu , Bochner matrices admit exactly the same holonomy characterization of the kernel, that depends only on angular factors. The same two propositions also settle
+the opposite end of the spectrum. By [13], the normalized Laplacian of any weighted cellular sheaf
+e ⊆ [0, 2],
+has spectrum in [0, 2], with the same degree normalization used here; in particular spec(B)
+−1/2
+−1/2
+e := D
+writing B
+BD
+. The upper value is governed by the twist matrix N := 2D − B: since
+⊤
+Nvu = −Bvu = −Mvu Wvu
+, N is again a Bochner matrix, with the same radial factors as B but angular factors −Wvu , whence x⊤ Bx ≤ 2x⊤ Dx. Attaining the value 2 is therefore the balance of N , read
+through its twisted transport maps Tbγ := (−1)|γ| Tγ , and this is the multidimensional counterpart of
+antibalance.
+e be the eigenspace of B
+e for eigenvalue 2.
+Theorem 4.1 (Antibalance characterization). Let E2 (B)
+1/2
+e
+e ≤ d,
+Then E2 (B) = D ker(N ), with z ∈ ker(N ) iff zu = −Wvu zv on every edge; and dim E2 (B)
+|γ|
+with equality iff Tγ = (−1) I for every closed walk.
+e = D−1/2 N D−1/2 together with Propositions 4.1 and 4.2 applied to
+This is immediate from 2I − B
+e =
+N . When G is not bipartite, every x ∈ ker(B) and every z ∈ ker(N ), the latter giving E2 (B)
+1/2
+D ker(N ), are moreover orthogonal at every vertex, ⟨xv , zv ⟩ = 0, and the two spaces can coexist,
+which has no scalar analogue (Appendix B).
+
+4.2
+
+Cheeger inequalities and the synchronization problems
+
+Seeing Bochner matrices as a generalization of both matrix-weighted Laplacians and connection Laplacians lets us extend techniques known for these two classes. Hansen’s comparison between the block
+spectrum of a matrix-weighted Laplacian and a scalar one [26] extends to Bochner matrices (Appendix B). Here we follow the synchronization framework of Bandeira, Singer and Spielman [22, 63],
+extended to the anisotropic setting. Each of the three theorems below comes with an algorithm
+attaining the bound, since the nontrivial half of a Cheeger-type inequality is proved by exhibiting a
+good combinatorial object.
+−
+Definition 4.1 (Anisotropy constants and companion graph). For each edge, wvu
+:= λmin (Mvu ),
++
+wvu := λmax (Mvu ), and we set:
+
+we+
+− ≥ 1,
+e∈E we
+
+κD := max
+
+κE := max
+
+v∈V
+
+λmax (Dv )
+.
+λmin (Dv )
+
+(4.2)
+
+P
+±
+For each vertex, d±
+v :=
+u∼v wvu . The companion graph G− is the scalar weighted graph on V with
+−
+−
+weights wvu and degree matrix D0− := diag(d−
+v ); its Laplacian L− has (L− )vv = dv and (L− )vu =
+− −1/2
+− −1/2
+−
+−wvu for v ̸= u, and its normalized Laplacian is L− := (D0 )
+L− (D0 )
+. For x ∈ Rnd , the
+n
+local norm vector nx ∈ R is (nx )v := ∥xv ∥.
+By (H2)–(H3), G− has the same edges as G and λ2 (L− ) > 0. Connection Laplacians are exactly the
+case κE = 1; matrix-weighted graphs (W ≡ I) place no constraint on κE , so the two degenerations
+are independent, and the results below reduce to the classical ones in the first.
+2
+
+Definition 4.2 (Frustration constants). For M ⪰ 0 write ∥A∥M,F := tr(A⊤ M A). With η(x) :=
+x⊤ Bx/x⊤ Dx, set:
+∗
+ηG := min η(x),
+ηG
+:=
+min
+η(x),
+(4.3)
+x:V →Sd−1
+
+x:V →Sd−1 ∪{0}
+x̸=0
+
+8
+
+and, for a group potential g : V → O(d):
+ν(g) :=
+
+1
+2
+
+P
+
+2
+
+v̸=u
+
+⊤
+gv − Wvu
+gu Mvu ,F
+
+vol(G)
+
+,
+
+vol(G) :=
+
+X
+
+tr(Dv ),
+
+νG :=
+
+v
+
+min
+
+g:V →O(d)
+
+ν(g).
+
+(4.4)
+
+Each of the three measures how far B is from having a kernel configuration, in the sense of Proposition 4.1, just as the frustration index of a signed graph (Section 2.2) measures how far it is from being
+balanced. The three constants correspond to three feasible sets: a unit vector at some vertices, at
+every vertex, and a full orthonormal frame at every vertex, each measuring the residual of explaining
+the measured rotations
+gu gv−1 . Expanding
+ν(g) columnwise and applying Lemma 4.1 to each
+P
+P Wvu as
+(k) ⊤
+(k) ⊤
+column gives ν(g) = k≤d (g ) Bg (k)
+(g
+) Dg (k) , so ν could be seen as η evaluated on d
+k≤d
+P
+e not λ1 (B)
+e alone, is the quantity compared against νG
+columns at once. This is why
+λk (B),
+k≤d
+
+below. Figure 1 pictures the Sd−1 and the O(d) problem.
+
+Figure 1: The Sd−1 and O(d) synchronization problems on a single edge, d = 2. (a) Each node carries
+⊤
+a unit vector. The angular factor W10
+, here a rotation by 90◦ , transports x0 to the stalk of node 1,
+⊤
+and the frustration of the edge is the discrepancy between x1 and W10
+x0 (dashed), weighted by the
+radial factor M10 . The ellipse below the edge draws M10 , with principal axes labelled by its largest
++
+−
+and smallest eigenvalues w10
+and w10
+: a discrepancy along the first costs more than one along the
+second, while the dashed circle is the isotropic case of a connection Laplacian. (b) Each node carries
+⊤
+an orthogonal frame gv ∈ O(d), drawn as its two columns, and the frustration is g1 − W10
+g0 M10 ,F .
+e ≤ νG ; (c)
+e ≤ η ∗ ≤ ηG ; (b) λ1 (B)
+Proposition 4.3 (Relaxation). Under (H1)–(H3): (a) λ1 (B)
+G
+1 Pd
+e ≤ νG .
+λk (B)
+d κD k=1
+Proof in Appendix A. Parts (a) and (b) match the connection-Laplacian case; (c) does not, since
+ordinary vertex degrees no longer make the columns of a group potential D-orthogonal, and κD is
+the penalty for that failure.
+e = 0 ⇐⇒ ker(B) ̸= {0} ⇐⇒ ηG =
+Proposition 4.4 (Zero sets). Under (H1)–(H3), λ1 (B)
+∗
+0 ⇐⇒ ηG = 0. Moreover νG = 0 iff the transport maps Tγ are path independent, equivalently, by
+Proposition 4.2, iff dim ker(B) = d.
+Proof in Appendix A.
+Partial synchronization. In the first problem some vertices are allowed to abstain.
+Algorithm 4.1 (Partial synchronization). Input: a Bochner matrix B satisfying (H1)–(H3).
+e = D−1/2 BD−1/2 and compute a unit eigenvector z for λ1 (B).
+e
+1. Form B
+2. Set x := D−1/2 z and rescale it so that maxv ∥xv ∥ = 1.
+9
+
+3. For t ≥ 0 let x>t be the thresholded normalization:
+(
+2
+xv / ∥xv ∥ , ∥xv ∥ > t,
+>t
+xv :=
+0,
+otherwise,
+
+(4.5)
+
+2
+
+and form the candidates x>t at the n thresholds t = ∥xv ∥ , v ∈ V .
+4. Output: the candidate minimizing η.
+Steps 3 and 4 turn the eigenvector into an admissible assignment, the step that Cheeger-type proofs
+call rounding. Step 3 needs only finitely many thresholds: as t varies, x>t changes only when t crosses
+2
+one of the values ∥xv ∥ , so trying these at most n values covers every possible candidate.
+Theorem 4.2 (Partial synchronization). Under (H1)–(H3):
+q
+3/2
+∗
+e
+e
+10 λ1 (B),
+λ1 (B) ≤ ηG ≤ κE
+
+(4.6)
+
+and Algorithm 4.1 returns a partial assignment attaining the upper bound.
+Proof in Appendix A.
+Full synchronization. Moving from partial to full synchronization additionally requires controlling
+the connectivity of the companion graph, quantified by its spectral gap λ2 (L− ), exactly as when
+Bandeira, Singer and Spielman move from partial to full synchronization [22].
+Algorithm 4.2 (Full synchronization). Input: a Bochner matrix B satisfying (H1)–(H3).
+e = D−1/2 BD−1/2 and compute a unit eigenvector z for λ1 (B).
+e
+1. Form B
+2. Set x := D−1/2 z.
+3. Output: the normalized assignment x̃, given by x̃v := xv / ∥xv ∥ where xv ̸= 0, and by an
+arbitrary unit vector where xv = 0.
+Theorem 4.3 (Full synchronization). Under (H1)–(H3):
+e ≤ ηG ≤
+λ1 (B)
+
+54 κ2E
+e
+λ1 (B),
+λ2 (L− )
+
+(4.7)
+
+and Algorithm 4.2 returns a full assignment attaining the upper bound.
+Proof in Appendix A.
+Synchronization in O(d). The third problem asks for a full orthonormal frame at every vertex.
+Its solution uses the polar projection: for nonsingular X = P ΣQ⊤ , Pol(X) := P Q⊤ is the nearest
+orthogonal matrix in Frobenius norm. Alongside D we need the isotropized degree:
+X
+d¯v := d1 tr(Dv ), D̄ := blockdiag(d¯v Id ), B̄ := D̄−1/2 B D̄−1/2 , vol :=
+d¯v ,
+(4.8)
+v
+
+whose
+property is that, D̄ being a scalar multiple of the identity in each block, x⊤ D̄x =
+P ¯ relevant
+2
+2
+dv ∥xv ∥ = ∥nx ∥ exactly, for every x (with D̄0 := diag(d¯v )). The O(d) argument needs the d
+v
+
+D̄0
+
+vectors at a vertex to be nearly orthonormal; under D̄ this holds exactly, while under the ordinary
+degree D it holds only up to an additive error, where the argument needs a multiplicative one. D̄
+e D and λ2 (L− ) only.
+occurs only inside the construction: the statement of Theorem 4.4 involves B,
+Algorithm 4.3 (O(d) synchronization). Input: a Bochner matrix B satisfying (H1)–(H3).
+1. Form d¯v = d1 tr(Dv ) and B̄ = D̄−1/2 B D̄−1/2 .
+2. Compute orthonormal eigenvectors z 1 , . . . , z d of B̄ for its d smallest eigenvalues λ1 (B̄) ≤ · · · ≤
+λd (B̄).
+√
+3. Set xk := vol D̄−1/2 z k for k = 1, . . . , d, and let Xv := [x1v · · · xdv ] ∈ Rd×d .
+4. Output: the group potential gv := Pol(Xv ), computed from the SVD of Xv , setting gv := Id
+where Xv is singular.
+10
+
+Theorem 4.4 (O(d) synchronization). Under (H1)–(H3):
+d
+
+d
+
+k=1
+
+k=1
+
+11 3 3 X
+1 X
+e ≤ νG ≤ 2 κE d
+e
+λk (B)
+λk (B),
+d κD
+λ2 (L− )
+
+(4.9)
+
+with κD ≤ κE , and Algorithm 4.3 returns a group potential attaining the upper bound. No hypothesis
+beyond (H1)–(H3) is required.
+Proof in Appendix A.
+In the isotropic case every Mvu = ωvu Id , so κE = κD = 1, Dv = dv Id , D̄ = D, and the companion
+graph G− is the underlying weighted graph itself, so λ2 (L− ) = λ2 (L0 ), the second smallest eigenvalue
+of its normalized Laplacian, simple since the graph is connected by (H3). The three bounds then
+reduce to those of Bandeira, Singer and Spielman [22], up to the numerical constants: in place of our
+54 in Theorem 4.3 and 211 in Theorem 4.4, they obtain 44 and 210 , by sharper bookkeeping at two
+steps we have not attempted to optimize.
+3/2
+
+The κE of Theorem 4.2 is three half-powers of the anisotropy: one from the estimate on a single
+edge, one from the Cauchy–Schwarz comparison of x⊤ Bx against the companion graph, and one from
+converting the resulting ℓ1 bound back into a bound on η. In Theorem 4.3 the two comparisons appear
+outside any square root and give κ2E , while Theorem 4.4 carries one such comparison together with
+two further powers from passing to the isotropized degree, hence κ3E . Our technique stems directly
+from the approach of Bandeira, Singer and Spielman, with the anisotropy entering as a factor that
+rescales their estimates; we leave open finding other techniques that could improve these bounds.
+Related Cheeger inequalities. Liu, Münch and Peyerimhoff [36] prove Buser-type inequalities
+for connection Laplacians with orthogonal or unitary matrices, bounding eigenvalues from above
+under nonnegative Ricci curvature. Their Cheeger constants are mixtures of the expansion rate of
+the underlying graph and the frustration index of the signature. One open question would be to
+generalize Ricci curvature for Connection Laplacian to Bochner matrices, and, subsequently, apply
+analogous Cheeger inequalities to Bochner matrices.
+For general sheaves, First and Kaufman [64] prove Cheeger-type inequalities bounding the coboundary
+expansion of sheaves obtained as quotients of a constant sheaf by a subsheaf. Their technique applies
+only to certain graphs, which they characterize, whereas the inequalities above hold for every Bochner
+matrix on an arbitrary graph. To our knowledge, the Bochner matrices defined in this work are
+therefore the largest class of cellular sheaves for which a Cheeger inequality is known on arbitrary
+graphs.
+
+4.3
+
+The anisotropic random walk
+
+Attaching a random walk to a general sheaf Laplacian is nontrivial, and is left open byPHansen and
+2
+, the
+Ghrist [13]. The obstruction is already visible for d = 1: the diagonal entry at v is e Fv⊴e
+off-diagonal entry on e = (v, u) is the product Fv⊴e Fu⊴e , and nothing forces the first to be the
+sum of the absolute values of the second, soPno transition probability falls out naturally. It does for
+connection Laplacians, where pvu = wvu / ρ wvρ induces the vector-valued walk of Bandeira and
+Singer [22, 23]; Bochner matrices repair the general case, since by construction their diagonal block
+is exactly the sum of the matrix absolute values of the off-diagonal ones.
+Definition 4.3 (Anisotropic random walk). Let B satisfy (H1)–(H3). For each neighbour u of v set:
+X
+
+X
+Pvu := Dv−1/2 Mvu Dv−1/2 ⪰ 0,
+Pvu = Dv−1/2
+Mvu Dv−1/2 = I,
+(4.10)
+u̸=v
+
+u̸=v
+
+a Positive Operator-Valued Measure (POVM) at v. Given a unit vector x̂v ∈ Sd−1 , the walker jumps
+to u with probability pvu (x̂v ) := x̂⊤
+v Pvu x̂v and updates its vector deterministically as x̂ 7→ Wvu x̂,
+giving a Markov chain on S = V × Sd−1 that moves from (v, x̂) to (u, Wvu x̂) with probability pvu (x̂).
+The jump law is state-dependent: which neighbour the walker visits next depends on the direction x̂
+it currently carries, large when x̂ aligns with the large eigenspace of Mvu and small against its small
+eigenspace. This is the ingredient that the anisotropy
+P adds to the walk of a connection Laplacian.
+When Mvu = wvu I, Pvu collapses to the scalar wvu / ρ wvρ times the identity, and the walk reduces
+11
+
+to the classical vector-valued walk of the connection Laplacian [22, 23]. We also note that an effective
+conductance and resistance have recently been developed out of that notion of random walk [65].
+For d = 1, O(1) = {−1, +1} and the walk is exactly the Gremban expansion of the signed graphs
+of Section 2.2: each node is lifted to two copies, one per sign, and Pvu collapses to the ordinary
+edge weight. The construction above lifts each node instead to a whole sphere Sd−1 , one point per
+orientation available to a stalk vector, with the POVM {Pvu } playing the role the unsigned Gremban
+weights play for d = 1 (Figure 2). We call it the generalized Gremban expansion: it carries the
+scalar construction from S0 = {−1, +1}, where a step either flips a sign or does not, to O(d)-valued
+transport, where a step rotates an entire stalk vector.
+
+Figure 2: The random walk of a Bochner matrix as a generalized Gremban expansion. (a) For the
+signed triangle with w01 = −3 (dashed) and w02 = 1, the Gremban expansion doubles each node
+into v + and v − . From node 0 the walker moves to node 1 with probability 3/4 and to node 2 with
+probability 1/4, in proportion to |w0u |; crossing the negative edge flips its sign, 0± → 1∓ , and crossing
+the positive one keeps it, 0± → 2± . (b) For d > 1 each node is lifted to a sphere Sd−1 , and the jump
+probability p0u (x̂) = x̂⊤ P0u x̂ depends on the direction the walker carries: in this example, from y it
+reaches nodes 1 and 2 with probabilities 3/4 and 1/4, from x with 1/2 each (Definition 4.3).
+Trajectories and conserved quantities. The fibre carries no randomness of its own. Each step
+applies Wvi vi+1 to the current vector, so a walker following γ : v0 → · · · → vt ends in the state
+(vt , Tγ x̂0 ): the path determines the fibre, the transport maps of Proposition 4.2 reappear unchanged,
+and the randomness lies entirely in which path is taken. This makes the kernel visible along trajectories. The observables fy (v, x̂) := ⟨x̂, yv ⟩ that stay constant along every trajectory, and not merely
+in expectation, are exactly those with y ∈ ker(B): such a y is transported edge by edge by the same
+orthogonal map as the walker’s own vector, by Proposition 4.1, and orthogonal maps preserve inner
+products. Both statements are proved in Appendix A. Kernel vectors therefore confine the walker
+to a subset of each fibre. The walk is not reversible in general, while a variant with the same fibre
+update and a modified jump law is; both facts are in Appendix B.
+
+12
+
+5
+
+Forman Sheaf Curvature
+
+So far we have presented the Bochner–Weitzenböck decomposition for each order k of the Hodge
+Laplacian of a simplicial complex, highlighting that even the node-graph case k = 0 is non-trivial.
+We then considered Bochner matrices, the first term arising from the Bochner decomposition, and
+studied them on their own, setting aside the decomposition they come from. In this section we turn
+back to the simplicial complex setting, and to the k = 1 case. Throughout this section we write
+H1F = B1F + F1F for the Bochner decomposition of the 1-dimensional Hodge sheaf Laplacian, to keep
+it apart from the graph sheaf Laplacian LF of the previous sections. We show that the sheaf Forman
+term, which we call sheaf Forman Ricci curvature RicF := F1F , controls the first sheaf cohomology
+dimension, dim H1 (M ; F), when it is positive semidefinite everywhere. This is the analogue of the
+Bochner theorem for cellular sheaves, and we obtain it by generalizing Forman’s original techniques
+to our setting. Throughout, M is a compact, connected, quasiconvex regular CW complex and F has
+invertible restriction maps, everywhere of dimension d.
+
+5.1
+
+A Bochner theorem for cellular sheaves
+
+The two ingredients of the theorem are assembled here: nonnegative curvature confines a harmonic
+cochain to the kernel of the Bochner term, and the kernel characterization of Section 4 then propagates
+a vanishing from one edge to its neighbours.
+Corollary 5.1. Under RicF ⪰ 0, ker(H1F ) = ker(B1F ) ∩ ker(RicF ).
+Proof. B1F ⪰ 0 always (Proposition 3.1) and RicF ⪰ 0 by hypothesis, so for c ∈ ker(H1F ), 0 =
+⟨H1F c, c⟩ = ⟨B1F c, c⟩ + ⟨RicF c, c⟩ is a sum of two nonnegative terms, forcing both to vanish; since each
+is a positive semidefinite quadratic form, this forces c ∈ ker(B1F ) ∩ ker(RicF ). The reverse inclusion
+is immediate.
+P
+Lemma 5.1. Let c = e ce e ∈ ker ∂ ∗ ∩ ker B1F , let f be a 2-cell, and let e1 , e2 ⊴ f be edges with
+ē1 ∩ ē2 ̸= ∅ and ce1 = ce2 = 0. Then ce = 0 for every e ⊴ f .
+Proof. Let e ̸= e1 , e2 be the remaining edge of f . If e shares no vertex with e1 or e2 , the off-diagonal
+⊤
+block of B1F between e and e1 reduces to its up contribution alone, Fe⊴f
+Fe1 ⊴f , invertible as a product
+of invertible maps; the Bochner kernel characterization (Proposition 4.1) then gives ∥ce ∥ = ∥ce1 ∥ = 0.
+Otherwise e shares a vertex with each of e1 , e2 , and since M is a quasiconvex regular CW complex these
+are the only three edges of f . For vf ∈ F(f ), extended by 0 elsewhere, ∂vf has one term per edge of f ,
+each the transpose restriction map applied to vf ; since ce1 = ce2 = 0, we get ⟨∂vf , c⟩ = ± vf⊤ Fe⊴f ce .
+But ⟨∂vf , c⟩ = ⟨vf , ∂ ∗ c⟩ = 0 by hypothesis, for every vf , so Fe⊴f ce = 0; since Fe⊴f is invertible,
+ce = 0.
+Invertibility is what makes the last step work: without it, the argument only forces ce ∈ ker(Fe⊴f ),
+not ce = 0.
+Theorem 5.1 (Unique continuation). Let M be connected and c ∈ ker ∂ ∗ ∩ ker B1F . If ce = 0 for
+every edge e incident to some fixed vertex, then c = 0.
+By induction on graph distance from that vertex: at distance 0 the hypothesis gives ce = 0 directly,
+and the inductive step propagates this to every edge at distance k + 1 via Lemma 5.1, using either
+parallel propagation (Proposition 4.1 applied to the pair) or the vertex relation, depending on whether
+the two edges at that step share a face. Full proof in Appendix A.
+Propagation turns a local hypothesis into a global bound on H1 : it suffices to exhibit, at a single
+vertex, a small set of edges whose vanishing forces the rest.
+Proposition 5.1. Let M be connected with RicF ⪰ 0, and suppose RicF (e) ≻ 0 for every edge e at
+some fixed vertex. Then H1 (M ; F) = 0.
+Proof. By Corollary 5.1, a harmonic c lies in ker(RicF ), hence vanishes on every edge at that vertex
+by strict positivity there, and Theorem 5.1 gives c = 0.
+
+13
+
+Theorem 5.2 (Bochner theorem for combinatorial manifolds). Let M be a compact connected combinatorial n-manifold, n ≤ 3, with RicF ⪰ 0. Then dim H1 (M ; F) ≤ nd.
+We follow Forman’s proof [24, Theorem 4.4]. By Corollary 5.1, a harmonic cochain c lies in ker B1F ,
+and two facts about such a c at a vertex v carry the argument. The first is parallel propagation: if two
+edges at v are parallel (Section 2.3) and c vanishes on one, it vanishes on the other (Proposition 4.1).
+The second is the vertex relation: ∂c = 0 at v, so if c vanishes on every edge at v but one, it vanishes
+on that one too, the restriction maps being invertible. Forman’s proof chooses n edges at v such that,
+once c vanishes on them, these two facts force c to vanish on every edge at v; Theorem 5.1 then gives
+c = 0, so the evaluation c 7→ (ce1 , . . . , cen ) is injective on H1 (M ; F), whose dimension is therefore at
+most nd. For n = 1 one edge suffices, since the two edges at a vertex are parallel. For n = 2 take two
+edges at v sharing a face: every other edge at v is parallel to one of them, unless v has only three
+edges, and then the vertex relation kills the third. For n = 3 the choice of three edges uses the link
+of v, the cell structure on S2 whose vertices are the edges at v, two being adjacent when transverse,
+together with the fact that K5 does not embed in S2 . The choice depends only on the geometry of
+M ; the sheaf enters only through the two facts above, and Appendix A checks them and recalls the
+choice.
+Beyond n = 3 an explicit case analysis is out of reach, as Forman already notes in his original work,
+but a coarser, purely local quantity still bounds the cohomology.
+Definition 5.1 (Local homological dimension [24]). At a vertex v, let ∼ be the equivalence relation on
+incident edges generated by not sharing a face, let N (v) be its number of classes, and set D(v) := N (v)
+if every class has at least two elements, D(v) := N (v) − 1 otherwise. The local homological dimension
+of M is D(M ) := inf v D(v).
+Theorem 5.3. Let M be a compact connected combinatorial manifold with RicF ⪰ 0.
+dim H1 (M ; F) ≤ d · D(M ).
+
+Then
+
+Full proof in Appendix A. Since D(v) depends only on the neighbourhood of v, the bound is computable from purely local data, which could make it usable in inductive settings such as trajectory
+prediction, where only the edges near the region of interest are known.
+
+5.2
+
+Comparison with combinatorial curvature
+
+The same complex also carries the scalar Forman curvature Ric(e) = degu (e) + degl (e) −
+#{parallel neighbours of e} of the unweighted case [24]. The two curvatures are independent:
+neither Ric ≥ 0 nor RicF ⪰ 0 implies the other, even on manifolds, so neither cohomology bound
+is a special case of the other. Throughout this part d = 1, already enough for every phenomenon
+involved. The three examples below are drawn in Figure 3.
+Remark 5.1 (Curvature depends on the presentation). RicF is not invariant under sheaf isomorphism: it depends on the chosen restriction maps. The hypothesis RicF ⪰ 0 therefore reads as in the
+classical Bochner theorem, which does not ask every metric on a manifold to have nonnegative Ricci
+curvature, but only that one such metric be exhibited.
+Example 5.1 (Nonnegative Ric everywhere, negative RicF on some edge). Let M be the empty
+triangle, with vertices 0, 1, 2 and no 2-cell. Every edge has two parallel neighbours, so Ric = 0+2−2 =
+0. Take all restriction maps equal to 1 except F0⊴[0,2] = F1⊴[1,2] = 2. The sheaf is invertible, and
+RicF ([0, 1]) = 2 − 2 − 2 = −2 < 0.
+Example 5.2 (Negative Ric everywhere, presentations of both signs everywhere). Let M be the
+star S4 , with center 0 and leaves 1, . . . , 4. Every spoke ei = [0, i] has three parallel neighbours, so
+2
+Ric(e√
+i ) = 0 + 2 − 3 = −1. The sheaf with F0⊴ei = 1 and Fi⊴ei = A has RicF (ei ) = 1 + A − 3 ≥ 0 for
+A ≥ 2. It is isomorphic, via the gauge P0 = 1, Pi = A, to the constant sheaf R, whose curvature is
+−1 everywhere, so the same isomorphism class admits presentations of both signs (Remark 5.1).
+The following example instead considers a combinatorial 2-manifold.
+Example 5.3 (Negative Ric on some edges, positive RicF everywhere, on a manifold). We exhibit a
+combinatorial 2-manifold M and a cellular sheaf F with invertible restriction maps such that Ric < 0
+on some edges of M while RicF ≻ 0 on every edge of M .
+
+14
+
+Let M be the bipyramid over a heptagon: equator v0 , . . . , v6 a 7-cycle, apexes A, B, and the 14 triangles
+[vi , vi+1 , A], [vi , vi+1 , B] with indices mod 7, so 9 vertices, 21 edges and 14 triangles. Every edge lies
+in exactly two triangles, so Ric([u, v]) = 10 − deg(u) − deg(v), which equator degrees 4 and apex
+degrees 7 make +2 on the equator and −1 on each of the 14 spokes.
+For F, fix a positive function q on the vertices and set Fv⊴e := qw with w the other endpoint of e,
+and Fe⊴t := qz with z the vertex of t opposite e; the restriction maps are invertible. On transverse
+neighbours the up and down contributions to RicF cancel as in the unweighted case, leaving only
+parallel ones:
+X
+RicF (e) = qu2 + qv2 + qz21 + qz22 −
+qx qy ,
+(5.1)
+ẽ parallel to e
+
+with e = [w, x], each parallel neighbour ẽ = [w, y], and z1 , z2 the triangle apexes of e; so q tunes the
+parallel neighbours against the diagonal. A spoke [vi , A] has parallel neighbours [vi , B] at vi and the
+four spokes [vj , A], j ̸= i, i ± 1, at A; an equator edge [vi , vi+1 ] has [vi−1 , vi ] and [vi+1 , vi+2 ]. Taking
+(qv0 , . . . , qv6 ) = (1, 6, 11, 8, 11, 6, 1) and qA = qB = 3 gives:
+P
+F
+edges
+(H1F )ee
+RicF
+ẽ̸=e |(H1 )eẽ |
+[v0 , A], [v0 , B], [v6 , A], [v6 , B]
+
+47
+
+45
+
++2
+
+[v1 , A], [v1 , B], [v5 , A], [v5 , B]
+
+167
+
+165
+
++2
+
+[v2 , A], [v2 , B], [v4 , A], [v4 , B]
+
+230
+
+218
+
++12
+
+[v3 , A], [v3 , B]
+
+315
+
+121
+
++194
+
+[v6 , v0 ]
+
+20
+
+12
+
++8
+
+[v0 , v1 ], [v5 , v6 ]
+
+55
+
+17
+
++38
+
+[v2 , v3 ], [v3 , v4 ]
+
+203
+
+169
+
++34
+
+[v1 , v2 ], [v4 , v5 ]
+
+175
+
+59
+
++116
+
+Every entry is strictly positive, so RicF ≻ 0 on all 21 edges, while the first four rows are exactly the
+14 spokes on which Ric = −1.
+
+Figure 3: The three examples of this section, with d = 1. (a) The empty triangle of Example 5.1: each
+arrow carries the restriction map from a vertex to an edge, all equal to 1 except F0⊴[0,2] = F1⊴[1,2] = 2.
+(b) The star S4 of Example 5.2, with maps 1 from the center and A from the leaves. (c) The heptagonal
+bipyramid of Example 5.3 seen from above: the vertices A and B, one on each side of the equator,
+project onto the same point at the center. Next to each vertex is its value of q, which sets the
+restriction maps of the construction.
+
+6
+
+Dynamical Interpretation and Applications to Sheaf Neural
+Networks
+
+With both terms characterized, the decomposition admits a dynamical reading, in which sheaf diffusion can be seen as a reaction-diffusion process, and each term yields a computable quantity at
+15
+
+

@@ -1,0 +1,106 @@
+TABLE I: The RMSE of The VIO and The Proposed Method
+VIO
+Traj Length
+RMSE of drone 0
+RMSE of drone 1
+RMSE of drone 2
+RMSE of drone 3
+
+0.766m
+1.205m
+0.727m
+0.387m
+
+Proposed Method
+91.52m
+0.347m
+0.418m
+0.436m
+0.472m
+
+VII. C ONCLUSION AND F UTURE W ORK
+This paper proposed an active localization correction
+system for the vision-based FoV-limited swarm. Compared
+with previous works that utilize visual mutual observation in
+relative state estimation, we designed an extra module, which
+calculates appropriate actions for drones to actively execute
+mutual observation, to solve the contradiction between mutual observation and environment observation that occurs in
+the FoV-limited swarm.
+In the future, the active mutual observation can be executed via path planning in addition to yaw planning to
+avoid the loss of environment observation during mutual
+observation.
+R EFERENCES
+[1] L. Quan, L. Yin, T. Zhang, M. Wang, R. Wang, S. Zhong, X. Zhou,
+Y. Cao, C. Xu, and F. Gao, “Robust and efficient trajectory planning
+for formation flight in dense environments,” IEEE Transactions on
+Robotics, 2023.
+[2] K. Zhang, P. Chermprayong, F. Xiao, D. Tzoumanikas, B. Dams,
+S. Kay, B. B. Kocer, A. Burns, L. Orr, T. Alhinai, et al., “Aerial
+additive manufacturing with multiple autonomous robots,” Nature, vol.
+609, no. 7928, pp. 709–717, 2022.
+[3] B. Zhou, H. Xu, and S. Shen, “Racer: Rapid collaborative exploration with a decentralized multi-uav system,” IEEE Transactions on
+Robotics, 2023.
+[4] A. Carrio, S. Vemprala, A. Ripoll, S. Saripalli, and P. Campoy,
+“Drone detection using depth maps,” in 2018 IEEE/RSJ international
+conference on intelligent robots and systems, pp. 1034–1037.
+[5] T. Nguyen, K. Mohta, C. J. Taylor, and V. Kumar, “Vision-based multimav localization with anonymous relative measurements using coupled
+probabilistic data association filter,” in 2020 IEEE International Conference on Robotics and Automation, pp. 3349–3355.
+[6] V. Walter, M. Saska, and A. Franchi, “Fast mutual relative localization
+of uavs using ultraviolet led markers,” in 2018 International Conference on Unmanned Aircraft Systems. IEEE, pp. 1217–1226.
+[7] H. Xu, Y. Zhang, B. Zhou, L. Wang, X. Yao, G. Meng, and S. Shen,
+“Omni-swarm: A decentralized omnidirectional visual–inertial–uwb
+state estimation system for aerial swarms,” IEEE Transactions on
+Robotics, vol. 38, no. 6, pp. 3374–3394, 2022.
+[8] M. Saska, T. Baca, J. Thomas, J. Chudoba, L. Preucil, T. Krajnik,
+J. Faigl, G. Loianno, and V. Kumar, “System for deployment of groups
+of unmanned micro aerial vehicles in gps-denied environments using
+onboard visual relative localization,” Autonomous Robots, vol. 41, pp.
+919–944, 2017.
+[9] S. I. Roumeliotis and G. A. Bekey, “Distributed multi-robot localization,” in Distributed Autonomous Robotic Systems 4. Springer, 2000,
+pp. 179–188.
+[10] P. Zhang, H. Wang, B. Ding, and S. Shang, “Cloud-based framework
+for scalable and real-time multi-robot slam,” in 2018 IEEE International Conference on Web Services, pp. 147–154.
+[11] M. Karrer, P. Schmuck, and M. Chli, “Cvi-slam—collaborative visualinertial slam,” IEEE Robotics and Automation Letters, vol. 3, no. 4,
+pp. 2762–2769, 2018.
+[12] P.-Y. Lajoie, B. Ramtoula, Y. Chang, L. Carlone, and G. Beltrame,
+“Door-slam: Distributed, online, and outlier resilient slam for robotic
+teams,” IEEE Robotics and Automation Letters, vol. 5, no. 2, pp. 1656–
+1663, 2020.
+
+[13] Y. Huang, T. Shan, F. Chen, and B. Englot, “Disco-slam: Distributed
+scan context-enabled multi-robot lidar slam with two-stage globallocal graph optimization,” IEEE Robotics and Automation Letters,
+vol. 7, no. 2, pp. 1150–1157, 2021.
+[14] X. Zhou, X. Wen, Z. Wang, Y. Gao, H. Li, Q. Wang, T. Yang, H. Lu,
+Y. Cao, C. Xu, et al., “Swarm of micro flying robots in the wild,”
+Science Robotics, vol. 7, no. 66, p. eabm5954, 2022.
+[15] T. Wu, G. Zaitian, Q. Wang, and F. Gao, “Scalable distance-based
+multi-agent relative state estimation via block multiconvex optimization,” Robotics: Science and Systems (RSS), 2024.
+[16] T. H. Nguyen and L. Xie, “Relative transformation estimation based
+on fusion of odometry and uwb ranging data,” IEEE Transactions on
+Robotics, vol. 39, no. 4, pp. 2861–2877, 2023.
+[17] M. Cutler, B. Michini, and J. P. How, “Lightweight infrared sensing for
+relative navigation of quadrotors,” in 2013 International Conference
+on Unmanned Aircraft Systems, pp. 1156–1164.
+[18] V. Walter, N. Staub, A. Franchi, and M. Saska, “Uvdar system
+for visual relative localization with application to leader–follower
+formations of multirotor uavs,” IEEE Robotics and Automation Letters,
+vol. 4, no. 3, pp. 2637–2644, 2019.
+[19] F. Zhu, Y. Ren, F. Kong, H. Wu, S. Liang, N. Chen, W. Xu, and
+F. Zhang, “Swarm-lio: Decentralized swarm lidar-inertial odometry,”
+in 2023 IEEE International Conference on Robotics and Automation,
+pp. 3254–3260.
+[20] H. Xu, L. Wang, Y. Zhang, K. Qiu, and S. Shen, “Decentralized visualinertial-uwb fusion for relative state estimation of aerial swarm,” in
+2020 IEEE international conference on robotics and automation, pp.
+8776–8782.
+[21] A. Martinelli, F. Pont, and R. Siegwart, “Multi-robot localization using
+relative observations,” in Proceedings of the 2005 IEEE international
+conference on robotics and automation, pp. 2797–2802.
+[22] Y. Wang, X. Wen, L. Yin, C. Xu, Y. Cao, and F. Gao, “Certifiably
+optimal mutual localization with anonymous bearing measurements,”
+IEEE Robotics and Automation Letters, vol. 7, no. 4, pp. 9374–9381,
+2022.
+[23] T. Qin, S. Cao, J. Pan, and S. Shen, “A general optimization-based
+framework for global pose estimation with multiple sensors,” arXiv
+preprint arXiv:1901.03642, 2019.
+
+

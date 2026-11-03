@@ -1,0 +1,416 @@
+Separation Principle for Event-Triggered Prescribed-Time
+Consensus Tracking of Nonlinear Multi-Agent Systems under
+DoS Attacks
+Hongjian Chen a , Hefu Ye b , Changyun Wen a
+a
+
+School of Electrical and Electronic Engineering, Nanyang Technological University, Singapore 639798, Singapore
+Faculty of Science and Technology, University of Macau, Macau 999078, China
+
+arXiv:2610.05785v1 [eess.SY] 5 Oct 2026
+
+b
+
+Abstract
+
+Despite the recent development of control theory for multi-agent systems (MASs), the highly desirable separation principle is
+diﬀicult to establish even for linear MASs, let alone for nonlinear ones that rely solely on output measurements under denialof-service (DoS) attacks. This paper establishes a separation principle for distributed leader-following control of this class
+of nonlinear MASs, allowing the observer and the controller to be designed independently. For each agent, two parametric
+Lyapunov equations (PLEs) are employed to generate two symmetric positive-definite matrices, which respectively support the
+independent design of the controller gain and the observer gain. To ensure that these two parameters do not affect each other,
+we adopt a matrix pencil formulation to decouple the relevant coupled terms and exploit time-varying feedback to handle
+potential impacts arising from nonlinearities. Furthermore, we design a hybrid observer that consists of a local state observer
+for reconstructing unmeasurable follower states and a distributed leader state observer for estimating the inaccessible leader
+state. Notably, we find that as long as the nonlinearity of all agents satisfies a linear-growth-type condition and the nonlinear
+model of the leader is available for followers, the separation principle can be established regardless of the presence of eventtriggered control and/or admissible DoS attacks. In our method, the selection of design parameters for each agent is elegantly
+simple, involving only three parameters: one for the prescribed convergence time tf , and the other two for the controller and
+the hybrid observer, respectively. Moreover, the latter two parameters can be chosen independently from explicit admissible
+ranges once the system order is specified. Numerical simulations verify the effectiveness of the proposed method.
+Key words: Prescribed-time consensus tracking; Separation principle; Denial-of-Service attacks; Matrix pencil; Resilient
+control.
+
+1 Introduction
+Output-feedback control is a fundamental problem in
+control theory since full-state measurements are often
+unavailable or prohibitively expensive in practical engineering systems. This problem warrants even greater
+attention in multi-agent systems (MASs), where largescale networked interactions impose additional sensing,
+communication, and computation burdens. Among various output-feedback control methodologies, the separation principle is particularly desirable, since it allows
+the observer and controller to be designed independently and enables the output-feedback controller to
+be constructed by replacing the unavailable states in a
+
+Email addresses: hongjian001@e.ntu.edu.sg (Hongjian
+Chen), hefuye@um.edu.mo (Hefu Ye), ecywen@ntu.edu.sg
+(Changyun Wen).
+
+Preprint submitted to Automatica
+
+state-feedback law with their estimates. Owing to this
+modular feature, separation-principle-based designs
+have been extensively studied for linear systems (Ghodrat and Marquez (2021)), linear MASs (Su and Lee
+(2021)), and have also been extended to the internal
+model based output regulation problem (Maggiore and
+Passino (2005)).
+While the separation principle has been widely studied
+for classical control settings, its extension to prescribedtime control is considerably more challenging, since both
+the observer and the controller involve time-varying
+gains, and this diﬀiculty is further compounded by the
+fact that the underlying system is not only nonlinear
+but also time-varying. For single-agent linear systems,
+prescribed-time separation principle results have been
+developed in Holloway and Krstic (2019) by imposing
+that the scaling power of the time-varying observer
+
+6 October 2026
+
+gains to exceed that of the controller gains by at least
+twice the system order. For MASs, however, analogous
+separation principle results are still largely absent. The
+work in Tran, Yucelen and Sarsilmaz (2021) addresses
+prescribed-time control of leaderless MASs using a time
+transformation method. Nevertheless, this result remains confined to linear systems and does not readily
+extend to nonlinear or more general multi-agent architectures.
+
+pling terms, thereby paving the way for establishing the
+separation principle.
+Motivated by the above observations, this paper aims
+to design a distributed prescribed-time controller and
+establish the separation principle for a class of leaderfollowing multi-agent systems. First, a hybrid observer
+comprising a distributed observer and a local observer
+is constructed: the former estimates the leader’s state
+for followers that cannot communicate directly with the
+leader, while the latter reconstructs unmeasurable local states for all agents. Notably, a key to the success
+of the separation principle lies in the ability of the proposed local observer to access the nonlinear model of
+the leader. Second, a matrix pencil formulation with an
+increased design degree-of-freedom is developed to decouple the coupled terms, ensuring that the design parameters of the controller and the observer do not interfere with each other. The resulting control framework
+involves only three design parameters: the prescribed
+convergence time, the observer gain, and the controller
+gain, where the latter two parameters can be obtained
+from a numerical table that depends solely on the system
+order. We further investigate the feasibility of the proposed scheme under event-triggered communication and
+DoS attacks, which is necessary and important in the
+study of networked systems (Deng, Che and Wu (2020);
+Deng, Zhang and Feng (2022); Yan, Li and Liang (2025);
+Liu et al. (2026)). We find that if the triggering condition is designed using only controller parameters, and
+the DoS-induced switching terms are incorporated into
+the resilient matrix-pencil formulation while a mild constraint is imposed on the choice of the prescribed time,
+then the separation principle still holds for both scenarios.
+
+The main obstacles to establishing such a separation
+principle for nonlinear MASs with a leader-following architecture lie in two aspects. The first challenge stems
+from the fact that certain followers lack direct access to
+the leader’s information (Liu and Xu (2025); Li, Hua,
+You et al. (2020); Liu, Zan and Tang (2026)). Consequently, followers must not only design local observers
+to estimate their own unmeasurable states but also rely
+on distributed observers to reconstruct the leader’s state
+using only neighboring information. This necessity introduces additional coupling terms into the closed-loop system, which in turn undermines the independence of parameter selection. Although various types of distributed
+observers, such as distributed leader-state observers and
+distributed relative-state observers (Zhang, Zhou, Yang
+and Duan (2024); Zhang, Zhou and Wen (2022)), have
+been developed for leader-following problems, most of
+them are designed under state-feedback control. Consequently, they are not directly applicable to the outputfeedback control for nonlinear MASs, where only output measurements are available and one must simultaneously reconstruct follower states and estimate the leader
+state.
+The second aspect lies in the treatment of nonlinearities in stability analysis. Most existing methods for handling coupled nonlinear terms, either directly or indirectly, alter the control structure or parameter selection,
+thereby rendering the separation principle inapplicable.
+For example, robust treatments based on Young’s inequality require incorporating additional negative feedback terms into the control law to counteract statedependent effects (Li et al. (2020)). Similarly, small-gain
+conditions impose additional constraints on parameter
+selection (Jin, Qin, Zhang and Guan (2022)). A notable
+exception is the work of Atassi and Khalil (1999), which
+established a separation principle for a class of nonlinear systems using high-gain observers. By increasing the
+observer gain ϵ, the trajectories under output feedback
+can be made close to those under state feedback, thereby
+ensuring the separation principle. More recently, Ye and
+Song (2025) successfully established a separation principle for a class of nonlinear systems via a PLE-based
+output feedback controller, revealing that adding an extra design degree of freedom to the matrix pencil formulation developed in Krishnamurthy and Khorrami
+(2022, 2024) enables the decoupling of coupled terms
+in the controller and observer, while the blow-up timevarying gains are capable of dominating nonlinear cou-
+
+The main contributions are summarized as follows:
+i) A separation principle is established for the proposed output-feedback control framework, enabling
+the observer and controller to be designed independently. As a result, the parameters of the two modules can be selected separately from explicit admissible ranges, without iterative trial-and-error, even
+in the presence of intermittent communication and
+DoS attacks.
+ii) A hybrid observer is proposed to address the concurrent unavailability of leader-state access and
+follower-state measurements for nonlinear leaderfollowing MASs. By synergizing a distributed observer with a high-gain local observer, it enables
+each follower to retrieve the requisite feedback information using only output measurements and
+neighbor information.
+iii) A resilient matrix-pencil-based analysis is proposed, which integrates the coupled terms arising
+from DoS-induced switching terms, nonlinearities, and both distributed and local observation
+errors into several generalized eigenvalue solving
+
+2
+
+problems. Through this formulation, explicit relationships are derived between the admissible DoS
+duration and the extended prescribed time. As an
+additional benefit, the conservatism in parameter
+selection is notably reduced.
+iv) Compared with the result in Ye, Zhang, Liu, Shi
+and Feng (2026), which considers linear MASs and
+adopts a full-state feedback design, the proposed
+method addresses resilient output-feedback consensus tracking for high-order nonlinear MASs with
+unknown growth rates under intermittent communication interruptions, thereby offering broader applicability to systems with nonlinear dynamics and
+limited state measurements.
+
+and its dual form
+
+Notations: Let R, Rn , and Rn×m denote the sets of real
+numbers, n-dimensional real vectors, and n × m real
+matrices, respectively. The symbol 0 denotes a zero
+vector or matrix with compatible dimensions, and In
+denotes the n × n identity matrix. For scalars or matrices q1 , . . . , qn , diag{q1 , . . . , qn } denotes the corresponding diagonal or block-diagonal matrix. For a vector
+x = [x1 , . . . , xn ]⊤ , x⊤ denotes its transpose, |x| its Euclidean norm, and |x|e = [|x1 |, . . . , |xn |]⊤ . The notation
+|q|e ≤e |x|e means that the corresponding componentwise inequalities hold. For a square matrix Q, det(Q)
+denotes its determinant, |Q|e denotes its entrywise absolute value, and diag{Q} denotes the diagonal matrix
+formed by the diagonal entries of Q.
+
+Two lemmas regarding PLEs with the matrix pencil are
+introduced here.
+
+AQi (ϱi ) + Qi (ϱi )A⊤ − Qi (ϱi )C ⊤ CQi (ϱi ) = −ϱi Qi (ϱi ),
+(2)
+where ri (t) and ϱi (t) are time-varying parameters to be
+designed in (26) and (20), A, B and C are defined as
+"
+A=
+
+0n−1 In−1
+0
+
+0⊤
+n−1
+
+#
+
+"
+,
+
+B=
+
+0n−1
+
+#
+
+"
+,
+
+C=
+
+1
+
+1
+
+#⊤
+.
+
+0n−1
+(3)
+
+Lemma 2 (Ye and Song (2025)) Let (A, B) be given by
+(3). Then, the PLE (1) has a unique symmetric positive
+definite (SPD) solution Pi (r) if and only if ri > 0. In
+this case, the unique solution satisfies
+Pi (ri ) = ri Lci Pni Lci ,
+
+(4)
+
+where Pni = Pi (1) is a constant SPD matrix and Lci =
+diag{rin−1 , rin−2 , . . . , 1} is a time-varying diagonal matrix. Furthermore, we have
+
+2 Preliminaries
+
+dPi
+Pi
+≤ (1 + ξi ) ,
+dri
+ri
+Pi BB ⊤ Pi ≤ δi ri Pi ,
+
+2.1 Properties of matrix pencils and PLEs
+A useful lemma is introduced for the matrix pencil formulation here:
+
+(5)
+
+where ξi > 0 and δi > 0 are constants obtained by
+
+ξi = max σ(Ei Pni + Pni Ei , Pni ) ,
+
+δi = max σ(Pni Lci BB ⊤ Lci Pni , Pni ) .
+
+Lemma 1 (Krishnamurthy and Khorrami (2024))
+Given real square matrices Q1 and Q2 , the generalized
+eigenvalues of the matrix pencil Q1 − sQ2 are defined as
+the values of s that make det(Q1 − sQ2 ) = 0. The set of
+generalized eigenvalues of the matrix pencil Q1 − sQ2
+is denoted as σ(Q1 , Q2 ). Generalized eigenvalues have
+several useful almost self-evident properties such as the
+following:
+
+(6)
+
+with Ei = diag{n − 1, n − 2, . . . , 0}.
+Lemma 3 (Zhou and Shi (2021)) Let (A, C) be given by
+(3). Then the PLE (2) has a unique symmetric positive
+definite solution Qi (ϱi ) if and only if ϱi > 0. In this case,
+the unique solution satisfies
+
+(1) sQ1 + Q2 < 0 holds for all s > max{σ(Q2 , −Q1 )},
+if Q2 is symmetric and Q1 is symmetric negativedefinite (SND);
+(2) sQ1 − Q2 < 0 holds for all s < min{σ(Q2 , Q1 )}, if
+Q2 and Q1 are symmetric positive-definite (SPD).
+
+−1
+Qi (ϱi ) = ϱ2n−1
+L−1
+i
+oi Qni Loi ,
+
+(7)
+
+where Qni = Qi (1) and Loi = diag{ϱin−1 , ϱin−2 , . . . , 1}.
+In addition, it holds that
+
+Consider the following PLE:
+A⊤ Pi (ri ) + Pi (ri )A − Pi (ri )BB ⊤ Pi (ri ) = −ri Pi (ri ),
+(1)
+
+dQi
+Qi
+≥
+.
+dϱi
+nϱi
+
+3
+
+(8)
+
+otherwise. For agent i, j is in the neighboring set Ni
+if aij > 0. Then the Laplacian matrix is defined as
+L = H − A, where H = diag{ω0 , ω1 , . . . , ωN } and
+"
+#
+PN
+0 0
+ωi = j=0 aij . L can be written as L =
+, with
+L1 L2
+L1 ∈ RN ×N and L2 ∈ RN ×1 . The following assumption
+for the directed graph is widely adopted in consensus
+tracking problems.
+
+2.2 System model
+This paper considers nonlinear MASs consisting of one
+leader and N followers. The dynamic of the leader is
+ẋ0 = Ax0 + f0 (t, x0 ),
+y0 = Cx0 ,
+
+(9)
+
+where x0 ∈ Rn and y0 ∈ R denote the state and output,
+respectively. The system matrices A, B and C are given
+in (3). The structure of the nonlinear function of f0 (·, t)
+is available to all followers. The dynamic of the follower
+is
+ẋi = Axi + Bui + fi (t, xi ),
+yi = Cxi , i = 1, . . . , N,
+
+Assumption 2 (Olfati-Saber and Murray (2004)) In
+the absence of DoS attacks, the directed graph G contains
+a directed spanning tree rooted at the leader.
+The objective of this paper is to develop distributed control schemes for the MAS (9)–(10) when only the outputs of all agents are available, such that the prescribedtime consensus tracking problem formulated in Definition 1 is solved with a user-prescribed time. In addition,
+we establish the separation principle for distributed control schemes, namely, the design parameters for the controllers and observers are independent of each other.
+
+(10)
+
+where xi ∈ Rn , yi ∈ R, ui ∈ R denote the state, output,
+and control input, respectively. fi = [fi,1 , · · · , fi,n ]⊤ ∈
+Rn denotes the nonlinear function of follower i, which
+satisfies a Lipschitz condition with respect to xi and is
+piecewise continuous with respect to t. For the closedloop MASs, the following linear growth condition should
+be satisfied.
+
+Definition 1 (Ye et al. (2025)) The prescribed-time
+consensus tracking of the leader-following MAS (10)
+is said to be achieved if, for i ∈ {1, . . . , N }, there exist a class KL function β and a time-scaling function
+µ(t) : [0, tf ) → [0, ∞) such that µ(t) tends to infinity as
+t goes to tf , and, for any xi (0), x0 (0) ∈ Rn ,
+
+Assumption 1 (Ye, Wen and Song (2025)) There exist unknown constants θi and a known lower-triangular
+matrix Af ∈ Rn×n such that
+|fi (xi , t) − fj (xj , t)|e ≤e θi Af |xi − xj |e .
+
+
+|xi (t) − x0 (t)| ≤ β |xi (0) − x0 (0)|, µ(t) ,
+
+(11)
+
+∀t ∈ [0, tf ),
+(13)
+where tf > 0 is an arbitrary time-independent constant.
+
+where θi denotes the unknown growth rate, and Af is
+
+1 ··· 0
+
+
+.
+.
+Af =  .. . . . ..  .
+
+
+1 ··· 1
+
+
+2.4
+
+Prescribed-time state-feedback controller
+
+(12)
+The prescribed-time state-feedback controller for follower i in (10) that has direct access to x0 , without an
+event-triggered mechanism is given as follows
+
+Remark 1 Assumption 1 is a commonly used growth
+condition in the control of nonlinear MASs (Zhang, Liu
+and Feng (2015); Li, Liu, Feng and Zhang (2021); Ye
+et al. (2025)). Compared with Zhang et al. (2015); Li
+et al. (2021), this paper allows the nonlinear growth rates
+to be unknown. Compared with Ye et al. (2025), where
+each follower is assumed to have direct access to the leader
+information, this paper considers a more general directed
+communication graph that only contains a spanning tree
+rooted at the leader.
+
+1
+ui = − B ⊤ Pi (ri )(xi − x0 ),
+2
+
+(14)
+
+where ri (t) = γci α(t) and the time scaling function is
+α(t) =
+
+1
+,
+tf − t
+
+t ∈ [0, tf ),
+
+(15)
+
+which are widely adopted in Orlov and Kairuz (2022);
+Orlov (2022); Orlov, Kairuz and Aguilar (2024); Efimov
+and Orlov (2026); Li and Krstic (2022, 2023); Krishnamurthy, Khorrami and Krstic (2020). Inspired by the
+state-feedback control design in Ye and Song (2025), a
+lemma is introduced as follows.
+
+2.3 Graph theory
+Define G as a directed graph with a node set V =
+{0, 1, . . . , N } and an edge set E ⊆ V × V. If node j
+communicates with node i directly, one can get that
+(j, i) ∈ E. Define A = [aij ] ∈ R(N +1)×(N +1) as the adjacency matrix, where aij > 0 if (j, i) ∈ E and aij = 0
+
+Lemma 4 Consider a follower that has direct access to
+the leader state x0 in the MAS (10). With the state-
+
+4
+
+

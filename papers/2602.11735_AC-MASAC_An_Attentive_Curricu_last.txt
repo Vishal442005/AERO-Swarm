@@ -1,0 +1,325 @@
+thereby sustaining effective cooperative decision-making under
+uncertainty.
+
+5
+
+CONCLUSION
+
+This paper addresses the cooperative path planning control of a
+heterogeneous UAV swarm using a multi-agent reinforcement learning method. By defining a Leader-Follower role structure, we established a decentralized Partially Observable Markov Decision
+Process (POMDP) that takes into account both individual agent
+dynamics and multi-agent coordination objectives. A heterogeneous actor-critic architecture was developed to address the rolespecific decision-making requirements. Within this architecture, a
+role-aware attention mechanism was designed to process the unstructured state information inherent in multi-agent systems. The
+constructed system learns distinct policies for Leader and Follower
+agents based on their differentiated observation and action spaces.
+To address the challenges of training instability and slow convergence in complex, sequential tasks, a structured curriculum
+learning framework was integrated. Based on a sequence of tasks
+with progressively increasing complexity, the framework utilizes a
+hierarchical knowledge transfer mechanism for policy initialization
+and a stage-proportional experience replay strategy to mitigate catastrophic forgetting. Based on this framework, a robust, curriculumdriven policy was synthesized, which adapts to environments of
+varying difficulty.
+The proposed AC-MASAC method is applicable to cases with
+heterogeneous agent roles and complex, dynamic environments,
+and it achieves superior performance in success rate and formation
+keeping compared with conventional MARL baselines. In the future,
+the AC-MASAC framework will be extended to address the challenges of sim-to-real transfer for deployment on physical hardware
+platforms.
+
+REFERENCES
+[1] Johannes Ackermann, Volker Gabler, Takayuki Osa, and Masashi Sugiyama. 2019.
+Reducing overestimation bias in multi-agent domains using double centralized
+critics. arXiv preprint arXiv:1910.01465 (2019).
+[2] Richard Bellman. 1957. A Markovian decision process. Journal of mathematics
+and mechanics (1957), 679–684.
+[3] Dimitri Bertsekas. 2019. Reinforcement learning and optimal control. Vol. 1. Athena
+Scientific.
+[4] CL Fang, FS Yang, and Q Pan. 2024. Multi-UAV collaborative path planning based
+on multi-agent soft actor critic. Sci. Sin. Inf 54 (2024), 1871–1883.
+[5] J Foerster. 2018. Deep multi-agent reinforcement learning. Ph.D. Dissertation.
+University of Oxford.
+[6] Tuomas Haarnoja, Aurick Zhou, Pieter Abbeel, and Sergey Levine. 2018. Soft
+actor-critic: Off-policy maximum entropy deep reinforcement learning with a
+stochastic actor. In International conference on machine learning. Pmlr, 1861–1870.
+[7] Jiale Han, Yi Zhu, and Jian Yang. 2025. A Deep Reinforcement Learning Method
+for Collision Avoidance with Dense Speed-Constrained Multi-UAV. IEEE Robotics
+and Automation Letters (2025).
+[8] Drew Hanover, Antonio Loquercio, Leonard Bauersfeld, Angel Romero, Robert
+Penicka, Yunlong Song, Giovanni Cioffi, Elia Kaufmann, and Davide Scaramuzza.
+2024. Autonomous drone racing: A survey. IEEE Transactions on Robotics 40
+(2024), 3044–3067.
+[9] Shariq Iqbal and Fei Sha. 2019. Actor-attention-critic for multi-agent reinforcement learning. In International conference on machine learning. PMLR, 2961–2970.
+[10] Leslie Pack Kaelbling, Michael L Littman, and Anthony R Cassandra. 1998. Planning and acting in partially observable stochastic domains. Artificial intelligence
+101, 1-2 (1998), 99–134.
+[11] Sertac Karaman, Matthew R Walter, Alejandro Perez, Emilio Frazzoli, and Seth
+Teller. 2011. Anytime motion planning using the RRT. In 2011 IEEE international
+conference on robotics and automation. ieee, 1478–1483.
+[12] Oussama Khatib. 1986. Real-time obstacle avoidance for manipulators and mobile
+robots. The international journal of robotics research 5, 1 (1986), 90–98.
+
+[13] Chengju Liu, Junqiang Han, and Kang An. 2017. Dynamic path planning based
+on an improved RRT algorithm for RoboCup robot. Robot 39, 1 (2017), 8–15.
+[14] Ryan Lowe, Yi I Wu, Aviv Tamar, Jean Harb, Pieter Abbeel, and Igor Mordatch.
+2017. Multi-agent actor-critic for mixed cooperative-competitive environments.
+Advances in neural information processing systems 30 (2017).
+[15] Shankarachary Ragi and Edwin KP Chong. 2013. UAV path planning in a dynamic
+environment via partially observable Markov decision process. IEEE Trans.
+Aerospace Electron. Systems 49, 4 (2013), 2397–2412.
+[16] Tabish Rashid, Mikayel Samvelyan, Christian Schroeder De Witt, Gregory Farquhar, Jakob Foerster, and Shimon Whiteson. 2020. Monotonic value function
+factorisation for deep multi-agent reinforcement learning. Journal of Machine
+Learning Research 21, 178 (2020), 1–51.
+[17] Zhuang Shao, Fei Yan, Zhou Zhou, and Xiaoping Zhu. 2019. Path planning
+for multi-UAV formation rendezvous based on distributed cooperative particle
+swarm optimization. Applied Sciences 9, 13 (2019), 2621.
+[18] Kyunghwan Son, Daewoo Kim, Wan Ju Kang, David Earl Hostallero, and Yung
+Yi. 2019. Qtran: Learning to factorize with transformation for cooperative multiagent reinforcement learning. In International conference on machine learning.
+PMLR, 5887–5896.
+[19] Chuxiong Sun, Zehua Zang, Jiabao Li, Jiangmeng Li, Xiao Xu, Rui Wang, and
+Changwen Zheng. 2024. T2mac: Targeted and trusted multi-agent communication through selective engagement and evidence-driven integration. In Proceedings of the AAAI Conference on Artificial Intelligence, Vol. 38. 15154–15163.
+[20] Peter Sunehag, Guy Lever, Audrunas Gruslys, Wojciech Marian Czarnecki, Vinicius Zambaldi, Max Jaderberg, Marc Lanctot, Nicolas Sonnerat, Joel Z Leibo, Karl
+Tuyls, et al. 2017. Value-decomposition networks for cooperative multi-agent
+learning. arXiv preprint arXiv:1706.05296 (2017).
+[21] Ardi Tampuu, Tambet Matiisen, Dorian Kodelja, Ilya Kuzovkin, Kristjan Korjus,
+Juhan Aru, Jaan Aru, and Raul Vicente. 2017. Multiagent cooperation and
+competition with deep reinforcement learning. PloS one 12, 4 (2017), e0172395.
+[22] Hanfu Wang and Weidong Chen. 2022. Multi-robot path planning with due
+times. IEEE Robotics and Automation Letters 7, 2 (2022), 4829–4836.
+[23] Liang Wang, Kezhi Wang, Cunhua Pan, Wei Xu, Nauman Aslam, and Lajos
+Hanzo. 2020. Multi-agent deep reinforcement learning-based trajectory planning
+for multi-UAV assisted mobile edge computing. IEEE Transactions on Cognitive
+Communications and Networking 7, 1 (2020), 73–84.
+[24] Xiaojun Xing, Zhiwei Zhou, Yan Li, Bing Xiao, and Yilin Xun. 2024. MultiUAV adaptive cooperative formation trajectory planning based on an improved
+MATD3 algorithm of deep reinforcement learning. IEEE Transactions on Vehicular
+Technology 73, 9 (2024), 12484–12499.
+
+APPENDIX
+A HYPERPARAMETER DETAILS
+To ensure the reproducibility of our work, this section provides a detailed account of the hyperparameters used for the neural network
+architectures and the training process.
+
+A.1
+
+Neural Network Architectures
+
+The architectural details of the actor and critic networks within the AC-MASAC framework are presented in Table 1. We utilize Multi-Layer
+Perceptrons (MLPs) with ReLU activation functions for all hidden layers. The final layer of the actor network employs a Tanh activation to
+constrain the output actions within the range [-1, 1].
+
+Table 1: Concise neural network architectures for AC-MASAC.
+
+A.2
+
+Network Component
+
+Architecture Details
+
+Actor Network
+Encoder
+Attention
+Head
+
+Input(7) → Linear(256) → ReLU → Linear(128)
+Multi-Head (4 Heads, Dropout=0.1)
+Context → Linear(128) → ReLU → Linear(2) → Tanh
+
+Critic Network
+Encoder
+Attention
+Head (Q1 & Q2)
+
+Input(9) → Linear(256) → ReLU → Linear(128)
+Multi-Head (4 Heads, Dropout=0.1)
+Concat(Context, Action) → Linear(128) → ReLU → Linear(1)
+
+Training Hyperparameters
+
+The key hyperparameters used during the training of the AC-MASAC agent and all baseline models are summarized in Table 2. These
+parameters were selected based on common practices in deep reinforcement learning literature and were kept consistent across all experiments
+to ensure a fair comparison.
+
+Table 2: Training hyperparameters for all experiments.
+Hyperparameter
+
+Value
+
+Optimizer
+Learning Rate (Actor)
+Learning Rate (Critic)
+Learning Rate (Entropy)
+Discount Factor (𝛾)
+Target Network Update Rate (𝜏)
+Replay Buffer Capacity
+Batch Size
+Target Entropy (H )
+
+Adam
+1 × 10−4
+3 × 10−4
+3 × 10−4
+0.99
+0.01
+50000
+256
+-0.1
+
+B CURRICULUM STAGE SPECIFICATIONS
+B.1 Environmental Configurations
+Our progressive curriculum learning framework utilizes a deterministic sequence of tasks with incrementally increasing complexity. The
+specific environmental configurations for each stage of the curriculum are detailed in Table 3. The transition to the next stage is triggered
+upon meeting the holistic competency criteria outlined in the main text.
+
+Table 3: Environmental configurations for each curriculum learning stage.
+
+B.2
+
+Stage
+
+Leader Count
+
+Follower Count
+
+Obstacle Count
+
+1
+2
+3
+4
+5
+
+1
+1
+1
+1
+1
+
+1
+2
+3
+4
+5
+
+0
+1
+2
+2
+3
+
+Knowledge Transfer Mechanism
+
+Our parameter transfer strategy employs a differentiated approach to accommodate the distinct characteristics and functional requirements
+of various network components. For actor networks, the leader network parameters 𝜃 𝐿(𝑡 ) are completely transferred to the new stage as
+𝜃 𝐿(𝑡 +1) = 𝜃 𝐿(𝑡 ) , since the leader’s decision-making patterns and coordination responsibilities remain consistent across curriculum stages. In
+𝑁𝑡
+contrast, follower networks adopt an expansive transfer strategy where existing follower network parameters {𝜃 𝐹(𝑡𝑖 ) }𝑖=1
+are fully preserved
+to maintain learned collaborative behaviors, while newly added follower networks acquire foundational cooperation capabilities through
+parameter replication: 𝜓 𝐹(𝑡𝑗 +1) = 𝜓 𝐹(𝑡𝑁) for 𝑗 > 𝑁𝑡 , where 𝑁𝑡 and 𝑁𝑡 +1 represent the number of followers in stages 𝑡 and 𝑡 + 1 respectively. The
+𝑡
+
+critic network employs a reinitialization strategy 𝜙 (𝑡 +1) ∼ N (0, 𝜎 2 ) due to changes in state-action space dimensionality from S (𝑡 ) × A (𝑡 )
+to S (𝑡 +1) × A (𝑡 +1) , preserving the network architecture while resetting all parameter weights and relying on new-stage experience data
+to rapidly relearn value function 𝑄𝜙 (𝑠, 𝑎). Entropy adjustment parameters {𝛼 𝐿(𝑡 ) , 𝛼 𝐹(𝑡 ) } are preserved as {𝛼 𝐿(𝑡 +1) , 𝛼 𝐹(𝑡 +1) } = {𝛼 𝐿(𝑡 ) , 𝛼 𝐹(𝑡 ) },
+maintaining the optimal exploration-exploitation balance established in the previous stage. This differentiated parameter transfer strategy
+ensures effective knowledge inheritance while providing appropriate flexibility for new-stage learning, achieving an optimal balance between
+knowledge accumulation and adaptability throughout the curriculum learning process.
+
+B.3
+
+Stage-Proportional Experience Sampling
+
+To mitigate catastrophic forgetting, the experience replay buffer D is managed as a collection of stage-specific sub-buffers. During training
+Ð −1
+at stage 𝑘, a mini-batch is composed of samples from the current stage buffer D𝑘 and a historical buffer Dhist = 𝑘𝑗=1
+D 𝑗 . The proportion of
+experiences sampled from the historical buffer, 𝜌 old (𝑘), is determined by the stage-dependent decay function detailed in Equation 11, using
+the hyperparameters specified in Section 3.3. This mechanism ensures a dynamic balance between adapting to the current task and retaining
+previously acquired knowledge.
+
+C
+
+SUPPLEMENTARY RESULTS
+
+This section provides additional qualitative and quantitative results to complement the analysis in the main paper, offering deeper insights
+into the AC-MASAC algorithm’s performance characteristics and behavioral patterns.
+
+C.1
+
+Trajectory Analysis in Challenging Scenarios
+
+Figure 8 illustrates typical agent trajectories for AC-MASAC and baseline algorithms across various challenging test scenarios. These
+visualizations demonstrate the superior path planning capabilities and obstacle avoidance strategies of the proposed method.
+
+(a) Simple environment
+
+(b) Moderate environment
+
+(c) Complex environment
+
+Figure 8: Trajectory comparison across environments of varying complexity. AC-MASAC demonstrates superior path efficiency
+and smoother navigation compared to baseline methods including MADDPG, RRT*, and MASAC. Black circles represent
+obstacles, green stars indicate target positions.
+The trajectory analysis reveals several key advantages of AC-MASAC: (1) Path Efficiency: AC-MASAC consistently generates shorter
+and more direct paths to targets across all complexity levels; (2) Smooth Navigation: The trajectories exhibit reduced oscillations and
+smoother curves, indicating better control stability; (3) Obstacle Avoidance: More effective navigation around obstacles with improved
+safety margins compared to baseline methods.
+
+C.2
+
+Formation Dynamics Analysis
+
+Figure 9 presents detailed analysis of the formation control capabilities, examining heading angle coordination, velocity synchronization,
+and inter-agent distance management.
+Velocity Variation
+
+Heading Angle Variation
+
+Distance between leader and follower
+Leader
+
+Leader
+
+Distance Range
+
+Follower 1
+
+Follower 1
+
+Average distance
+
+Follower 2
+
+Follower 2
+
+Follower 3
+
+Follower 3
+
+°
+
+Leader
+
+Step
+
+(a) Heading angle variation
+
+Step
+
+(b) Velocity coordination
+
+Step
+
+(c) Distance evolution
+
+Figure 9: Formation dynamics analysis showing multi-agent coordination performance over time. The plots demonstrate the
+effectiveness of the attention mechanism in achieving synchronized behavior among heterogeneous agents.
+The formation dynamics analysis reveals the effectiveness of AC-MASAC’s attention-based coordination mechanism across three critical
+aspects. In heading angle coordination (Figure 9a), the leader and followers initially exhibit significant heading disparities, but through the
+attention mechanism, followers progressively align with the leader’s heading direction, achieving synchronization within approximately
+100 time steps and maintaining alignment with deviations below 5 in the final phase. Simultaneously, velocity synchronization (Figure 9b)
+demonstrates rapid adaptation capabilities, where the leader’s velocity changes from 17 m/s to 19 m/s are accurately tracked by followers, with
+95% synchronization achieved within 150 time steps, validating the effectiveness of role-specific actor networks in maintaining coordinated
+movement. Furthermore, distance management (Figure 9c) shows rapid convergence from initial separation (≈ 350 m) to stable formation
+distance (20–30 m) within 100 time steps, with subsequent maintenance of consistent spacing demonstrating robust formation-keeping
+capabilities. These coordinated behaviors collectively validate the superior multi-agent coordination performance achieved through the
+proposed attention mechanism and heterogeneous network architecture.
+
+

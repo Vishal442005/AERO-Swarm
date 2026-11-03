@@ -1,0 +1,585 @@
+1
+
+Distributed Neurodynamics-Based Backstepping
+Optimal Control for Robust Constrained Consensus
+of Underactuated Underwater Vehicles Fleet
+
+arXiv:2308.09326v1 [eess.SY] 18 Aug 2023
+
+Tao Yan, Graduate Student Member, IEEE, Zhe Xu, Member, IEEE, Simon X. Yang, Senior Member, IEEE,
+S. Andrew Gadsden, Senior Member, IEEE
+
+Abstract—Robust constrained formation tracking control of
+underactuated underwater vehicles (UUVs) fleet in threedimensional space is a challenging but practical problem. To
+address this problem, this paper develops a novel consensus based
+optimal coordination protocol and a robust controller, which
+adopts a hierarchical architecture. On the top layer, the spherical
+coordinate transform is introduced to tackle the nonholonomic
+constraint, and then a distributed optimal motion coordination
+strategy is developed. As a result, the optimal formation tracking
+of UUVs fleet can be achieved, and the constraints are fulfilled. To
+realize the generated optimal commands better and, meanwhile,
+deal with the underactuation, at the lower-level control loop a
+neurodynamics based robust backstepping controller is designed,
+and in particular, the issue of ”explosion of terms” appearing
+in conventional backstepping based controllers is avoided and
+control activities are improved. The stability of the overall UUVs
+formation system is established to ensure that all the states of
+the UUVs are uniformly ultimately bounded in the presence of
+unknown disturbances. Finally, extensive simulation comparisons
+are made to illustrate the superiority and effectiveness of the
+derived optimal formation tracking protocol.
+Index Terms—Underactuated underwater vehicles (UUVs)
+fleet, robust constrained consensus formation tracking control,
+distributed optimal motion coordination, backstepping control,
+neurodynamics based control.
+
+I. I NTRODUCTION
+UTONOMOUS underwater vehicle (AUV) is a sort of
+marine mechatronics systems, and has been used to
+perform various underwater missions without human intervention [1]–[3]. Recently, employing a group of autonomous
+underwater vehicles has attracted growing attention as multiagent systems are proved to be more efficient, flexible and
+cost-effective compared to a single AUV, and appear also to
+be more robust when faced with disturbances or even faults.
+The main technical problems of this type of system lie in designing effective and efficient coordination protocols to make
+teams of AUVs perform tasks together in complicated marine
+conditions. In particular, formation control has increasingly
+
+A
+
+This work was supported by the Natural Sciences and Engineering Research
+Council (NSERC) of Canada. (Corresponding author: Simon X. Yang.)
+T. Yan and S. X. Yang are with Advanced Robotics and Intelligent Systems
+(ARIS) Laboratory, School of Engineering, University of Guelph, Guelph,
+ON N1G2W1, Canada (e-mail: tyan03@uoguelph.ca; zxu02@uoguelph.ca;
+syang@uoguelph.ca).
+Z. Xu and S. A. Gadsden are with Intelligent and Cognitive Engineering (ICE) Laboratory, Department of Mechanical Engineering, McMaster
+University, Hamilton, ON L8S4L8, Canada (e-mail: xu804@mcmaster.ca;
+gadsden@mcmaster.ca).
+
+become a focus in multiple AUVs coordination, considering
+its wide applications in practice. However, formation control
+of a group of AUVs is barely an easy thing to do, due to
+the nonlinear, uncertain and underactuated characteristics of
+dynamics, communication constraints as well as detrimental
+marine environments. Therefore, it is still an open and pressing
+problem for both societies of control and ocean engineering
+[4]–[6].
+Formation control of an AUVs fleet can be roughly separated into two major portions, that is, motion coordination
+and control. For the former, there are several structures and
+strategies commonly used to coordinate the motion of multiple
+AUVs, such as leader-following structure [7], [8], virtual structure [9], [10], and artificial potential field approach [11], etc.
+Besides coordination, efficient formation controllers are also
+key to achieving coordinated motions successfully. Following
+this procedure, extensive research efforts have been made in
+recent decades in order to synthesize effective and practical
+formation control protocols for AUVs fleet. In [12], a H2 /H∞
+control scheme was proposed based on the leader-following
+structure to ensure the optimal formation performance when
+disturbances and communication delays may happen. While
+the linear quadratic based optimal control is fairly efficient
+at specific operating points, it may become restrictive when
+a wide range of operations is required, such as following
+a time-varying dynamic trajectory. In this respect, nonlinear
+control techniques have played an important role in the design
+of high-performance AUVs formation controllers and have
+been widely applied [13]–[15]. To handle the nonlinearity
+and underactuation, an adaptive backstepping controller was
+synthesized with neural network approximation to drive a
+group of underactuated underwater vehicles (UUVs) to create
+formation via a leader-following structure [13]. By incorporating a data-driven predictor, the resulting formation control
+strategy also addressed the communication delay [16]. System
+constraints fulfillment is another critical concern in designing
+practical controllers. As such, the model predictive control
+(MPC) method, as one of the optimal control techniques,
+was applied to resolve the AUV trajectory tracking problem
+subject to constraints [14]. In their studies, a Lyapunov-based
+backstepping nonlinear MPC algorithm was proposed with
+stability and feasibility guarantees. Based on a similar idea,
+receding horizon formation tracking of multiple UUVs with
+input limitation were addressed [15].
+In addition to the nonlinearity and underactuation han-
+
+2
+
+dling, the marine disturbances (e.g., ocean currents, waves
+and winds) as well as hydrodynamic effects have significant
+impacts on the acquirement of robust formation performance.
+Towards this end, a good many research works take advantage
+of the sliding mode control (SMC) method due to its great
+robustness in tackling any matched and bounded disturbances
+[17]–[21]. In [17], the authors presented an adaptive sliding
+mode formation control scheme to address issues of the
+variable added mass and communication constraints, and the
+overall closed-loop stability was analyzed using Lyapunov
+theory. To pursue a fast transient performance, a terminal SMC
+method was adopted for the tracking control of UUVs [18].
+While SMC-based approaches are expected to obtain good robustness against the disturbances, the chattering phenomenon
+stops their applications from real AUV control implementation. To overcome this drawback, a higher order SMC method
+was proposed for chattering-free trajectory tracking control of
+AUVs [19]. With the integration of a neurodynamics model, a
+distributed bioinspired SMC scheme was proposed to address
+the robust formation tracking of a fleet of fully actuated AUVs
+[22]. Other than sliding mode control strategies, observer
+techniques are other effective alternatives to the improvement
+of system robustness [23]. In [20], considering both unknown
+disturbances and uncertain nonlinearity, an extended state
+observer based integral SMC scheme was proposed for an
+underwater robot, and real-world experiments verified its effectiveness. Employing a similar technique, active disturbance
+rejection control was used in the dynamic controller design of
+multiple AUVs formation [24]. In [21], the authors addressed
+robust finite-time consensus formation control of nonholonomic wheeled mobile robots, in which a finite-time observer
+was designed to estimate both velocities and disturbances,
+followed by an integral SMC controller. Likewise, based on
+a disturbance observer, distributed formation tracking for a
+group of underactuated AUVs in the horizontal plane was
+studied [25].
+While a vital amount of research results as mentioned above
+have been attained to study the formation control of AUVs
+fleet, there still are several aspects not well considered from
+a practical control point of view. Most of the existing AUVs
+formation protocol adopts a leader-following structure [12],
+[13], [15], [24], [25]. In such an approach, it is assumed that
+all the vehicles can have access to the leaders’ information,
+which would be rather restricted in reality. Besides, the robustness analysis in their methods is usually neglected, but it
+is quite crucial to maintain the feasibility of a method when
+faced with uncertainties. To handle the underactuation, many
+existing works follow a backstepping control design procedure,
+whereas such a method necessitates the derivative of designed
+virtual commands which is hard to obtain and its robustness
+is also limited. In terms of disturbance rejection, while sliding
+mode control behaves well for certain bounded disturbances
+[17]–[19], such a method essentially employs a high-gain
+strategy, thus intrinsically sensitive to the noise. The observer
+technique acts as an active disturbance compensation [23],
+yet its performance relies closely on the accurate modeling
+of particular disturbances, which is almost impossible for
+the marine situation. On the other hand, system constraints
+
+handling and performance optimization are also significant
+dimensions in the control design of real mechatronic systems,
+but barely resolved in the existing formation control literature.
+Motivated by the above observations, this paper is concerned with the UUVs optimal formation tracking control with
+unknown disturbances as well as system constraints in threedimensional (3D) space. Such a problem, clearly, is of practical
+interest but more challenging, and has not been well studied
+yet. The main contributions and novelties of this paper are
+detailed below:
+1) A distributed robust optimal protocol is developed for
+the consensus formation tracking of a fleet of underwater
+autonomous vehicles in 3D space. The controlled plant
+is subject to velocity constraints, underactuation, and
+unknown disturbances.
+2) To deal with the underactuation, a spherical coordinate
+transformation is used, followed by a consensus based
+formation tracking design. Furthermore, to achieve optimal coordination and meanwhile fulfill the constraints,
+an on-line motion optimization procedure is developed,
+and the stability, feasibility, and real-time applicability
+are discussed.
+3) To realize the planned optimal commands efficiently and
+robustly, a neurodynamics based backstepping controller
+is designed, in which the issue of “explosion of terms” is
+avoided and control performance is improved. Moreover,
+the stability and robustness properties are analyzed.
+4) The overall stability result of the proposed UUVs formation system is derived, which shows that under some
+moderate conditions, all the states of the UUVs in the
+fleet can be steered into an ultimate bound even when
+faced with unknown disturbances.
+The rest of the article is arranged as follows. Some preliminaries are presented in Section II. Section III addresses
+the constrained consensus formation tracking problem. Neurodynamics based robust backstepping controller shall be designed and analyzed in Section IV. Section V provides extensive numerical simulations. The conclusion is made in Section
+VI.
+II. PRELIMINARY AND PROBLEM FORMULATION
+In this section, some basic knowledge regarding the graph
+theory is presented, mathematical models of UUVs are described, and moreover the objective of formation tracking
+control of UUVs fleet is formulated.
+A. Preliminary on graph theory
+The communication topology of a UUVs fleet can be
+modeled by a weighted directed graph G = {V, E, A}, and
+each vehicle in such a system can be treated as a node. As for
+a simple time-invariant graph G, it can be described by the
+vertex set V = {ν1 , ν2 , . . . , νN } , edge set E ⊆ V × V , and
+weighted adjacency matrix A = [aij ] ∈ RN×N . The element νi
+in vertex set V denotes i-th UUV, and the index i belongs to
+an index set Γ = {1, . . . , N }. If νi is able to receive messages
+from νj (i ̸= j), then, say, there exists an edge pointing from
+νj to νi , i.e., (νi , νj ) ∈ E, and aij > 0; particularly, we call νj
+
+3
+
+νi2 = [qi , ri ]T ∈ R2 are the linear and angular velocities,
+respectively,
+which is expressed in the body-fixed frame
+
+B
+B
+B
+E B = eB
+o,i , ex,i , ey,i , ez,i , as shown in Fig. 1.
+The dynamics of the i-th vehicle is modeled by
+mi1 u̇i = mi2 vi ri − mi3 wi qi − βui ui + τi1 + di1 ,
+mi2 v̇i = −mi1 ui ri − βvi vi + di2 ,
+mi3 ẇi = mi1 ui qi − βwi wi + di3 ,
+mi4 q̇i = (mi3 − mi1 ) ui wi − βqi qi − βbi sin θi + τi2 + di4 ,
+mi5 ṙi = (mi1 − mi2 ) ui vi − βri ri + τi3 + di5 ,
+Fig. 1. Schematic diagram of i-th UUV .
+
+a neighbor of νi , and all such νj form the set of neighbors of
+νi , denoted by Ni = {j|(νi , νj ) ∈ E}. Otherwise, there is no
+edge from νj to νi , and aij = 0. Moreover,
+we define aii = 0
+P
+for all i ∈ Γ, and out-degree di = j∈Ni aij associated with
+the node i. Then, the degree matrix and Laplacian matrix of
+graph G are defined as D = diag {d1 , . . . , dN } ∈ RN×N and
+L = D − A, respectively. A path in G is defined by a set of
+successive adjacent nodes, starting from any νi and ending at
+νj . If there is at least one path on any two nodes in graph G,
+then, say, graph G is connected.
+In order to make the UUVs fleet move along with a
+prescribed trajectory together, a reference must be defined
+ahead of time. The availability to the information of reference
+trajectory for i-th UUV is indicated by a parameter bi ; that
+is, if UUV i have access to this information, then bi > 0;
+otherwise, bi = 0, and define matrix B = diag (b1 , . . . , bN ).
+Assumption 1. For the considered multi-UUV formation control network, graph G is connected, and moreover there is at
+least one UUV able to receive the information of reference
+trajectory, i.e., the elements of matrix B are not all equal to
+zero.
+Lemma 1. if Assumption 1 holds, then matrix L+B is positive
+definite.
+
+B. Dynamic model and problem formulation
+The distributed robust constrained formation tracking control of fleets of underactuated autonomous underwater vehicles
+in 3D space is addressed in this paper. First, following the
+work of Qi et al. [26], the kinematics of each underwater
+vehicle are described as
+ẏi = cos θi sin ψi ui + cos ψi vi + sin θi sin ψi wi ,
+żi = − sin θi ui + cos θi wi ,
+θ̇i = qi ,
+1
+ψ̇i =
+ri ,
+cos θi
+
+where mi1 = mi − βu̇i , mi2 = mi − βv̇i , mi3 = mi − βẇi ,
+mi4 = Iyi − βq̇i and mi5 = Izi − βṙi ; mi is the mass
+of the i-th vehicle; Iyi and Izi are the moments of inertia
+B
+around the axes of eB
+y,i and ez,i , respectively; β(·) is a
+set of hydrodynamics related terms associated with the i-th
+T
+vehicle. τi = [τi1 , τi2 , τi3 ] ∈ R3 is the control input, and
+T
+di = [di1 , di2 , di3 , di4 , di5 ] ∈ R5 is the unknown disturbance
+acting on the i-th vehicle.
+Remark 1. It can be clearly seen from (2) that the velocities
+in sway and heave directions are underactuated; that is, these
+two degrees of freedom cannot be manipulated directly, and
+thus the control of such a system can be more challenging.
+To deal with the underactuated constraint, a spherical coordinate transformation [27] is introduced as follows for i-th
+UUV
+q
+uia = u2i + vi2 + wi2 ,
+θia = θi + θi′ ,
+ψia = ψi + ψi′ ,
+
+(1)
+
+where ηi1 = [xi , yi , zi ]T ∈ R3 and ηi2 = [θi , ψi ]T ∈ R2
+represent the location and orientation of the i-th vehicle
+(i ∈ Γ),
+ respectively, expressed in the earth-fixed frame
+E I = eIo , eIx , eIy , eIz , and νi1 = [ui , vi , wi ]T ∈ R3 and
+
+(3)
+
+with
+θi′ = arctan
+
+
+
+
+q
+2
+2
+−wi / ui + vi ,
+
+ψi′ = arctan (vi /ui ) .
+
+(4)
+
+Since uia is positive, it is easy to verify that θi′ and ψi′ are both
+well defined in the open interval (−π/2, π/2). Applying the
+above transformation, the kinematics of UUV i in (1) becomes
+ẋi = uia cos θia cos ψia ,
+ẏi = uia cos θia sin ψia ,
+żi = −uia sin θia ,
+θ̇ia = qi + θ̇i′ ,
+ψ̇ia = ri / cos θi + ψ̇i′ ,
+
+ẋi = cos θi cos ψi ui − sin ψi vi + sin θi cos ψi wi ,
+
+(2)
+
+(5)
+
+Clearly, the transformed variables (uia , θia , ψia ) now are all
+fully actuated.
+In the considered formation tracking problem, the desired
+geometric formation shape of the UUVs fleet can be determined by a set of relative deviations between the vehicles i
+T
+and j (i, j ∈ Γ), and denote as ∆ij = [δx,ij , δy,ij , δz,ij ] ∈ R3
+where δ(·),ij is the relative deviation in a particular direction.
+In addition to the formation keeping, a prescribed reference
+trajectory
+ requires
+T to be tracked by the UUVs. Denote by
+d
+ηi1
+= xdi , yid , zid ∈ R3 the desired 3D trajectory for each
+
+4
+
+d
+will be given for a
+vehicle to track. Both variables ∆ij and ηi1
+particular formation tracking task. We may have the following
+assumptions.
+
+T
+d
+Assumption 2. The reference signals, i.e., ηi1
+= xdi , yid , zid
+
+T
+d
+and
+and its first and second derivatives η̇i1
+= ẋdi , ẏid , żid
+
+
+T
+d
+η̈i1
+= ẍdi , ÿid , z̈id , are all bounded for all time (i ∈ Γ).
+
+Assumption 3. There is some positive constant α1 such that
+the unknown disturbance di enforced on i-th UUV is bounded
+by ∥di ∥ ≤ α1 .
+Consider a multiple UUVs formation system where the
+motion of each individual vehicle is described by equations (1)
+and (2), satisfying Assumptions 2 and 3. The control objective
+of this paper is to provide a distributed robust constrained
+solution for each vehicle such that the following coordination
+motion can be achieved: 1) The desired formation shape (i.e.,
+desired deviations ∆ij ) can be formed and maintained by
+UUVs. 2) Besides, the UUV fleet can track a predefined
+trajectory together even in the presence of disturbances. 3) The
+restrictions in velocities and control inputs should be realized.
+III. C ONSTRAINED F ORMATION T RACKING C ONTROL
+P ROTOCOL D ESIGN
+To achieve the preceding control requirements, this section
+addresses the consensus based formation tracking control
+problem for a fleet of underactuated underwater vehicles, in
+which all neighbors’ information is considered. In particular,
+the control commands of each vehicle are optimized through
+an on-line motion optimization procedure so that the planned
+maneuvering actions could be ensured within a practical range,
+meanwhile realizing the required specifications.
+A. Distributed formation tracking controller
+Let us first define the consensus formation tracking error
+for i-th UUV (i ∈ Γ) as follows
+X
+
+d
+ei =
+aij (ηi1 − ηj1 − ∆ij ) + bi ηi1 − ηi1
+, (6)
+j∈Ni
+
+where the non-negative indicator aij shows the information
+interactions between vehicle i and its neighbors j ∈ Ni ,
+and non-negative constant bi indicates whether or not the i-th
+vehicle can access the information of the reference trajectory.
+∆ij denotes the desired constant relative position between
+vehicles i and j. Taking the time derivative of equation (6),
+yield
+X
+
+d
+ėi =
+aij (η̇i1 − η̇j1 ) + bi η̇i1 − η̇i1
+.
+(7)
+j∈Ni
+
+Based on the above consensus
+error defined
+
+ for each indiT
+T T
+vidual, we denote with e = eT
+,
+e
+,
+.
+.
+.
+,
+e
+the consensus
+1
+2
+N
+fromation tracking error of overall
+UUVs
+formation
+system
+
+
+T
+T T
+,
+ė
+,
+.
+.
+.
+,
+ė
+.
+Since
+UUVs
+and its time derivative ė = ėT
+1
+2
+N
+fleet moves as a whole, the desired velocities are the same
+d
+(i.e., η̇i1
+= η̇1d for all i ∈ Γ). Then, a set of equations (7) can
+be arranged into a compact form
+
+ė = (L + B) η̇ − 1N η̇1d ,
+(8)
+
+ T
+
+T
+T T
+where η̇1 = η̇11
+, . . . , η̇N
+, 1N = [1, . . . , 1] , and matrices
+1
+L and B describing the communication topology of the considered formation system are detailed in the previous section
+(see Section II-A).
+Recall that after transformation the ηi1 -dynamics is governed by equation (5), and it is desirable to design control
+commands driving the consensus error e to zero. To this end,
+define
+   cmd
+
+cmd
+cmd
+uia cos θia
+cos ψia
+ρix
+cmd
+cmd 
+ρi = ρiy  =  ucmd
+,
+(9)
+ia cos θia sin ψia
+cmd
+cmd
+ρiz
+−uia sin θia
+and a virtual control law is proposed for UUV i as
+ρi = −Ki1 ei + η̇1d ,
+
+(10)
+
+where Ki1 ∈ R3×3 is a diagonal positive definite matrix. By
+(9), we then get the following control commands for UUV i:
+q
+ucmd
+= ρ2ix + ρ2iy + ρ2iz ,
+ia
+
+
+ρiz
+cmd
+,
+θia
+= − arcsin
+ucmd
+ia
+
+
+ρiy
+cmd
+.
+(11)
+ψia
+= arcsin
+cmd
+ucmd
+ia cos θia
+There may exist multiple results for the above angle commands. Observe that in many practical tasks it is unlikely
+to specify motions for UUVs such that the θi goes beyond
+cmd
+±π/2, whereby the angle command θia
+can select those
+values within the interval (−π/2, π/2). For the determination
+cmd
+of ψia
+, based on the kinematic relation (9), we also have
+cmd
+the expression tan (ψia
+) = ρiy /ρix , by which the unique
+cmd
+solution for ψia can be determined.
+On the basis of the virtual controller as proposed in (9)–
+(11), the ηi1 -dynamics can be rewritten as
+η̇i1 = −Ki1 ei + η̇1d + σi ,
+
+(12)
+
+with
+
+
+cmd
+cmd
+uai cos θai cos ψai − ucmd
+ai cos θai cos ψai
+cmd
+cmd 
+σi =  uai cos θai sin ψai − ucmd
+. (13)
+ai cos θai sin ψai
+cmd
+−uai sin θai + ucmd
+sin
+θ
+ai
+ai
+Substituting equation (12) into (8), yield
+ė = (L + B) (−K1 e + σ) ,
+
+(14)
+
+where K1 = diag(K11 , . . . , KN 1 ) and σ = [σ1 , . . . , σN ]T .
+We then state the following stability properties.
+Lemma 2. The overall error dynamics of multiple UUVs
+consensus formation tracking as described in (14), obtained
+by applying the protocol (10) and (11), is input-to-state stable
+with respect to σ.
+Proof. Propose the following Lyapunov function candidate
+V1 =
+
+1 T
+e (L + B)−1 e.
+2
+
+(15)
+
+

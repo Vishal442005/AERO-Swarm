@@ -1,0 +1,473 @@
+Distributed multi-robot potential-field-based exploration
+with submap-based mapping and noise-augmented strategy
+Khattiya Pongsirijindaa,∗ , Zhiqiang Caoa , Kaushik Bhowmikb , Muhammad Shalihana ,
+Billy Pik Lik Laua , Ran Liuc , Chau Yuenc and U-Xuan Tana
+a Engineering Product Development, Singapore University of Technology and Design, Singapore 487372
+b Inria Grenoble, Grenoble Alpes University, France 38330
+
+arXiv:2407.07409v1 [cs.RO] 10 Jul 2024
+
+c School of Electrical and Electronic Engineering, Nanyang Technological University, Singapore 639798
+
+ARTICLE INFO
+
+ABSTRACT
+
+Keywords:
+Cooperating robots
+Distributed multi-robot exploration
+Multi-robot SLAM
+Multi-robot systems
+Potential-field-based exploration
+
+Multi-robot collaboration has become a needed component in unknown environment exploration due
+to its ability to accomplish various challenging situations. Potential-field-based methods are widely
+used for autonomous exploration because of their high efficiency and low travel cost. However,
+exploration speed and collaboration ability are still challenging topics. Therefore, we propose a
+Distributed Multi-Robot Potential-Field-Based Exploration (DMPF-Explore). In particular, we first
+present a Distributed Submap-Based Multi-Robot Collaborative Mapping Method (DSMC-Map),
+which can efficiently estimate the robot trajectories and construct the global map by merging the
+local maps from each robot. Second, we introduce a Potential-Field-Based Exploration Strategy
+Augmented with Modified Wave-Front Distance and Colored Noises (MWF-CN), in which the
+accessible frontier neighborhood is extended, and the colored noise provokes the enhancement of
+exploration performance. The proposed exploration method is deployed for simulation and real-world
+scenarios. The results show that our approach outperforms the existing ones regarding exploration
+speed and collaboration ability.
+
+hierarchical-based [21, 22]. It is rather challenging for the
+existing strategies to make the robots collaboratively and
+efficiently explore real-world unknown environments. Most
+of them are still based on greedy or heuristic manners.
+Some exploration methods [23, 24, 25, 26] are devoted
+to only unmanned aerial vehicles (UAVs) and 3D environment representation. In addition, some methods do not
+focus on detecting the environment’s corner details, which
+is necessary for rescue scenarios because robots can be
+trapped at small corners or narrow holes. Furthermore, some
+techniques do not have any adjustable parameters. These
+constraints make their exploration tend to be repetitious. So,
+if they cannot succeed in exploring the given environment
+in early iterations, they tend not to be able to accomplish it
+even after several attempts.
+Recently, there were newly developed multi-robot exploration methods that improved robot performance in exploring unknown environments. One of the recent approaches
+applied the novel temporal-memory-based strategy [27] together with the conventional RRT (Rapidly-exploring Random Tree) exploration [14, 15]. Another freshly proposed
+method [28] concentrated on the situation when the robots’
+initial positions are unknown. However, these mentioned
+methods are still based on the centralized architecture. So,
+they have yet to satisfy another critical aspect of multi-robot
+exploration regarding the independent coordination structure between robots. Since a central coordinator will control
+and make the decisions for all the robots, communication
+and computation issues can arise. Recent years have gained
+research interests in distributed exploration manner, as it allows the exploration to continue functioning in the scenarios
+
+1. Introduction
+Multi-robot exploration has gained significant attention
+in recent decades due to its potential applications in various
+challenging domains, such as high-tech industries, search
+and rescue tasks, environmental monitoring, and subterranean exploration [1]. It can reduce the risk of human exposure to exploration and navigation tasks in dangerous and
+inaccessible areas. Due to the functionality of multi-robot
+systems, there are recent studies in various aspects, such
+as multi-robot collaborative localization [2, 3], navigation
+[4, 5], path and motion planning [6, 7, 8, 9], etc.
+This paper will mainly focus on the exploration method,
+in which mapping and exploration strategy play principal
+roles. Both of them are fundamental functions in multi-robot
+exploration tasks, which will directly affect the performance
+of the overall multi-robot exploration system. So far, most
+of the current map merging methods implement mapping
+and merging independently, in which each robot separately
+builds a map within the local coordinate system and merges
+the maps from the rest robots into a common reference frame
+[10, 11]. Since the two parts are completely independent, the
+quality and consistency of the merged map will not be guaranteed. This constraint can consequently impact exploration
+speed and inter-robot coordination.
+Moving on to look at the multi-robot exploration strategy, we notice that exploration strategies with different techniques were proposed, for example, cost-based [12], sensorbased [13], sampling-based [14, 15, 16, 17], potential-fieldbased [10, 18], reinforcement-learning-based [19, 20], and
+∗ Corresponding author.
+
+Email address: khattiya_pongsirijinda@mymail.sutd.edu.sg
+(K. Pongsirijinda).
+
+1
+
+This paper has been accepted by Robotics and Autonomous Systems with DOI: 10.1016/j.robot.2024.104752.
+
+potential of robots fluctuated by the colored noise is also
+assigned during the exploration to diversify the potential
+values. In summary, the main contributions of our proposed
+method are as follows:
+• To deal with the reliability and consistency of the
+mapping, we propose the DSMC-Map combining LiDAR loop closures and odometry measurements in
+a novel manner. In particular, each robot performs
+distributed pose graph optimization to guarantee the
+consistency and accuracy of the pose estimation and
+build a global map including all areas explored by
+robots.
+• To overcome challenging exploration scenarios, we
+propose the MWF-CN consisting of the attractive
+potential of frontiers and the repulsive potential of
+robots. In particular, the MWF distance helps to boost
+the attractive potential in a new way by extending the
+frontier neighborhood and hindering the local optima
+problems. The colored noise also novelly exerts diverse repulsive potential, leading to better exploration
+performance.
+
+Fig. 1. Illustration of the DMPF-Explore with distributed mapping
+and exploration running on the individual robot. The map in Fig.
+1(b) is built by Robot 1 in Fig. 1(a), and the map in Fig. 1(d) is built
+by Robot 2 in Fig. 1(c).
+
+• We implement the DMPF-Explore and test it in simulated and real-world unknown environments. Our
+approach is compared with a benchmark to show its
+superiority in exploration efficiency and collaboration
+ability.
+
+of lost communications and be more appropriate in environments where robots can be stuck more easily. Because
+if a robot malfunctions, other robots can still continue the
+exploration independently in the case of distributed solution.
+Some distributed strategies [10, 29] have been introduced for
+multi-robot exploration. However, there are still rooms for
+improvement due to their mapping ability and exploration
+strategy, especially in unknown environments of size more
+than 200m2 , which are considered large-scale, and also the
+complex settings, which are not simply polygonal structures,
+contain small details and involve several pathways.
+Therefore, in this paper, we propose a Distributed MultiRobot Potential-Field-Based Exploration (DMPF-Explore)
+consisting of two main components: mapping and exploration. Firstly, we present a Distributed Submap-Based
+Multi-Robot Collaborative Mapping Method (DSMC-Map)
+to construct the occupancy map of the environment by
+combing the individual robot local maps, as shown in Fig.
+1. Our method is based on the submaps, which are the accumulation of scans over a time period. Loop closures, which
+are the processes of identifying previously visited locations,
+are also tackled in this part. In particular, the DSMCMap comprises three modules: submap construction, loop
+closure detection (including intra-robot loop closures and
+inter-robot loop closures), and distributed pose graph optimization. Secondly, another key element that we introduce
+is a potential-field-based exploration strategy augmented
+with Modified Wave-Front distance and Colored Noises
+(MWF-CN). In particular, the attractive potential of frontiers
+with the modified wave-front (MWF) distance is for leading
+robots to appropriate goals. At the same time, the repulsive
+
+The remaining sections of this paper proceed as follows:
+Firstly, in Section 2, the DSMC-Map is described in three
+parts, namely submap construction, loop closure detection,
+and distributed pose graph optimization. Then, the attractive and repulsive potentials from the exploration strategy,
+MWF-CN, will be explained in Section 3. In Section 4, we
+will provide the details about the evaluation metrics and
+explain how the simulation is conducted. After that, the
+simulation results are also analyzed. Next, in Section 5, we
+demonstrate how the real-world deployment is designed and
+discuss the experimental results. And lastly, in Section 6,
+we conclude the main findings and identify areas for future
+research.
+
+2. DSMC-Map mapping strategy
+
+2
+
+This section explains one of the main compositions
+of the proposed DMPF-Explore, which is the multi-robot
+collaborative mapping. Each robot has a separate mapping
+module running independently, as illustrated in Fig. 2. In
+this paper, the initial pose of each robot is assumed to be
+known as a prior. Formally, the robot group consists of 𝑁
+robots, and we denote the pose of robot 𝑖 (1 ≤ 𝑖 ≤ 𝑁) at
+time 𝑡 as 𝐱𝑖𝑡 = [𝐑𝑡𝑖 , 𝐩𝑡𝑖 ] ∈ 𝑆𝐸(2), in which 𝐑𝑡𝑖 represents the
+rotation matrix of the heading 𝜃𝑖𝑡 and 𝐩𝑡𝑖 = [𝑥𝑡𝑖 , 𝑦𝑡𝑖 ] is the 2D
+position. The odometry measurement of robot 𝑖 at time 𝑡 is
+described as 𝐨𝑡𝑖 ∈ 𝑆𝐸(2). And the relative transformation of
+odometry measurements between the adjacent timestamps
+of robot 𝑖 is denoted as 𝐱𝑖𝑡−1,𝑡 . In addition, we use 𝐱𝑖𝑛 ,𝑗 𝑚
+
+This paper has been accepted by Robotics and Autonomous Systems with DOI: 10.1016/j.robot.2024.104752.
+
+matching algorithm to optimize consecutive LiDAR scans
+and build high-accuracy submap.
+
+2.2. Loop closure detection
+The loop closure detection is a fundamental module
+for robotic teams to complete multi-robot collaborative
+mapping tasks in unknown enviornments. We refer to the
+method in [10] to calculate the relative transformation
+and consistency confidence score between two submaps.
+Moreover, we perform matching of two submaps if the
+distance between their odometry pose is less than a certain
+threshold 𝜆 to save computational resources. So, firstly,
+we utilize the Accelerated-𝐾𝐴𝑍𝐸 (𝐴𝐾𝐴𝑍𝐸) [31] local
+feature descriptor based on the Modified Local Difference
+Binary (MLDB) algorithm to extract the feature points in the
+submaps. This method has been implemented into OpenCV
+library[32]. The extracted feature points of the submap of
+robot 𝑖 at time 𝑡 are defined as s𝑡𝑖 . Then, the feature matcher,
+𝐴𝑓 𝑓 𝑖𝑛𝑒𝐵𝑒𝑠𝑡𝑂𝑓 2𝑁𝑒𝑎𝑟𝑒𝑠𝑡𝑀𝑎𝑡𝑐ℎ𝑒𝑟 [33], is used to find the
+best match for each feature point, which also will calculate
+the relative transformation 𝐱𝑖𝑚 ,𝑗 𝑛 and consistency confidence
+score 𝑐𝑖𝑚 ,𝑗 𝑛 between two submaps. When 𝑖 ≠ 𝑗, the estimated
+relative transformation is considered as inter-robot loop
+closures. Otherwise, when 𝑖 = 𝑗 and 𝑚 ≠ 𝑛, the estimated
+relative transformation will be considered as intra-robot loop
+closures.
+
+Fig. 2. Overview of the DMPF-Explore framework
+
+Algorithm 1 Pose graph construction for the multirobot system
+Input: Odometry measurements of robots 𝑖, 𝑗 at time 𝑡: 𝐨𝑡𝑖 , 𝐨𝑡𝑗 , submap of
+robots 𝑖, 𝑗: s𝑘𝑖 , s𝑙𝑗 , where 1 ≤ 𝑘 ≤ 𝐾, 1 ≤ 𝑙 ≤ 𝐿, and 𝐾, 𝐿 are the
+numbers of corresponding submaps for robot 𝑖 and robot 𝑗
+Output: Constructed pose graph 𝐺
+// detect the loop closures and build pose graph
+for i ← 1 to N do
+for k ← 1 to K do
+// obtain feature points of 𝑘𝑡ℎ submap of robot 𝑖: s𝑘𝑖
+for j ← 1 to N do
+for l ← 1 to L do
+// obtain feature points of 𝑙𝑡ℎ submap of robot 𝑗: s𝑙𝑗
+// calculate the distance between submaps
+if distance > 𝜆 then
+break
+// match s𝑘𝑖 and s𝑙𝑗
+// calculate the relative transformation and
+consistency confidence score 𝑐𝑖𝑘 ,𝑗 𝑙
+if 𝑐𝑖𝑘 ,𝑗 𝑙 > 0.5 then
+if 𝑖 ≠ 𝑗 then
+Add inter-robot loop closures to 𝐺
+
+2.3. Distributed pose graph optimization
+Considering the challenge of computational and communicational resources in the centralized system, this paper
+uses a DPGO [34] to optimize the trajectories of a group of
+robots based on LiDAR loop closures and odometry measurements. DPGO can be modeled as a pose graph 𝐺 consisting of collections of vertices and edges. In general, the
+vertices are denoted as the poses of robots to be estimated,
+and the edges represent the relative pose estimation between
+two vertices (odometry or LiDAR loop closures). After
+completing the pose graph construction, we can solve that
+by minimizing the residual error, which can be expressed as
+
+if 𝑖 = 𝑗 then
+Add intra-robot loop closures to 𝐺
+// Add the odometry constraints
+𝐺 = 𝐺 ∪ o𝑡𝑖 ∪ o𝑡𝑗
+return Pose graph 𝐺
+
+to represent the submap-based loop closures, which means
+the relative pose between the 𝑛𝑡ℎ submap created by robot
+𝑖 and the 𝑚𝑡ℎ submap created by robot 𝑗. To quantify the
+correlation between two matched submaps, we use 𝑐𝑖𝑛 ,𝑗 𝑚 to
+represent the consistency confidence score. Due to the pose
+graph optimization framework being sensitive, a consistency
+confidence score greater than 0.5 is considered a loop closure. The modules of the DSMC-Map will be explained in
+detail in the following subsections.
+
+minimize
+𝐱𝑡
+𝑖
+
+𝑁
+∑
+
+(
+
+𝑡−1,𝑡 2
+||𝐑𝑡𝑖 − 𝐑𝑡−1
+||2 + ||𝐩𝑡𝑖 − 𝐩𝑡−1
+− 𝐑𝑡𝑖 Δ𝐩𝑡−1,𝑡
+||22
+𝑖
+𝑖 Δ𝐑𝑖
+𝑖
+
+)
+
+𝑖=1
+
+⏟⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏟⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏟
++
+
+𝑁 𝑁
+∑
+∑
+
+(
+
+Odometry Constraints
+𝑛
+2
+𝑚
+𝑛
+𝑛
+2
+||𝐑𝑚
+𝑗 − 𝐑𝑖 𝐑𝑖𝑛 ,𝑗 𝑚 ||2 + ||𝐩𝑗 − 𝐩𝑖 − 𝐑𝑖 𝐩𝑖𝑛 ,𝑗 𝑚 ||2
+
+)
+
+𝑖=1 𝑗=1
+
+⏟⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏟⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏟
+Intra-robot and Inter-robot Constraints
+
+(1)
+𝑡−1 represent the rotation and translation
+where 𝐑𝑡−1
+and
+𝐩
+𝑖
+𝑖
+components of robot 𝑖 at time 𝑡 − 1. Δ𝐑𝑡−1,𝑡
+and Δ𝐩𝑡−1,𝑡
+𝑖
+𝑖
+are the relative rotation and translation of odometry of robot
+𝑖 from 𝑡 − 1 to 𝑡, respectively. 𝐑𝑖𝑛 ,𝑗 𝑚 and 𝐩𝑖𝑛 ,𝑗 𝑚 represent
+the relative rotation and translation of LiDAR loop closures
+between the poses of robot 𝑖 at time 𝑛 and robot 𝑗 at time 𝑚.
+To solve eq. (1), we utilize the method proposed by [34],
+which is based on a sparse semidefinite relaxation of the
+pose graph optimization problem and is able to confront
+the challenge from large-scale environments. Afterward, the
+
+2.1. Submap construction
+We use a collection of consecutive frames of LiDAR
+data and corresponding odometry measurements to establish
+the submap. It is widely known in the robotics community
+that odometry measurements cannot satisfy the requirement
+of LiDAR mapping due to accumulative errors over a long
+time. Still, they can provide a relatively precise trajectory
+estimation over a short period of time. In this paper, we
+refer to the mapping method proposed in [30] to create the
+occupancy grid submap, which performs the correlative scan
+3
+
+This paper has been accepted by Robotics and Autonomous Systems with DOI: 10.1016/j.robot.2024.104752.
+
+Algorithm 2 Attractive and repulsive potentials
+calculation
+
+Input: Current cluster that centroid 𝑞 belongs to, where 𝐶𝑞 is the size of
+the cluster, orthogonal and diagonal neighbors of the centroid 𝑞,
+MWF distances between point 𝑝 and centroid 𝑞: 𝑑 ∗ (𝑝, 𝑞), distances
+between robot 𝑖 and point 𝑝: 𝑑(𝑖, 𝑝), number of robots 𝑁
+Output: Total potential of robot 𝑖 for centroid 𝑞 at point 𝑝: 𝑃total
+for l ← 1 to 8 (number of neighbors) do
+𝑃𝑎 = 0, 𝑃𝑟 = 0
+// calculate the attractive potential
+for m ← 1 to 𝐶𝑞 do
+𝑃𝑎 − = 𝑘𝑎 𝐶𝑞 ∕𝑑 ∗ (𝑝, 𝑞)
+// calculate the repulsive potential
+for n ← 1 to N do
+if 𝑑(𝑖, 𝑝) < 𝑑𝑠 then(
+)
+𝑃𝑟 + = 𝑘𝑟 exp
+
+Fig. 3. Graphical representation of the exploration by MWF-CN
+from robot1’s point of view. 𝑃total is the total potential calculated
+by eq. (2), 𝑃𝑟 is the repulsive potential calculated by eq. (9), and
+the green arrow is the robot1’s desired direction to reach the goal
+at the centroid with the lowest 𝑃total .
+
+where 𝑘𝑎 is a scaling constant, 𝐶𝑞 is the total number of
+frontiers in the cluster that centroid 𝑞 belongs to, and the
+leading role of this potential is the MWF distance from point
+𝑝 to centroid 𝑞 denoted by 𝑑 ∗ (𝑝, 𝑞).
+A similar distance form was once introduced in [35], and
+there were some studies regarding the comparison between
+the performance by different types of distances [36], [37].
+However, the previous ones were not utilized as a part
+of the potential. Moreover, the mathematical expression of
+this distance function has never been constructed explicitly
+before. Hence, for the purposes of clarification and further
+development, here we present the MWF distance 𝑑 ∗ (𝑝, 𝑞)
+from point 𝑝 to centroid 𝑞 newly defined as
+
+3. MWF-CN exploration strategy
+This section describes the details of the proposed exploration strategy for multiple collaborative robots, MWFCN. First of all, the detected frontiers are clustered by the
+continuity-based algorithm [10], and the centroid of each
+cluster will represent all the frontiers in that corresponding cluster. Then, the total potential, which consists of the
+attractive potential of frontiers and the repulsive potential
+of robots, will be calculated and assigned to the centroids.
+Each robot will first try to reach the centroid with the lowest
+potential value, as shown in Fig. 3. The total potential of
+robot 𝑖 for centroid 𝑞(𝑥𝑞 , 𝑦𝑞 ) at point 𝑝(𝑥𝑝 , 𝑦𝑝 ) is defined as
+
+⎧ 0
+⎪ 3
+𝑑 (𝑝, 𝑞) = ⎨
+4
+⎪
+⎩ min((𝑘, 𝑞))
+∗
+
+(5)
+The diagonal and orthogonal neighborhoods of point 𝑝 are
+𝑑𝑖𝑎𝑔 (𝑝) = {𝑥𝑝 − 1, 𝑥𝑝 + 1} × {𝑦𝑝 − 1, 𝑦𝑝 + 1}, (6)
+𝑜𝑟𝑡ℎ (𝑝) =  (𝑝) ⧵ 𝑑𝑖𝑎𝑔 (𝑝).
+
+,
+
+(7)
+
+And the set of MWF distances from point 𝑞’s neighborhood
+to 𝑞 is defined as
+{
+}
+(𝑘, 𝑞) = 𝑑 ∗ (𝑘, 𝑞) + 3 ∣ 𝑘 ∈ 𝑜𝑟𝑡ℎ (𝑞) ⧵ 
+{
+}
+∪ 𝑑 ∗ (𝑘, 𝑞) + 4 ∣ 𝑘 ∈ 𝑑𝑖𝑎𝑔 (𝑞) ⧵  . (8)
+
+The attractive potential of frontiers attracts the robots to
+appropriate goals based on the potential value. As previously
+stated, the frontiers detected from the merged map are clustered, and their centroids’ potentials will be calculated. The
+attractive potential of centroid 𝑞 at point 𝑝 is defined as
+
+𝑑 ∗ (𝑝, 𝑞)
+
+(4)
+
+ (𝑝) = ({𝑥𝑝 −1, 𝑥𝑝 , 𝑥𝑝 +1}×{𝑦𝑝 −1, 𝑦𝑝 , 𝑦𝑝 +1})⧵{(𝑥𝑝 , 𝑦𝑝 )}.
+
+3.1. Attractive potential of frontiers
+
+𝑘 𝑎 𝐶𝑞
+
+𝑞 = 𝑝,
+𝑞 ∈ 𝑜𝑟𝑡ℎ (𝑝) ⧵ ,
+𝑞 ∈ 𝑑𝑖𝑎𝑔 (𝑝) ⧵ ,
+otherwise,
+
+where  is the set of obstacles. The neighborhood of 𝑝 is
+
+(2)
+
+where 𝑃𝑎 (𝑝, 𝑞) is the attractive potential of the frontier centroid 𝑞 at point 𝑝 and 𝑃𝑟 (𝑖, 𝑝) is the repulsive potential of
+robot 𝑖 at point 𝑝. The potential modeling attractive effect
+is used for leading robots to explore the unknown area of
+environments. On the other hand, repulsiveness oversees inbetween robot interactions. The overall calculation process
+is presented in Algorithm 2, and the compositions of the potential field will be explained further below in the following
+subsections.
+
+𝑃𝑎 (𝑝, 𝑞) = −
+
++ 𝜒𝑖𝑝 (𝛼, 𝜎𝑑 )
+
+// calculating the total potential
+𝑃total = 𝑃𝑎 + 𝑃𝑟
+return 𝑃total
+
+estimated poses and corresponding LiDAR data are used to
+construct the global map. The process of constructing the
+pose graph is shown in Algorithm 1.
+
+𝑃total (𝑖, 𝑝, 𝑞) = 𝑃𝑎 (𝑝, 𝑞) + 𝑃𝑟 (𝑖, 𝑝),
+
+𝑑(𝑖,𝑝)−𝑑𝑠
+𝜎𝑟
+
+Note that the neighborhoods exist only on the explored
+areas and frontiers. The calculation process starts at point 𝑝,
+where 𝑑 ∗ (𝑝, 𝑝) = 0, and continues recursively until reaching
+centroid 𝑞, as shown in Fig. 4(b).
+Since some computational time is eliminated due to
+obstacles being considered in the MWF distance, a separate
+
+(3)
+4
+
+

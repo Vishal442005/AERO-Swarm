@@ -1,0 +1,136 @@
+Consensus-based Fast and Energy-Efficient
+Multi-Robot Task Allocation
+
+arXiv:2209.10513v1 [cs.RO] 21 Sep 2022
+
+Prabhat Mahatoa , Sudipta Sahaa , Chayan Sarkarb , Md Shaghila
+a
+
+School of Electrical Sciences, Indian Institute of Technology Bhubaneswar, India
+b
+Robotics and Autonomous Systems, TCS Research, India
+
+Abstract
+In a multi-robot system, the appropriate allocation of the tasks to the individual robots is a very significant component. The availability of a centralized infrastructure can guarantee an optimal allocation of the tasks. However,
+in many important scenarios such as search and rescue, exploration, disastermanagement, war-field, etc., on-the-fly allocation of the dynamic tasks to
+the robots in a decentralized fashion is the only possible option. Efficient
+communication among the robots plays a crucial role in any such decentralized setting. Existing works on distributed Multi-Robot Task Allocation
+(MRTA) either assume that the network is available or a naive communication paradigm is used. On the contrary, in most of these scenarios, the
+network infrastructure is either unstable or unavailable and ad-hoc networking is the only resort. Recent developments in synchronous-transmission
+(ST) based wireless communication protocols are shown to be more efficient than the traditional asynchronous transmission-based protocols in ad
+hoc networks such as Wireless Sensor Network (WSN)/ Internet of Things
+(IoT) applications. The current work is the first effort that utilizes ST for
+MRTA. Specifically, we propose an algorithm that efficiently adapts ST-based
+many-to-many interaction and minimizes the information exchange to reach
+a consensus for task allocation. We showcase the efficacy of the proposed
+algorithm through an extensive simulation-based study of its latency and
+energy-efficiency under different settings.
+Keywords: Multi-Robot Task Allocation, Synchronous Transmission,
+Multi-Robot Communication, Consensus-based MRTA, Energy-Efficient
+MRTA
+
+Preprint submitted to Robotics and Autonomous Systems, Elsevier
+
+September 22, 2022
+
+1. Introduction
+Multi-robot systems have been successfully used in many applications
+where appropriate allocation of tasks to the fleet of robots plays the anchor
+role towards the overall efficiency of the systems. Task allocation can be done
+in both a centralized or decentralized way. In many situations, due to lack
+of infrastructure, higher possibility of single-point-of-failure, communication
+bottlenecks, etc., centralized task allocation becomes impractical. Especially
+the applications like war-field [1], disastrous scenario [2], underwater exploration [3] where any infrastructure is not available, centralized allocation of
+tasks is not feasible.
+In a traditional decentralized task allocation strategy, first, a leader is
+elected, which oversees the overall task allocation [4, 5]. Such strategies will
+also have similar problems as a centralized solution in hostile scenarios. It
+may ultimately lead to the frequent election of the leaders, wasting time
+and energy. Decentralized task allocation without the intervention of a dedicated leader has also been considered in various works [6, 7]. Predominantly,
+decentralized task allocation methods follow various bidding-based schemes.
+Given a set of tasks, a robot can derive a bid value indicating its suitability
+in carrying out each of the tasks. Optimal distributed allocation of the tasks
+can be ensured using a simple two-step algorithm. In the first step, the robots
+would exchange the bid-values for each task with each of the robots. Next,
+each robot can run the task allocation algorithm locally as all of them possess the same input (bid value). This naive algorithm involves all-to-all data
+sharing, which is a very costly operation in terms of the amount of communication needed in the underlying network, especially, when the robots
+depend on limited battery power. Also, it’s very unrealistic to assume that
+all the tasks are known a priori. Tasks are usually explored continuously
+throughout and hence frequent execution of all-to-all data sharing would be
+very much necessary for the allocation of tasks.
+The other possible way for achieving decentralized multi-robot task allocation is by consensus. A task is supposed to be allocated to a robot that
+has the highest bid value for that task. Thus in a generic sense, the work
+of task allocation is finding a network-wide maximum value among the bids.
+However, the problem becomes complicated since there are multiple tasks,
+and multiple robots may have got the highest bid value for the same task.
+Thus, the allocation of a certain number of tasks to a certain set of robots
+cannot be solved trivially by finding the maximum bid in each of the tasks.
+2
+
+All-to-all sharing becomes useful in such a scenario as more information can
+help break the ties.
+To realize both all-to-all data sharing as well as consensus, the underlying
+communication mechanism, and network protocols play a very crucial role.
+In most of the existing works either it is assumed that there exist efficient
+communication mechanisms by which all robots can easily talk to each other
+or the whole issue related to communication has been ignored. In summary,
+the multi-robot task allocation (MRTA) problems have not been studied so
+far in a context where both the allocation and communication protocols are
+optimized.
+Communication protocols under traditional asynchronous-transmission
+(AT) can manage the multi-robot communication up to a certain load. However, in hostile situations like a war-field or disaster management, an MRTA
+process needs to maintain quite a good connectivity among the robots over
+multiple hops as well as under severe constraints of time as well as limited
+energy in the robots. Under such situations, when the robots need to communicate their task bid-values with each other, they need to use a network-wide
+one-to-all communication through flooding. In general flooding under ATbased protocols wastes a lot of time and energy due to repeated collisions
+among uncoordinated transmissions of packets from different nodes (robots).
+The performance of the system drastically degrades when a series of such
+one-to-all flooding operations are carried out from all the robots.
+In the context of Wireless Sensor Networks (WSN) and Internet-of-Things
+(IoT) the communication protocols face similar constraints. Concurrent/
+synchronous-transmission (ST) based communication protocols have shown
+great success in many recent works in achieving both high reliability and lowlatency under low-energy consumption [8]. The solutions under ST have been
+also shown to work several times faster than AT-based strategies. Therefore,
+in this work, we find ST-based protocols as the best candidate to fulfill the
+communication need while carrying out decentralized task allocation in a
+multi-robot setting.
+We propose a bidding-based distributed task allocation mechanism that
+utilizes an ST-based efficient communication framework, called Chaos [9]
+for information exchange during task allocation. Chaos can perform both
+network-wide aggregation of data as well as all-to-all data sharing. It provides
+a fast and efficient communication alternative than the corresponding ATbased solution. However, the MRTA solution using Chaos-based all-to-all
+data sharing requires every robot to share the bidding information for every
+3
+
+available task. As a result, the total information exchange is in the order of
+the number of tasks multiplied by the number of robots. In a distributed
+bidding-based task allocation strategy, the bid values proposed by individual
+agents are necessary only to calculate the maximum bid value for each task.
+It is not necessary for each agent to know the individual bid values proposed
+by each of the agents for each of the tasks. The ST-based protocol used in
+our work uses local communications among pairs of nodes to compare the
+bid values with each other and converges to a global maximum value which
+is disseminated to all the agents in the network. Moreover, our strategy
+combines multiple instances of such maximum finding strategies together in
+an efficient way so that the best bid for each of the tasks becomes known
+to each of the agents quickly. Therefore, our proposed mechanism ensures
+maximal information exchange using minimum message exchange, which is
+also sufficient to ensure an efficient task allocation. The main contributions
+of this work are summarized in the following.
+• To the best of our knowledge, this is the first effort that utilizes ST
+based communication primitive for MRTA.
+• We propose an efficient adaptation of an ST-based protocol called
+Chaos that ensures faster and energy-efficient consensus, a.k.a. convergence of information sharing for distributed task allocation.
+• We develop a smart bidding mechanism that achieves minimal makespan
+in a distributed task allocation setup using minimal information sharing in the network. It also ensures lower energy consumption by all the
+robots.
+The rest of the paper is arranged as follows. Section 2 provides a comprehensive summary of the existing types of task allocation algorithms. Section
+3 describes the design of the proposed algorithm as well as the naive approaches to solve the problem. Section 4 provides a detailed simulation based
+evaluation study of the proposed algorithm. Before concluding, in Section
+5 several important issues regarding ST and MRTA have been discussed for
+further clarifications.
+2. Related works
+There exists a large body of prevalent works that deal with multi-robot
+task allocation (MRTA) in different scenarios. A complete taxonomy of var4
+
+

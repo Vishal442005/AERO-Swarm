@@ -1,0 +1,214 @@
+ChiSao: A GPU-Native Parallel Optimizer for Multimodal
+Black-Box Functions via Convergence-Anticonvergence
+Oscillation
+
+arXiv:2606.26164v1 [cs.LG] 24 Jun 2026
+
+Ira Wolfson
+Department of Electronics and Electrical Engineering
+Braude College of Engineering, Karmiel, Israel
+wolfsoni@braude.ac.il
+June 26, 2026
+
+Abstract
+Finding all modes of a multimodal black-box function is a fundamental challenge in
+optimization, Bayesian inference, and scientific computing. Existing approaches—basinhopping, CMA-ES, multistart gradient descent—operate sequentially and cannot exploit the
+massive parallelism of modern GPU hardware. We introduce ChiSao (Convergence-HaltInvert-Stick-And-Oscillate), a GPU-native population optimizer that runs an entire sample
+batch simultaneously and exploits a deliberate convergence-anticonvergence oscillation cycle
+to escape local traps while freezing confirmed modes. The structural move is asymmetric:
+samples that reach true peaks are frozen (“stuck”) and preserved, while the rest keep exploring via momentum-based anti-convergence and stochastically smoothed gradients. Adaptive
+reseeding via two complementary strategies (Repulse Monkey and Golden Rooster) maintains population diversity throughout. On all 42 functions of the Simon Fraser University
+optimization benchmark suite across dimensions d ∈ {2, 4, 8, 16, 32, 64}, ChiSao achieves
+100% mode recovery where all CPU baselines collapse at d ≥ 8 on the hardest multimodal
+functions, at up to 34× speedup over basin-hopping on functions where all methods succeed (Michalewicz d = 64) and up to 39× on unimodal functions (Rotated Hyper-Ellipsoid
+d = 64, pure GPU dividend). All benchmarks evaluate the objective by value alone—
+gradients come from finite differences—so the reported speedups are a derivative-free worst
+case. Under substantial likelihood noise (σnoise up to 1.0), mode detection remains 100%
+reliable. The algorithm is available as a standalone open-source Python package on PyPI.
+
+Keywords: multimodal optimization, GPU computing, black-box optimization, population
+methods, mode finding, parallel optimization
+
+1
+
+Introduction
+
+Multimodal optimization—finding all significant maxima of a function f : Rd → R accessible
+only through black-box evaluations—arises across scientific computing, probabilistic inference,
+and machine learning. The challenge is not merely finding a global optimum but cataloguing
+all modes, since downstream tasks (Bayesian model averaging, multistart refinement, mixture
+fitting) require knowledge of the full mode structure.
+Classical approaches fall into two families. Sequential methods such as basin-hopping [1] and
+simulated annealing [2] perturb a single solution and accept or reject moves stochastically; they
+explore one trajectory at a time and are inherently sequential. Population methods such as CMAES [3] and particle swarm optimization [4] maintain a set of candidate solutions but typically
+converge the entire population toward a single basin, losing mode diversity. Multistart gradient
+1
+
+descent runs multiple independent optimization trajectories but these are embarrassingly parallel
+only in the trivial sense—each trajectory is independent and discovers at most one mode.
+None of these is built for the architecture of modern GPUs: thousands of arithmetic units
+running the same instruction on different data simultaneously. On a GPU with P > 104 parallel
+cores, a batch of N ≤ P gradient evaluations completes in the same wall-clock time as a single
+evaluation. Sequential methods waste this capacity entirely; population methods use it only
+within a single generation step.
+ChiSao1 is a GPU-native population optimizer with three structural moves no prior method
+combines.
+The first is a freeze-and-explore asymmetry. A sample that reaches a true peak, passing
+both a gradient-norm and a likelihood-quality test, is frozen from the exploration phases but
+continues to participate in gradient ascent for peak refinement. The rest of the population keeps
+moving. Standard population methods either advance all particles or none; ChiSao advances
+only those that still have work to do.
+The second is a deliberate anti-convergence phase. After each batched L-BFGS pass, unfrozen
+samples take momentum-based gradient descent steps. This is neither noise injection (simulated
+annealing) nor random perturbation (basin-hopping); it is directed motion, the momentum term
+carrying samples across valleys into new basins.
+The third is stochastic smoothing, applied as a Hands Like Clouds phase in which unfrozen
+samples ascend on a Gaussian-smoothed estimate of ∇f . Smoothing at scale σ erases sub-σ
+texture and exposes the global basin geometry. HLC and anti-convergence are complementary
+rather than redundant: HLC steers samples toward promising regions on the smoothed landscape; anti-convergence then disperses them on the raw landscape.
+Two reseeding strategies—Repulse Monkey when many samples remain unfrozen, Golden
+Rooster when most are frozen—close the cycle. The algorithm needs only batched function and
+gradient evaluations, maps directly onto GPU execution, and works as a drop-in exploration
+module for any optimizer that supplies an initial population.
+Contributions. The contribution is fourfold: the oscillation cycle as a strategy for multimodal optimization with a formalized freeze-and-explore asymmetry (Section 3); convergence
+guarantees for log-concave targets and a coverage analysis for the multimodal case (Section 4);
+benchmarks against Differential Evolution, Basin-Hopping, and CMA-ES on all 42 SFU functions across d ∈ {2, 4, 8, 16, 32, 64} (Section 5); and noise-robustness results showing 100% mode
+detection up to σnoise = 1.0, the signal scale itself (Section 5.7).
+
+2
+
+Related Work
+
+Basin-hopping. Wales and Doye [1] introduced basin-hopping as alternating random perturbations with local minimization, accepting moves via a Metropolis criterion. It is effective
+in low dimensions and has been widely used in computational chemistry [5]. Its fundamental
+limitation is sequential execution: one perturbation, one local minimization, one accept/reject
+decision per step. GPU parallelization is limited to the local minimization sub-problem, not the
+search strategy.
+Simulated annealing. Kirkpatrick et al. [2] introduced temperature-based stochastic acceptance, which provides theoretical convergence guarantees under slow cooling [6] but requires
+an exponentially slow schedule to avoid premature convergence in practice. Parallel implementations [7] distribute independent chains but do not share information, losing the benefit of
+population diversity.
+1
+
+Wing Chun Chí Sǎo (“Sticky Hands”): in the martial art, sensitivity drills train simultaneous contact maintenance and redirection, precisely the explore-and-freeze asymmetry of the algorithm.
+
+2
+
+Evolutionary and population methods. CMA-ES [3] adapts a full covariance matrix to
+the population geometry, achieving state-of-the-art performance on unimodal and mildly multimodal problems. Niching extensions [8] attempt to maintain diversity but add significant
+complexity. Particle swarm optimization [4] uses social attraction toward the population best,
+which concentrates the population at a single basin in multimodal settings unless modified with
+repulsion terms [9]. Differential evolution [10] generates candidates by combining population
+members but shares CMA-ES’s tendency toward mode collapse.
+Multistart methods. Running multiple independent gradient-based optimizers from random
+initial points is the most common approach in practice [11]. It parallelizes trivially but has
+two weaknesses: restarts that converge to the same mode waste computation, and there is no
+mechanism to ensure the population maintains diversity after convergence begins. ChiSao’s
+deduplication and reseeding directly address both.
+Bayesian optimization. Gaussian-process surrogate methods [12] target the same black-box
+setting from a serial angle: each acquisition step refits the surrogate against all prior evaluations
+and then optimises the acquisition function. The design objective is locating the single best
+point at minimum evaluation budget, not cataloguing modes, and the per-step surrogate cost
+grows poorly with population size.
+GPU-parallel optimization. GPU acceleration of optimization has focused primarily on
+stochastic gradient descent for deep learning [13], where the objective is unimodal and the
+bottleneck is data throughput rather than exploration. For black-box multimodal optimization,
+GPU acceleration is largely unexplored, with Salimans et al. [14] the major exception—evolution
+strategies massively parallelized for reinforcement learning, but with a single-objective design
+that does not catalogue modes. Albert [15] parallelized nested sampling on GPU (JAXNS)
+but the sequential compression structure of nested sampling limits GPU utilization to withiniteration batching. ChiSao appears to be the first black-box multimodal optimizer with full
+GPU utilization across the search strategy itself, not only inside individual iterations.
+Smoothing and continuation methods. Gaussian smoothing of objective functions as a
+heuristic for escaping local optima has been studied under the name “diffusion” or “graduated
+non-convexity” [16, 17]. Nesterov and Spokoiny [18] analyzed Gaussian smoothing for convex
+optimization. The Hands Like Clouds phase of ChiSao applies smoothing as one phase within
+a structured oscillation cycle, rather than as a global preprocessing step or annealing schedule.
+Position relative to prior work. ChiSao differs from every method above on at least
+one structural axis: directional anti-convergence rather than random perturbation, stochastic
+smoothing within a cycle rather than a global annealing schedule, freeze-and-explore asymmetry
+rather than uniform population movement, and full-batch GPU execution rather than withinstep parallelism. Basin-hopping with restarts [1] is the closest neighbour; it differs on all four.
+
+3
+
+Algorithm
+
+3.1
+
+Problem Statement
+
+Let f : Θ → R be a black-box function on a bounded domain Θ ⊂ Rd , accessible through
+evaluations f (θ); the gradients ∇f (θ) the algorithm uses are computed by finite differences, or
+supplied analytically when available. We seek the set of all significant modes:
+
+M∗ = θ∗ ∈ Θ : ∇f (θ∗ ) = 0, ∇2 f (θ∗ ) ≺ 0, f (θ∗ ) ≥ fmax + log δ
+(1)
+3
+
+where fmax = maxθ f (θ) and δ ∈ (0, 1) is a quality threshold (default δ = 0.1, i.e., modes within
+one decade of the global maximum). The goal is not merely to find the global maximum but to
+identify all members of M∗ .
+ChiSao takes as input a population {xi }N
+i=1 ⊂ Θ of initial candidate points (arbitrary;
+provided by the caller), and returns the estimated set M̂∗ ⊆ {xi }.
+
+3.2
+
+The Oscillation Cycle
+
+ChiSao runs for nosc oscillation cycles (default 3). Each cycle consists of six phases executed
+in fixed order. The ordering is deliberate and is justified in Section 3.3.
+3.2.1
+
+Phase 1: Convergence
+
+All stuck masks are released (every sample is temporarily unfrozen) and the entire population
+undergoes nconv steps of batched L-BFGS [19, 20] toward local maxima of f . All N samples
+optimize simultaneously in a single GPU batch:
+xi ← L-BFGS(xi , nconv ) ∀i = 1, . . . , N
+
+(GPU-parallel)
+
+(2)
+
+The L-BFGS memory parameter is m = 10 by default. Iteration count adapts to dimension:
+nconv = max(10, 3 log2 d).
+3.2.2
+
+Phase 2: Stick Detection
+
+After convergence, samples that have reached true local maxima are marked as stuck :
+stucki ← (∥∇f (xi )∥∞ < ϵgrad ) ∧ (f (xi ) ≥ fmax + log δ)
+
+(3)
+
+The gradient threshold ϵgrad (default 10−6 ) ensures the sample has reached a stationary point.
+The likelihood threshold log δ (default log 0.1) prevents sticking at low-quality local maxima that
+fall outside M∗ . Stuck samples are excluded from exploration phases but continue to participate
+in gradient ascent for peak refinement.
+3.2.3
+
+Phase 3: Deduplication
+
+Stuck samples are deduplicated using the L∞ metric (see Appendix A):
+remove xj if ∃ xi ̸= xj : ∥xi − xj ∥∞ < ϵdup , f (xi ) ≥ f (xj )
+
+(4)
+
+The sample with the higher function value survives; its inverse Hessian estimate is preserved for
+width estimation. The number of removed duplicates Klost is recorded.
+3.2.4
+
+Phase 4: Reseeding (Repulse Monkey / Golden Rooster)
+
+If Klost > 0 and this is not the last oscillation, the population is maintained at size N by
+reseeding. Two strategies are used depending on exhaustion state.
+Repulse Monkey. When ≥ 5 unfrozen samples remain, new samples are generated by shooting rays from unfrozen samples in random directions, sampling uniformly along those rays within
+Θ. This disperses new candidates away from known peaks.
+Golden Rooster. When < 5 unfrozen samples remain (near exhaustion), new samples are
+generated from confirmed peaks using orthonormal ray directions obtained via QR decomposition
+of a random matrix. This exploits the GPU’s parallel capacity to systematically probe orthogonal
+directions from known peaks. Golden Rooster adaptively disables itself if successive generations
+discover no new peaks, preventing wasted computation.
+All reseeded samples are marked as unstuck to enable exploration.
+4
+
+

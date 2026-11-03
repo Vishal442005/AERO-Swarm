@@ -1,0 +1,134 @@
+Freezing Mechanism and Topology Dependence of
+Information Flow Structure in Small-Scale Particle
+Swarm Optimization
+
+arXiv:2610.33421v1 [cs.NE] 24 Oct 2026
+
+Zhenglong Xianga,b,c,∗, Hongrun Wub , Yu Xuea , Fei Yub , Yuanxiang Lid
+a
+School of Computer Science, School of Software,
+Nanjing University of Information Science and Technology, Nanjing 210044, China
+b
+Key Lab of Intelligent Optimization and Information Processing,
+Minnan Normal University, Zhangzhou 363000, China
+c
+State Key Lab. for Novel Software Technology,
+Nanjing University, Nanjing 210023, China
+d
+School of Computer Science,
+Wuhan University, Wuhan 430072, China
+
+Abstract
+The neighborhood topology of particle swarm optimization (PSO) determines
+information propagation and regulates the exploration–exploitation balance.
+However, existing evaluation methods based on fitness and spatial diversity
+fail to characterize the dynamic evolution of the population’s internal interaction structure. To address this gap, this paper focuses on small-scale
+PSO (20–50 particles) with regular topologies and models the iterative process as a dynamic weighted influence graph. We construct a multi-scale
+information-flow evaluation framework covering micro-, meso-, and macrolevel metrics, and propose a freeze-point detection method based on effective nodes, a macro-level distributional metric. Experiments on CEC2017
+benchmark functions show that the information flow structure freezes early
+in the search (3%–22% for representative configurations; 15%–49% for global
+medians) and remains unchanged thereafter. The freeze time follows the
+order Gbest < Von Neumann < Ring, consistent across standard, LDIW,
+and TVAC variants. Parameter-adaptive variants delay freezing without altering the topological order, and the freeze point is significantly negatively
+∗
+
+Corresponding author.
+Email address: zlxiang@nuist.edu.cn (Zhenglong Xiang)
+
+correlated with final solution quality. Intervention experiments under Gbest
+show that weakening hub nodes delays freezing and improves performance
+on multimodal functions, while strengthening hubs produces no additional
+deterioration due to saturation, revealing a decoupling between structural
+and performance effects. Among the three metric levels, only macro-level
+distributional metrics effectively capture freezing under regular topologies,
+because micro- and meso-level structures are predetermined by the topology. These findings reveal the freezing mechanism of information flow in
+small-scale PSO and provide structural prior signals for adaptive topology
+control.
+Keywords: particle swarm optimization; neighborhood topology;
+information flow structure; freezing phenomenon; dynamic network
+analysis; freeze-point detection
+1. Introduction
+Particle swarm optimization (PSO), proposed by Kennedy and Eberhart
+in 1995 [1], is one of the most representative swarm intelligence algorithms.
+Owing to its simple structure, few parameters, and ease of implementation,
+PSO has been successfully applied to numerous complex optimization problems, such as molecular simulation, inverse design of nanostructures, power
+grid dispatch, and graph clustering [2, 3]. However, despite its widespread
+success in engineering practice, PSO has long been confronted with the inherent bottleneck of premature convergence when solving high-dimensional,
+multimodal, and dynamic optimization problems. Although numerous improved variants have been proposed, the intrinsic operational mechanisms of
+PSO, particularly the influence of the neighborhood topology on the algorithm, remain insufficiently understood [4].
+The neighborhood topology determines the paths, speed, and range of
+information propagation among particles, and is a core factor affecting the
+balance between exploration and exploitation. The canonical PSO adopts
+a fully connected (Gbest) topology, which enables fast information diffusion
+but rapidly erodes population diversity. The ring (Ring) topology maintains
+diversity but often suffers from slow convergence. Kennedy et al. compared several static topologies and found that the Von Neumann topology
+generally achieved the best consistency, whereas the fully connected topology performed worst [5]. Going a step further, Blackwell et al. conducted
+2
+
+systematic experiments and confirmed this trade-off, showing that Gbest is
+generally the better algorithm for unimodal and separable problems, whereas
+a Ring neighborhood of connectivity two (Lbest) is the preferred choice for
+multimodal, non-separable, and composition functions [6]. However, these
+topologies are all predefined static structures that remain unchanged during
+the search process, and their structural influence on the search process has
+not yet been fully characterized. More importantly, theoretical analyses of
+the impact of topology on the convergence of PSO remain scarce.
+However, traditional theoretical analyses of PSO have paid insufficient
+attention to the structural role of topology. Existing theoretical work mainly
+characterizes the mathematical properties of particle trajectories through
+stochastic convergence analysis and Lyapunov stability analysis [7], but these
+analyses are typically built upon simplified assumptions, such as assuming a
+fully connected (Gbest) population or ignoring the influence of neighborhood
+topology on information propagation paths. As pointed out in a recent study
+[8], many theorems assume that the expectation and variance of each particle
+exist and converge, which is rarely satisfied in multimodal and dynamic scenarios. More importantly, these analyses focus on the motion of individual
+particles rather than the population-level information interaction structure.
+Questions such as how topology affects information propagation, when it
+stops changing, and how it causally relates to search performance are difficult to answer within the traditional theoretical framework. This theoretical
+gap motivates the need for an alternative perspective that characterizes the
+structural dynamics of PSO populations during actual algorithm runs.
+In recent years, network science has emerged as a promising lens for analyzing PSO dynamics. Oliveira et al. made pioneering contributions by
+proposing the concept of a swarm influence graph [9]. They further introduced the weighted influence graph by aggregating interaction records over
+a sliding window [10], and used network metrics such as the R-value and
+the number of zero eigenvalues of the Laplacian matrix to diagnose stagnation [11]. More recently, Deng et al. [8] systematically examined the
+intrinsic topology of PSO and found that PSO populations inherently exhibit a small-world architecture and a heavy-tailed degree distribution. The
+heavy-tailed property confirms the existence of hub nodes that dominate
+information propagation. Despite these advances, existing studies have either provided modeling tools and a posteriori diagnostics or described static
+topological properties, whereas the dynamic evolution of information flow
+structures and the point at which this evolution ceases to change have not
+3
+
+been systematically characterized.
+Motivated by this gap, this paper investigates the freezing mechanism
+and topology dependence of information flow structure in small-scale PSO
+with regular neighborhood topologies. Particularly, we focus on the typical
+population size of PSO (20–50 particles), three regular topologies (Gbest,
+Ring, and Von Neumann), and three conventional PSO variants (standard,
+LDIW [12], and TVAC [13]). The scope is deliberately restricted to this
+regime for three reasons. First, 20–50 particles is the most common population size in practical PSO implementations, making this regime directly
+relevant to real-world applications. Second, regular topologies provide a controlled experimental setting: node degrees, community structure, and path
+lengths are all predetermined, and the only varying factor is the distribution
+of edge weights. This allows us to isolate information flow concentration as
+a single variable and clearly observe its evolution and freezing. Third, conventional variants allow us to examine the freezing phenomenon without the
+confounding influence of sophisticated structural adaptive mechanisms.
+To be specific, this paper establishes a dynamic network-based framework
+to analyze the evolution of information flow in small-scale PSO. More precisely, the PSO population is modeled as a dynamic weighted influence graph,
+in which particles are represented as nodes and interaction weights characterize the influence strength among particles. Based on this representation,
+we construct a multi-scale information-flow evaluation framework comprising micro-, meso-, and macro-level metrics. The micro-level and meso-level
+structures are largely determined by the predefined regular topology, whereas
+the macro-level metrics describe the overall distribution of influence and thus
+can reflect structural changes during the search. Among these metrics, we
+construct the effective number of nodes, Strength Gini, and Strength Entropy to characterize the macro-level distribution of information flow. On
+this basis, we propose a freeze-point detection method that defines the freeze
+point as the first sample at which the effective number of nodes series remains
+statistically constant over a sliding window, thereby providing a quantitative
+and operational criterion for structural stagnation.
+Subsequently, systematic experiments are conducted on the CEC2017
+benchmark functions [14] with small-scale swarms of 20 to 50 particles and
+three regular topologies, namely Gbest, Von Neumann, and Ring. Three
+PSO variants are further considered, including standard PSO, LDIW, and
+TVAC. These experiments investigate when the information flow structure
+freezes, how the freeze time depends on topology and algorithmic variant,
+4
+
+

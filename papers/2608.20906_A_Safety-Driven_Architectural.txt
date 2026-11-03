@@ -1,0 +1,480 @@
+Accepted for presentation at the 45th AIAA/IEEE DASC, Orlando, FL, USA, 2026. ©2026 IEEE. Personal use permitted.
+
+A Safety-Driven Architectural Framework for
+Fail-Operational Drone Swarms in Critical Missions
+Luiz Giacomossi, Zafer Yigit, Marwan Shakarna, Shoaib Saleemi, Ivan Tomasic,
+Baran Çurüklü, and Håkan Forsberg
+
+arXiv:2608.20906v1 [eess.SY] 21 Aug 2026
+
+Mälardalen University
+Västerås, Sweden
+Email: luiz.giacomossi@mdu.se
+Abstract—The certification of Unmanned Aerial Vehicle (UAV)
+swarms for safety-critical operations requires verifiable design
+assurance. Airworthiness standards demand deterministic reliability, whereas multi-agent coordination algorithms execute nondeterministic models. This paper proposes a mixed-criticality
+architectural framework that applies SAE ARP4754B methods to
+swarm reconfiguration. First, a hardware-isolated Safety Monitor
+functions as a Run-Time Assurance (RTA) gateway, decoupling
+the flight-critical core from the non-deterministic Swarm Manager. Second, the monitor enforces formal safety contracts based
+on agent Health Vectors derived systematically from a Functional
+Hazard Assessment (FHA). Third, the framework propagates
+these Health Vectors to the collective planner to trigger failoperational task reallocation, enabling intelligent swarm behaviors without compromising flight-critical isolation. Markov
+reliability modeling demonstrates that the 10−7 failures per flight
+hour Hazardous target is theoretically achievable for our SAIL IV
+scenario, provided the Safety Monitor meets Cmonitor > 0.9991,
+consistent with DAL B CMD/MON implementations.
+Index Terms—Fail-Operational Systems, UAV Swarms, SafetyDriven Architecture, Swarm Resilience, Safety-Critical Systems
+
+I. I NTRODUCTION
+Unmanned Aerial Vehicle (UAV) swarms in safety-critical
+missions, such as Search and Rescue (SAR), require operational authorization based on formal design assurance [1]–
+[3]. While coordinated multi-agent systems offer increased
+area coverage over single agents, their non-deterministic emergent behaviors pose a certification challenge. As the primary
+regulatory framework for civil UAVs, the JARUS Specific
+Operations Risk Assessment (SORA) imposes quantitative
+reliability targets. Our reference scenario, a Beyond Visual
+Line of Sight (BVLOS) search over a sparsely populated area,
+corresponds to medium-risk SAIL IV. At this level, SORA
+mandates compliance with recognized airworthiness standards;
+we therefore adopt civil aviation severity targets, where a
+Hazardous condition (e.g., an uncontrolled crash) must remain
+below 10−7 per flight hour [4]. Achieving this target requires
+a verifiable link between system architecture and operational
+safety [5].
+An architectural gap exists between single-agent avionics
+and multi-agent robotics. The fault-tolerant systems community prioritizes deterministic, fail-safe designs using redundant hardware and time-triggered buses to mitigate failures
+[6]. Conversely, swarm robotics research focuses on collective resilience. Recent works have proposed ”health-aware”
+coordination strategies [7], [8]. However, these approaches
+
+typically optimize for mission performance (e.g., energy efficiency) rather than design assurance. They lack the formal
+isolation required to prevent a non-deterministic replanning
+algorithm from violating safety constraints. This creates a
+mixed-criticality integration problem: safety-critical flight control laws must coexist with complex, unverified swarm logic,
+requiring a high-integrity mediator to guarantee isolation [9].
+This paper proposes a safety-driven architectural framework
+toward fail-operational drone swarms. We apply the SAE
+ARP4754B systems engineering methodology, the civil aviation guideline for aircraft and systems development assurance,
+to derive a Run-Time Assurance (RTA) mechanism aligned
+with ASTM F3269-17, a standard practice for safely bounding
+the behavior of UAV with complex functions [9], that bounds
+swarm behavior. The contributions of this work are:
+1) A verifiable health-aware architecture that bridges adhoc swarm resilience and formal safety standards. Unlike traditional approaches using software self-reporting,
+we introduce a hardware-isolated Safety Monitor to
+enforce the accuracy of the health state, guaranteeing
+the swarm’s reconfiguration is based on trusted data.
+2) A systematic derivation of agent health states from Functional Hazard Assessment (FHA), with traceability from
+component faults to swarm reconfiguration behaviors.
+3) A quantitative reliability analysis using Markov modeling to identify the Safety Monitor coverage requirements
+necessary to satisfy the 10−7 probability of failure target
+for hazardous operations.
+While the framework is illustrated via a SAR mission
+under SORA SAIL IV, the architectural principles for isolating
+monitoring from planning apply to any safety-critical multiagent system with mixed-criticality partitioning.
+This paper presents a conceptual framework and a theoretical safety argument. The evaluation relies on systems engineering methods appropriate for this design phase: architectural
+traceability, Markov reliability modeling, and a ConOps scenario walkthrough. Hardware implementation, formal software
+verification, and flight-test validation are future work and
+remain outside this contribution’s scope.
+II. R ELATED W ORK
+The design of dependable systems for regulated airspace
+relies on established principles of fault tolerance through
+
+redundancy [5]. Our work connects fault-tolerant avionics,
+resilient swarm coordination, and RTA for complex systems.
+Architectures for fault-tolerant UAVs traditionally focus on
+fault containment within a single platform. These designs
+employ hardware replication, such as Triple-Modular Redundancy (TMR) [10], or analytical redundancy through robust
+control. Approaches range from controllers that maintain stability after actuator failures [11], [12] to energy management
+systems optimizing component longevity [13]. While these
+methods provide a rigorous foundation for fail-safe agents,
+they inherently treat the individual UAV as the system boundary. In these architectures, if a fault exceeds the local recovery
+capability, the agent typically executes a solitary emergency
+landing. In a SAR context, this creates an unmitigated coverage gap, as the remaining agents are unaware of the safetycritical state change.
+Multi-agent systems research focuses on collective resilience, ensuring mission completion despite agent loss.
+Strategies include centralized replanning to restore connectivity [14], [15] or distributed self-healing for communication
+repair [16]. Recently, ”health-aware” strategies have emerged,
+where swarm behavior adapts to specific health metrics. For
+instance, Zhao et al. [7] present a path planner that recalculates flight parameters after actuator faults, while Alamdar
+and Petrović [8] propose connectivity maintenance based on
+battery depletion. However, these approaches are primarily
+performance-driven. Crucially, they introduce a dependency
+on the very software layer that may be compromised. They
+operate under the assumption that the degraded agent can
+still reliably execute complex negotiation algorithms. If a
+physical fault is accompanied by a software anomaly (e.g.,
+thread deadlock), the health propagation fails. They lack a
+formal safety assessment to guarantee that the reconfigured
+behavior does not violate airspace safety constraints, rendering
+them difficult to certify under deterministic standards like
+ARP4754B.
+To certify non-deterministic algorithms on UAVs (or other
+systems not typically certified under traditional aircraft guidance regulations), the avionics community has adopted RunTime Assurance (RTA) architectures [9], [17]. This concept
+is grounded in the logical Simplex Architecture [18], which
+wraps complex, untrusted functions (e.g., AI planners) with
+a verifiable safety monitor. Bak et al. extended this to the
+System-Level Simplex [19], moving the safety monitor to
+isolated hardware (e.g., FPGA) to protect against Operating
+System (OS) failures. While these architectures successfully
+protect single UAVs from software faults, their application
+to multi-agent systems remains unexplored. Existing RTA
+frameworks enforce local “fail-safe” maneuvers (e.g., hover
+or terminate) but lack the mechanisms to propagate hardwareverified safety states to the collective for “fail-operational”
+reconfiguration.
+A gap exists between these domains. System-Level Simplex [19] provides rigorous hardware isolation but lacks
+swarm awareness. Health-aware swarm strategies [7] provide
+flexibility but lack determinism. Our work addresses this
+
+by proposing a hardware-enforced, compliance-driven architectural framework. We extend the System-Level Simplex
+concept by treating the Swarm Coordination Module as an
+”Untrusted Complex Function.” We use the SAE ARP4754B
+safety process to derive a formal interface between the agent’s
+isolated safety monitor and the collective logic, establishing a
+traceable chain of resilience from component-level faults to
+mission-level reconfiguration.
+III. S AFETY-D RIVEN D ESIGN M ETHODOLOGY
+The proposed architecture is derived from a systematic
+safety assessment to support certification. Our methodology
+adapts SAE ARP4761A [20], the civil aviation guideline for
+safety assessment of airborne systems, and ARP4754B [21] to
+the constraints of mixed-criticality swarms. Unlike traditional
+single-aircraft processes, we explicitly analyze the propagation
+of faults originating in the physical agent and impacting the
+collective behavior, as seen in Fig. 1.
+
+Fig. 1. Data flow of the Verifiable Health-Aware Framework. The architecture acts as a Hardware Isolation Boundary between physical and
+logical domains. (1) Physical Layer: Component faults (e.g., a propulsion
+degraded motor failure) are detected by the Safety Monitor. (2) Safety
+Monitor: The FMU uses a “Lock and Filter” mechanism to constrain control
+and filter fault data. (3) Swarm Logic: The resulting “Health Vector” (e.g.,
+⟨NOMINAL, DEGRADED, NOMINAL⟩, Eq. 1) is broadcast to the collective,
+triggering autonomous reallocation of mission tasks to healthy neighbors
+(icons show logical transfer).
+
+To define the architectural components and interfaces shown
+in Fig. 1, the design process follows a top-down hierarchy:
+1) Hazard Identification (HazID) to establish swarm-level
+safety bounds; 2) Functional Hazard Assessment (FHA) to
+map functions to Design Assurance Levels (DAL); and 3)
+Formal Interface Definition, applying Contract-Based Design
+principles [22] to mathematically derive the health states
+required to contain the identified hazards.
+A. Hazard Analysis and Risk Class
+A Preliminary Hazard Identification (HazID) established the
+top-level safety constraints. We align our severity classifications with the JARUS Specific Operations Risk Assessment
+(SORA) [4]. We assume a Search and Rescue mission in a
+sparsely populated environment, corresponding to SAIL IV
+(Specific Assurance and Integrity Level 4).
+In this context, the uncontrolled crash of a single drone
+(H-02) is classified as a Hazardous event (Target Prob. <
+10−7 /hr). Although the immediate ground risk in sparse areas
+is low, a Loss of Control event in a Beyond Visual Line of
+Sight (BVLOS) swarm allows the agent to deviate from its
+operational geofence, potentially infringing on civil airspace
+or threatening the remaining fleet (precursor to H-01). Thus, a
+
+Hazardous integrity target is required for containment. Table I
+summarizes critical hazards and probability targets.
+TABLE I
+S YSTEM -L EVEL H AZARDS (A LIGNED WITH JARUS SORA SAIL IV)
+ID
+H-01
+H-02
+H-03
+H-06
+H-07
+
+Hazard Description
+Mid-air or terrain collision of multiple drones.
+Uncontrolled crash of a single drone.
+Failure to detect the search target (Mission Failure).
+Loss of Command and Control (C2) link.
+Unauthorized control of the swarm.
+
+Severity
+Catastrophic
+Hazardous
+Minor
+
+Target Prob.
+< 10−9 /hr
+< 10−7 /hr
+< 10−3 /hr
+
+Major
+Catastrophic
+
+< 10−5 /hr
+< 10−9 /hr
+
+B. Functional Hazard Assessment (FHA)
+The FHA maps top-level hazards to specific functional
+failures and assigns a Design Assurance Level (DAL) to each
+(Table II). This partitions the mixed-criticality system: while
+top-level flight hazards require DAL B integrity, the use of
+dual-channel redundancy allows the flight control modules to
+be developed at DAL C (see Tab. II-footnote a). The Safety
+Monitor (FMU) is assigned to DAL B consistent with its
+Hazardous failure classification, and non-deterministic swarm
+functions are assigned to DAL D. The FHA includes the failure
+modes of the Fault Management Unit (FMU) to evaluate
+the integrity requirements of the Run-Time Assurance (RTA)
+gateway against Hazardous safety targets.
+C. Formal Derivation of Safety Contracts
+To decouple the DAL B Safety Monitor and the deterministic Flight Core (DAL C) from the non-deterministic Swarm
+Coordinator (DAL D), the architecture employs ContractBased Design (CBD) [22]. This formalism establishes a set
+of Safety Contracts C = {Cnav , Cprop , Ccomm } that bound the
+permissible behavior of the swarm.
+A contract C for a component M is defined as a pair (A, G),
+where A represents the Assumptions regarding the environment
+and inputs, and G denotes the Guarantees provided by the
+component. Component M satisfies C if it behaves according
+to G whenever the environment satisfies A.
+Hierarchical Fault Abstraction and Health Vector: To
+prevent the swarm algorithms processing hardware-specific
+fault data, the architecture implements a three-tier hierarchical
+abstraction:
+1) Atomic Level: Physical sensors detect localized hardware errors (e.g., motor RPM deviation, battery voltage
+Vbatt drop, GNSS dilution, packet loss).
+2) Functional Level: The FMU evaluates atomic errors
+against predefined safety thresholds, mapping them
+to a discrete functional state σ ∈ {NOMINAL,
+DEGRADED, FAILED}.
+3) Aggregated Level: The functional states of subsystem
+categories are aggregated into the Health Vector Hi for
+agent i:
+Hi (t) = ⟨σnav , σprop , σcomm ⟩
+(1)
+For the ConOps analysis (Section V-D), Hi is instantiated
+for specific agents by substituting the agent identifier, e.g.,
+HD (t) for the faulted agent D.
+
+Timing and Latency Bounds: To guarantee temporal determinism for the RTA gateway, the Health Vector update is
+bounded by strict timing constraints. The FMU evaluates Hi (t)
+at a fixed update frequency fupdate . Upon the occurrence of
+an atomic fault at t = 0, the total latency for fault detection
+(τdetect ) and subsequent contract enforcement (τenf orce ) must
+satisfy the maximum latency bound τmax :
+τdetect + τenf orce ≤ τmax
+
+(2)
+
+The bound τmax is derived from the vehicle’s time-todivergence under a worst-case fault. For a hexacopter with a
+single-motor winding fault producing a thrust asymmetry ∆F ,
+the resulting uncompensated angular acceleration is ϕ̈f ault =
+∆F · larm /Ixx , where larm is the motor arm length and Ixx
+is the roll-axis moment of inertia. The time to reach the
+maximum recoverable attitude deviation ∆ϕmax (nominally
+30◦ for a hexacopter before loss of controllability [12]) is:
+
+τmax =
+
+q
+
+2·∆ϕmax
+ϕ̈f ault
+
+(3)
+
+For representative platform parameters (e.g., 10 kg mass,
+larm = 0.5 m, maximum thrust asymmetry ∆F = 60 N,
+and Ixx ≈ 0.25 kg·m2 ), this yields τmax in the range of 80–
+150 ms, supporting the 100 ms design target used throughout
+this work. The specific value is a conservative platform-level
+requirement to be verified during hardware integration.
+Contract Instantiation: The contracts mathematically formalize the mapping of atomic faults into functional degradation. The Propulsion Contract (Cprop ) restricts actuation
+authority when an actuator fault or a critical power degradation
+is detected:
+
+
+A : FMU Powered ∧ Sensors Active
+Cprop : G : ((|RPMcmd − RPMmeas | > ϵRP M ) ∨ (Vbatt ≤ Vcrit )) =⇒ . . .
+
+
+(σprop ← DEGRADED) ∧ (∥vcmd ∥ ≤ vsaf e )
+
+(4)
+
+where ϵRP M is the kinematic error threshold, Vbatt is
+the telemetry provided by the Battery Management System
+(BMS), Vcrit is the minimum voltage threshold to prevent
+brownout during high-thrust transients, and vsaf e is the resulting velocity limit imposed.
+The Navigation Contract (Cnav ) mandates a fail-safe transition upon sensor uncertainty:
+
+
+A : FMU Powered ∧ Sensors Active
+Cnav : G : (GNSSHDOP > HDOPmax ) =⇒ . . .
+(5)
+
+
+(σnav ← FAILED) ∧ (Mode ← LAND)
+where HDOP is the Horizontal Dilution of Precision (a standard metric for GNSS positioning quality), and HDOPmax is
+the threshold for safe navigation. Finally, the Communication
+Contract (Ccomm ) addresses Link Loss (H-06) by monitoring
+the telemetry heartbeat and Signal-to-Noise Ratio (SNR):
+
+
+A : FMU Powered ∧ COM Hardware Active
+Ccomm : G : ((t − tlast hb > τtimeout ) ∨ (SNR < SNRmin )) =⇒ . . .
+
+
+(σcomm ← FAILED) ∧ (Mode ← RTB)
+
+(6)
+
+where tlast hb is the timestamp of the last valid heartbeat
+from the swarm mesh, τtimeout is the maximum allowable
+
+TABLE II
+F UNCTIONAL H AZARD A SSESSMENT (FHA) WITH C ALIBRATED D ESIGN A SSURANCE L EVELS (DAL)
+Function
+F1: Safety Monitoring (FMU)
+F2: Flight & Navigationa
+F3: Target Detection
+F4: Swarm Coord. Broadcastb
+F5: Power Management
+
+Failure Condition
+Loss of isolation, missed fault detection,
+or spurious contract enforcement
+Loss of ability to determine state (position/attitude)
+Failure to detect valid target (False Negative)
+Transmission of corrupted trajectory data
+Incorrect State of Charge (SoC) reporting
+
+Effect on System/Mission
+Uncontained swarm faults propagate to flight core;
+risk of uncontrolled crash (H-02).
+Uncontrolled descent; potential crash (H-02).
+
+Severity
+Hazardous
+
+Target FDAL
+DAL B
+
+Hazardous
+
+DAL B
+
+Minor
+
+DAL D
+
+Hazardous
+Major
+
+DAL D (B with monitor)
+DAL C
+
+Reduced search effectiveness (H-03).
+Risk of inter-agent collision (H-01) if not validated.
+Unexpected depletion and crash (H-02).
+
+a Although total navigation loss constitutes Hazardous condition, it requires the simultaneous failure of two independent channels. With each channel developed
+
+to λch ≈ 10−4 /hr, the probability of simultaneous dual-channel failure is λ2ch ≈ 10−8 /hr, one order of magnitude below Hazardous (10−7 /hr), satisfying the
+requirement at the system level. Partial navigation degradation (single-channel loss) is handled by the Cnav contract (Section III-C), which forces a controlled
+landing before total state loss can occur, preventing the fault from progressing to the Hazardous condition in practice.
+b F4 is DAL D because the DAL B Safety Monitor validates all trajectory commands via the Safety Contract (Section III-C), containing the effect of corrupted
+swarm data. The residual probability of F4 causing H-01 is P (H-01 | F4) ≤ λF 4 · (1 − Cmonitor ). With Cmonitor > 0.9991, this is below the 10−7 /hr
+Hazardous threshold, supporting DAL D per ASTM F3269 [9]. While ASTM F3269 supports monitoring of unassured functions (DAL E), ARP 4754B [21]
+specifies that DAL E functions do not require a structured development process; therefore, we do not consider this level for any subsystem.
+General Note: The FHA covers functions directly relevant to the proposed mixed-criticality architecture. DAL A (Catastrophic single-point failure) is absent
+because Catastrophic hazards (e.g., H-01) are mitigated via architectural redundancy, reducing subsystem requirements to DAL B/C.
+TABLE III
+H IERARCHICAL M APPING OF ATOMIC FAULTS TO H EALTH V ECTOR
+S TATES
+Atomic Signal
+
+Threshold Condition
+
+RPM mismatch
+Battery voltage
+GNSS HDOP
+Heartbeat timeout
+SNR
+
+|RPMcmd − RPMmeas | > ϵRP M
+Vbatt ≤ Vcrit
+HDOP > HDOPmax
+t − tlast hb > τtimeout
+SNR < SNRmin
+
+Functional
+State (σ)
+DEGRADED
+DEGRADED
+FAILED
+FAILED
+FAILED
+
+Health Vector
+Component
+σprop
+σprop
+σnav
+σcomm
+σcomm
+
+communication delay, and SNRmin is the threshold for link
+integrity. If the condition is met, the FMU enforces a ReturnTo-Base (RTB) maneuver.
+Contract Coverage: The three contracts jointly provide
+necessary coverage of the failure paths leading to H-02 at
+the component fault level. Cprop addresses propulsion-related
+faults (actuator anomalies) and power anomalies (F5) through
+combined RPM mismatch and Vbatt monitoring, the latter fed
+directly from the BMS to the FMU, as defined in Section IV.
+Cnav addresses navigation state degradation (F2) by gating on
+GNSS quality and transitioning to a controlled landing before
+total state loss. Ccomm addresses link loss (H-06) by enforcing RTB before communication failure can lead to uncontrolled flight. Coverage of compound failures—simultaneous
+multi-subsystem faults—is addressed at the architectural level
+through hardware redundancy in the Flight-Critical Core and
+is analyzed in the FTA (Section V-A). The contracts represent
+necessary but not sufficient conditions for system safety; sufficiency at the implementation level requires formal verification
+of the FMU logic, identified as future work.
+This formulation defines the Guarantee (G) of each contract
+as a direct algebraic link between physical anomalies and the
+resulting discrete state σ, satisfying the hierarchical abstraction requirement while preserving traceability to the DAL B
+hardware monitors.
+D. System Safety Requirements (SSRs)
+Based on the FHA and Safety Contracts, we derive the
+following SSRs that drive the architectural design:
+
+[SSR-FLT-01] The Flight Critical Core shall maintain
+DAL C integrity for attitude estimation and control.
+• [SSR-FTR-01] The system shall implement a hardwareisolated Safety Monitor of DAL B integrity to enforce
+the Safety Contract defined in Sec. III-C. The monitor
+shall achieve a diagnostic coverage Cmonitor > 0.9991
+for flight-critical faults, as derived in Section V-B.
+• [SSR-FTR-02] No single point of failure in the DAL D
+Swarm Coordination Module (after validation by the
+Safety Monitor) shall cause a hazardous or catastrophic
+event.
+• [SSR-MSN-02] The swarm logic shall autonomously reallocate tasks when an agent reports a σ ̸= NOMINAL
+state.
+• [SSR-SEC-01] All health vector transmissions shall be
+authenticated to prevent unauthorized access (H-07).
+•
+
+IV. FAIL -O PERATIONAL A RCHITECTURE
+To satisfy the SSRs, we propose a multi-level failoperational architecture that addresses fault tolerance at two
+layers: the individual agent and the collective swarm. This
+hierarchy provides local fault containment while the swarm
+maintains mission continuity.
+A. Individual Agent Architecture
+The foundation of the swarm relies on the integrity of each
+agent. Assuming a physical platform with actuator redundancy
+(e.g., a hexacopter), the logical architecture partitions into two
+subsystems with distinct DALs to maintain fault containment.
+Two complementary architectural views illustrate this split in
+Fig. 2 and Fig. 3.
+As shown in Fig. 2, the functional architecture enforces
+a Command/Monitor relationship. This logic is physically
+mapped in the conceptual architecture shown in Fig. 3. The
+first subsystem is the Flight-Critical Core (DAL C), which
+contains all modules essential for safe flight. To achieve fault
+tolerance, these functions execute on a dual-channel redundant
+flight computer. The second subsystem is the Mission and
+Perception System, which handles non-deterministic swarm
+
+
