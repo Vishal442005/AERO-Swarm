@@ -15,11 +15,19 @@ Design Constraints:
 
 import os
 import sys
+import shutil
 
 # Ensure src is on path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from src.butterpy import ButterFlowchart
+
+def distribute_file(primary_path, all_paths):
+    for p in all_paths:
+        if p != primary_path:
+            os.makedirs(os.path.dirname(p), exist_ok=True)
+            shutil.copyfile(primary_path, p)
+            print(f"Copied {primary_path} -> {p}")
 
 def make_flowchart1(out_paths):
     """Flowchart 1: Sheaf-Theoretic Distributed Swarm Coordination Pipeline"""
@@ -90,9 +98,10 @@ def make_flowchart1(out_paths):
     fc.add_arrow("consensus", "actuation")
     fc.add_arrow("actuation", "end")
 
-    for p in out_paths:
-        os.makedirs(os.path.dirname(p), exist_ok=True)
-        fc.render(p)
+    primary = out_paths[0]
+    os.makedirs(os.path.dirname(primary), exist_ok=True)
+    fc.render(primary, close_fig=True)
+    distribute_file(primary, out_paths)
     print("Flowchart 1 rendered successfully!")
 
 
@@ -165,9 +174,10 @@ def make_flowchart2(out_paths):
     fc.add_arrow("sync", "cycle")
     fc.add_arrow("cycle", "end")
 
-    for p in out_paths:
-        os.makedirs(os.path.dirname(p), exist_ok=True)
-        fc.render(p)
+    primary = out_paths[0]
+    os.makedirs(os.path.dirname(primary), exist_ok=True)
+    fc.render(primary, close_fig=True)
+    distribute_file(primary, out_paths)
     print("Flowchart 2 rendered successfully!")
 
 
@@ -255,9 +265,10 @@ def make_flowchart3(out_paths):
     fc.add_arrow("nominal_ctrl", "end", from_port="bottom", to_port="top",
                  waypoints=[(6.2, 1.0), (4.0, 1.0)])
 
-    for p in out_paths:
-        os.makedirs(os.path.dirname(p), exist_ok=True)
-        fc.render(p)
+    primary = out_paths[0]
+    os.makedirs(os.path.dirname(primary), exist_ok=True)
+    fc.render(primary, close_fig=True)
+    distribute_file(primary, out_paths)
     print("Flowchart 3 rendered successfully!")
 
 

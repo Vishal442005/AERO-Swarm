@@ -193,7 +193,7 @@ class ButterFlowchart:
                              bbox=dict(boxstyle="square,pad=0.2", facecolor="white", edgecolor="black", lw=0.8),
                              zorder=6)
 
-    def render(self, output_path):
+    def render(self, output_path, close_fig=False):
         if self.title:
             title_box = FancyBboxPatch((0.5, self.height - 0.75), self.width - 1.0, 0.55,
                                        boxstyle="square,pad=0.05",
@@ -210,5 +210,6 @@ class ButterFlowchart:
 
         plt.tight_layout()
         plt.savefig(output_path, dpi=300, bbox_inches="tight")
-        plt.close()
+        if close_fig:
+            plt.close(self.fig)
         print(f"Flowchart successfully saved to {output_path}")
