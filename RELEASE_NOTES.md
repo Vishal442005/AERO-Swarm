@@ -1,20 +1,23 @@
-# AERO-Swarm v1.0.0: Resilient Heterogeneous Drone Swarm Framework
+# AERO-Swarm v1.1.0: Ultra-Simple butterpy Flowcharts & Publication Diagrams
 
 **AERO-Swarm (Adaptive Edge-Resilient Optimization for Heterogeneous Swarms)** is an open-source, mathematically grounded, and production-ready coordination stack for large-scale heterogeneous aerial drone swarms in GPS-denied, contested, and electronically jammed environments.
 
-## Highlights of this Release
-- **Cellular Sheaf Network Kernel:** Formulates heterogeneous 6-DoF drone coordination over dynamic cellular sheaves, reconciling asymmetric platform state stalks ($\mathcal{F}_v = \mathbb{R}^{d_v}$) into edge stalks ($\mathcal{F}_e = \mathbb{R}^6$) via learnable, SINR-adaptive restriction maps $\rho_{v \trianglelefteq e}(t)$.
-- **Bochner--Weitzenböck SCVI Curvature:** Decomposes the Sheaf Laplacian into connection diffusion and Forman Ricci curvature ($\mathbf{L}_\mathcal{F} = \mathbf{L}_\mathcal{F}^{\mathrm{Bochner}} + \mathbf{Ric}_\mathcal{F}$), proving strictly linear degradation ($\mathrm{SRI} \geq \mathrm{SRI}_0(1 - c f_{\mathrm{jam}})$) and eliminating the catastrophic percolation threshold of classical graph Laplacians.
-- **Fisher-Rao Riemannian Event-Triggered Communication (IG-ETC):** Suppresses redundant wireless broadcasts by up to $79.7\%$ by gating transmissions on the Riemannian statistical divergence on the Gaussian belief manifold $\mathcal{P}_+^6$.
-- **SHATA Decentralized Task Allocation:** Solves multi-robot auction bundles over sheaf cochains with polynomial runtime $\mathcal{O}(|V| \cdot M \cdot D_G)$.
-- **Dual-Tier System & ROS 2 Humble Stack:** Includes vectorized 12-vCPU parallelized benchmark engines ($N=10$ to $200$ UAVs) and full ROS 2 Humble packages (`aero_swarm_ros2`) with hardware-isolated Run-Time Assurance (RTA) Safety Simplex barrier monitors ($<1.2\,\mathrm{ms}$ override latency, zero safety violations).
-- **Butterfly Architecture Flowchart:** Features a comprehensive, publication-grade butterfly flowchart visualizing inflow threat dynamics, central decision kernels, and decentralized flight execution.
-
-## Repository Contents
-- `src/`: Core mathematical modules (Cellular Sheaves, Information Geometry, Quadrotor Dynamics, Safety CBF, SHATA Auction, ST-GAT-S MARL, Butterfly Flowchart generator).
-- `ros2_ws/`: Production ROS 2 Humble package with C++/Python nodes and launch pipelines.
-- `results/`: Empirical CSV logs across all 5 operational scenarios, high-resolution publication figures, and 3D mission replay animations.
-- `papers/`: Target venue literature analysis and extracted insights across *IEEE Transactions on Cybernetics*, *Swarm and Evolutionary Computation (SWEVO)*, and *Robotics and Autonomous Systems (RAS)*.
-- `submission_ieee_(T-Cyb)/` & `submission_elseiver_(SWEVO)_RAS/`: Submission dossiers, figure directories, and tailored Cover Letters for journal submission.
+## Highlights of v1.1.0 Release
+- **`butterpy` Python Flowchart Extension (`src/butterpy/`):** Generates publication-grade, ultra-simple flowcharts and block diagrams conforming strictly to top IEEE and Elsevier standards:
+  - **Zero box fill colors:** Pure white box interiors.
+  - **Crisp solid black outlines and directed black arrows.**
+  - **Standard geometric primitives:** Capsules (Terminals), Rectangles (Processes), and Diamonds (Decisions).
+  - **Embedded vector icons:** Drone, Sensor, Sheaf Core ($L$), Decision ($?$), Jammer Tower, Target, and Safety Shield.
+- **The 3 Publication Flowcharts:**
+  1. `fig_flowchart1_sheaf_coordination.png`: System-level cellular sheaf Laplacian coordination, Bochner--Weitzenböck curvature jamming detection, and distributed state consensus.
+  2. `fig_flowchart2_ig_etc.png`: Information-Geometric Event-Triggered Communication (IG-ETC) using Fisher-Rao Riemannian geodesic divergence on $\mathcal{P}_+^6$ manifolds ($79.7\%$ communication suppression).
+  3. `fig_flowchart3_shata_auction.png`: Decentralized Sheaf Heterogeneous Auction for Task Allocation (SHATA) bundled with hardware-isolated Run-Time Assurance (RTA) Safety Simplex barrier monitors ($<1.2\,\mathrm{ms}$ override latency, zero safety violations).
+- **Simplified Publication Block Diagrams:**
+  - `fig_ros2_architecture.png`: Minimalist pure black-and-white ROS 2 Humble node architecture.
+  - `fig_teaser_sheaf_concept.png`: Minimalist pure black-and-white cellular sheaf projection model.
+- **Journal Submissions Verified & Recompiled:**
+  - `submission_ieee_(T-Cyb)/`: Formatted for *IEEE Transactions on Cybernetics* (9 pages, letter format, zero compile errors).
+  - `submission_elseiver_(SWEVO)_RAS/`: Formatted for *Elsevier Swarm and Evolutionary Computation / RAS* (14 pages, 2-column elsarticle, zero compile errors).
+  - Official formal `.docx` and `.md` cover letters provided for both journal targets.
 
 *(Note: In accordance with repository publication guidelines, manuscript `.tex` and `.pdf` files are strictly excluded from the Git tree).*
