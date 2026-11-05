@@ -12,13 +12,13 @@ from typing import Dict, List, Tuple, Optional
 class DroneType:
     LEADER = 0   # High-compute, SLAM, d_v = 24
     SCOUT = 1    # High-agility, FoV sensors, d_v = 12
-    RELAY = 2    # Mesh routing, SDR, d_v = 6
+    RELAY = 2    # Mesh routing, SDR, d_v = 8
 
 
 STALK_DIMS = {
     DroneType.LEADER: 24,
     DroneType.SCOUT: 12,
-    DroneType.RELAY: 6
+    DroneType.RELAY: 8
 }
 EDGE_STALK_DIM = 6  # Shared informational subspace (3D Pos + 3D Vel)
 
@@ -107,15 +107,17 @@ class CellularSheaf:
         # L_sheaf = L_Bochner + Ric_Forman
         # Where Ric_Forman is block diagonal
         Ric_forman = np.zeros((D_V, D_V), dtype=np.float64)
+        # Fast incident lookup
+        adj = {i: [] for i in range(self.num_nodes)}
+        for (u, v) in active_edges.keys():
+            adj[u].append(v)
+            adj[v].append(u)
+
         for i in range(self.num_nodes):
             idx_i = slice(self.offsets[i], self.offsets[i+1])
-            # The Forman curvature block for node i measures local holonomy / divergence
             deg_block = L_sheaf[idx_i, idx_i]
-            # Off-diagonal transport square
-            incident_edges = [v for (u, v) in active_edges.keys() if u == i] + \
-                             [u for (u, v) in active_edges.keys() if v == i]
             holonomy_sum = np.zeros_like(deg_block)
-            for j in incident_edges:
+            for j in adj[i]:
                 idx_j = slice(self.offsets[j], self.offsets[j+1])
                 transport = L_sheaf[idx_i, idx_j]
                 holonomy_sum += transport @ transport.T

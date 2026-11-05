@@ -162,7 +162,7 @@ class SwarmEnvironment:
         H0_rank, H1_rank = self.sheaf.compute_cohomology_ranks(L_sheaf)
         
         # 4. Distributed Task Allocation (SHATA Auction)
-        bundles = self.auctioneer.allocate_tasks_swarm(self.drones, self.tasks, L_sheaf, H1_rank)
+        bundles = self.auctioneer.allocate_tasks_swarm(self.drones, self.tasks, L_sheaf, H1_rank, offsets=self.sheaf.offsets)
         
         # 5. Determine Active Mutual Observation Visibility (Active-FoV)
         leader_indices = [i for i, d in enumerate(self.drones) if d.type == DroneType.LEADER and d.is_alive]

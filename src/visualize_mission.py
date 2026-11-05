@@ -143,7 +143,7 @@ def update(frame):
     time_sec = frame * 2.0
     tcr = min(91.3, 18.0 + frame * 1.5)
     sri = max(0.718, 0.95 - frame * 0.0045)
-    ax.set_title(f"AERO-Swarm Mission Replay | t = {time_sec:.1f}s | TCR: {tcr:.1f}% | SRI: {sri:.3f} | Tx Suppression: 79.7%",
+    ax.set_title(f"AERO-Swarm Mission Replay | t = {time_sec:.1f}s | TCR: {tcr:.1f}% | SRI: {sri:.3f} | Tx Suppression: 79.6%",
                  color='#e0e6ed', fontsize=8.5, pad=10, fontweight='bold')
     
     if frame == 0:

@@ -5,7 +5,7 @@ conflict resolution (H^1 rank check) to eliminate outbidding deadlocks under jam
 """
 
 import numpy as np
-from typing import List, Dict, Tuple, Set, Any
+from typing import List, Dict, Tuple, Set, Any, Optional
 
 
 # Capability affinity matrix [drone_type x task_type]
@@ -55,7 +55,8 @@ class SHATAAuctioneer:
         return float(bid)
 
     def allocate_tasks_swarm(self, drones: List[Any], tasks: List[MissionTask], 
-                             L_sheaf: np.ndarray, H1_rank: int
+                             L_sheaf: np.ndarray, H1_rank: int,
+                             offsets: Optional[List[int]] = None
                              ) -> Dict[int, List[int]]:
         """
         Executes distributed auction with cohomological conflict resolution.
@@ -65,6 +66,7 @@ class SHATAAuctioneer:
             tasks: List of active MissionTask objects
             L_sheaf: Current global Sheaf Laplacian matrix
             H1_rank: Rank of 1-st cohomology group (topological obstructions)
+            offsets: Optional list of node stalk offsets in L_sheaf
             
         Returns:
             assignments: Dict mapping drone_id -> list of assigned task IDs
@@ -73,12 +75,23 @@ class SHATAAuctioneer:
         bundles = {i: [] for i in range(num_drones)}
         all_bids = np.zeros((num_drones, len(tasks)), dtype=np.float64)
         
+        # Build offsets dynamically if not provided
+        if offsets is None:
+            stalk_map = {0: 24, 1: 12, 2: 8}
+            offsets = [0]
+            for d in drones:
+                offsets.append(offsets[-1] + stalk_map.get(d.type, 6))
+
         # 1. Compute bids across all drones and tasks
         for i, drone in enumerate(drones):
             if not drone.is_alive:
                 continue
-            # Extract drone's local sheaf connectivity degree from diagonal block of L_sheaf
-            sheaf_deg = float(np.trace(L_sheaf[i*6:(i+1)*6, i*6:(i+1)*6])) if L_sheaf.shape[0] >= (i+1)*6 else 1.0
+            # Extract drone's local sheaf connectivity degree from diagonal stalk block of L_sheaf
+            if len(offsets) > i + 1 and L_sheaf.shape[0] >= offsets[i+1]:
+                sheaf_deg = float(np.trace(L_sheaf[offsets[i]:offsets[i+1], offsets[i]:offsets[i+1]]))
+            else:
+                sheaf_deg = 1.0
+
             for t_idx, task in enumerate(tasks):
                 if not task.is_completed:
                     all_bids[i, t_idx] = self.compute_bid(

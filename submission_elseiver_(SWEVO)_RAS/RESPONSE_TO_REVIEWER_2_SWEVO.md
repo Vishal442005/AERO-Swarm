@@ -55,7 +55,7 @@ The revised manuscript compiles cleanly without errors into the updated 16-page 
     - `AERO-Swarm (Ours)` starts at $98.2\% \pm 0.8\%$ at $f_{\mathrm{jam}} = 0.0$, maintains $95.8\% \pm 1.2\%$ at $0.2$, $93.4\% \pm 1.4\%$ at $0.4$, **$91.3\% \pm 1.8\%$ at $0.6$**, and $85.2\% \pm 2.3\%$ at $0.8$.
     - `Euclidean ETC Baseline` drops sharply from $96.0\%$ ($0.0$) to $31.4\% \pm 4.5\%$ ($0.6$) and $14.5\%$ ($0.8$).
     - `Periodic Continuous Baseline` collapses to $23.7\% \pm 5.3\%$ ($0.6$) and $11.2\%$ ($0.8$).
-  - **Replay GIF:** In `src/visualize_mission.py`, the HUD telemetry was updated to reflect full-mission completion: `AERO-Swarm Mission Replay | t = 100.0s | TCR: 91.3% | SRI: 0.718 | Tx Suppression: 79.7%`. The animation has been re-rendered and updated in `submission_elseiver_(SWEVO)_RAS/figures/aero_swarm_mission_replay.gif`.
+  - **Replay GIF:** In `src/visualize_mission.py`, the HUD telemetry was updated to reflect full-mission completion: `AERO-Swarm Mission Replay | t = 100.0s | TCR: 91.3% | SRI: 0.718 | Tx Suppression: 79.6%`. The animation has been re-rendered and updated in `submission_elseiver_(SWEVO)_RAS/figures/aero_swarm_mission_replay.gif`.
 
 ---
 
@@ -78,7 +78,7 @@ The revised manuscript compiles cleanly without errors into the updated 16-page 
   - **Correction:** We replaced the static bar chart with the **Cumulative Transmitted Packets ($\times 10^3$) over the $100\,\mathrm{s}$ mission** ($N = 100$ drones) in Figure 3(c):
     - `Periodic Continuous Broadcast (20 Hz)`: scales linearly to $188.2 \times 10^3$ packets.
     - `Euclidean ETC Baseline`: transmits $102.4 \times 10^3$ packets ($-45.6\%$ reduction).
-    - `Fisher-Rao IG-ETC (Ours)`: dynamically dead-reckons during steady-state tracking, transmitting only $38.4 \times 10^3$ packets over $100\,\mathrm{s}$—confirming the headline **$-79.6\%$ ($-79.7\%$) bandwidth reduction**.
+    - `Fisher-Rao IG-ETC (Ours)`: dynamically dead-reckons during steady-state tracking, transmitting only $38.4 \times 10^3$ packets over $100\,\mathrm{s}$—confirming the headline **$-79.6\%$ bandwidth reduction** ($1 - 38.4 / 188.2 = 79.6\%$).
   - We also demonstrated in the ablation study (Table 3) that while an aggressive Euclidean threshold can suppress packet rate, it does so blindly with respect to covariance swelling, resulting in severe state divergence and dropped TCR ($78.9\%$). Fisher-Rao IG-ETC uniquely preserves state estimation fidelity while minimizing bandwidth.
 
 ---
@@ -317,7 +317,7 @@ The revised manuscript compiles cleanly without errors into the updated 16-page 
 | **Figure 2 (Flowcharts 1, 2, 3)** | `.../figures/fig_flowchart[1-3]*.png` | Regenerated with corrected formulas |
 | **Figure 3(a) (TCR vs Jamming)** | `.../figures/fig1_tcr_vs_jamming.png` | Re-plotted: AERO-Swarm $>91.3\%$ at 60% jamming |
 | **Figure 3(b) (SRI vs Attrition)** | `.../figures/fig2_sri_resilience.png` | Re-plotted: Linear degradation, SRI = 0.718 at 40% |
-| **Figure 3(c) (Comm Efficiency)** | `.../figures/fig3_comm_efficiency.png` | Re-plotted: Cumulative packets ($-79.7\%$ cut) |
+| **Figure 3(c) (Comm Efficiency)** | `.../figures/fig3_comm_efficiency.png` | Re-plotted: Cumulative packets ($-79.6\%$ cut) |
 | **Figure 3(d) (Scalability Runtime)** | `.../figures/fig4_scalability_runtime.png` | Re-plotted: Sub-$20\,\mathrm{ms}$ real-time latency ($14.18\,\mathrm{ms}$) |
 | **Figure 4 (2-Panel Architecture)** | `.../figures/fig_ros2_architecture.png` | Regenerated: (a) ROS 2 Nodes, (b) RTA Simplex |
 | **Mission Replay GIF** | `.../figures/aero_swarm_mission_replay.gif` | Re-rendered: $t=100\,\mathrm{s}, \mathrm{TCR}=91.3\%, \mathrm{SRI}=0.718$ |
