@@ -125,10 +125,10 @@ def make_flowchart2(out_paths):
     # 3. Dynamic Threshold Box
     fc.add_node("thresh", "Evaluate Dynamic Threshold", shape_type="box",
                 x=4.0, y=7.4, width=4.6, height=0.75, icon="shield",
-                subtitle="γ_i(t) = γ_0 exp(-λ t) + δ_i(E_i)")
+                subtitle="δ_i(t) = δ_0 exp(β_E(1-E_i(t)))(1+β_γ(1-γ_i(t)))")
 
     # 4. Trigger Decision Diamond
-    fc.add_node("trig_dec", "Trigger Condition Met?\nd_FR^2 ≥ γ_i(t)", shape_type="diamond",
+    fc.add_node("trig_dec", "Trigger Condition Met?\nd_FR(p_i, p_last) ≥ δ_i(t)", shape_type="diamond",
                 x=4.0, y=5.8, width=4.2, height=1.1, icon="decision")
 
     # 5a. Broadcast Box (Left branch - Triggered)
@@ -273,36 +273,27 @@ def make_flowchart3(out_paths):
 
 
 if __name__ == "__main__":
+    workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    
     fc1_targets = [
-        "/media/jarvis/01DB55B559EC9500/Robotics Swarm/results/fig_flowchart1_sheaf_coordination.png",
-        "/media/jarvis/01DB55B559EC9500/Robotics Swarm/submission_ieee_(T-Cyb)/figures/fig_flowchart1_sheaf_coordination.png",
-        "/media/jarvis/01DB55B559EC9500/Robotics Swarm/submission_elseiver_(SWEVO)_RAS/figures/fig_flowchart1_sheaf_coordination.png",
-        "/home/jarvis/.gemini/antigravity/brain/fafe8fae-1dc3-4e8d-9de8-adc10005550e/fig_flowchart1_sheaf_coordination.png",
+        os.path.join(workspace_root, "results", "plots", "fig_flowchart1_sheaf_coordination.png"),
+        os.path.join(workspace_root, "submission_elseiver_(SWEVO)_RAS", "figures", "fig_flowchart1_sheaf_coordination.png"),
+        os.path.join(workspace_root, "results", "fig_flowchart1_sheaf_coordination.png")
     ]
 
     fc2_targets = [
-        "/media/jarvis/01DB55B559EC9500/Robotics Swarm/results/fig_flowchart2_ig_etc.png",
-        "/media/jarvis/01DB55B559EC9500/Robotics Swarm/submission_ieee_(T-Cyb)/figures/fig_flowchart2_ig_etc.png",
-        "/media/jarvis/01DB55B559EC9500/Robotics Swarm/submission_elseiver_(SWEVO)_RAS/figures/fig_flowchart2_ig_etc.png",
-        "/home/jarvis/.gemini/antigravity/brain/fafe8fae-1dc3-4e8d-9de8-adc10005550e/fig_flowchart2_ig_etc.png",
+        os.path.join(workspace_root, "results", "plots", "fig_flowchart2_ig_etc.png"),
+        os.path.join(workspace_root, "submission_elseiver_(SWEVO)_RAS", "figures", "fig_flowchart2_ig_etc.png"),
+        os.path.join(workspace_root, "results", "fig_flowchart2_ig_etc.png")
     ]
 
     fc3_targets = [
-        "/media/jarvis/01DB55B559EC9500/Robotics Swarm/results/fig_flowchart3_shata_auction.png",
-        "/media/jarvis/01DB55B559EC9500/Robotics Swarm/submission_ieee_(T-Cyb)/figures/fig_flowchart3_shata_auction.png",
-        "/media/jarvis/01DB55B559EC9500/Robotics Swarm/submission_elseiver_(SWEVO)_RAS/figures/fig_flowchart3_shata_auction.png",
-        "/home/jarvis/.gemini/antigravity/brain/fafe8fae-1dc3-4e8d-9de8-adc10005550e/fig_flowchart3_shata_auction.png",
+        os.path.join(workspace_root, "results", "plots", "fig_flowchart3_shata_auction.png"),
+        os.path.join(workspace_root, "submission_elseiver_(SWEVO)_RAS", "figures", "fig_flowchart3_shata_auction.png"),
+        os.path.join(workspace_root, "results", "fig_flowchart3_shata_auction.png")
     ]
 
-    # Also maintain backward compatibility for single fig_butterpy_flowchart.png
-    legacy_targets = [
-        "/media/jarvis/01DB55B559EC9500/Robotics Swarm/results/fig_butterpy_flowchart.png",
-        "/media/jarvis/01DB55B559EC9500/Robotics Swarm/submission_ieee_(T-Cyb)/figures/fig_butterpy_flowchart.png",
-        "/media/jarvis/01DB55B559EC9500/Robotics Swarm/submission_elseiver_(SWEVO)_RAS/figures/fig_butterpy_flowchart.png",
-        "/home/jarvis/.gemini/antigravity/brain/fafe8fae-1dc3-4e8d-9de8-adc10005550e/fig_butterpy_flowchart.png",
-    ]
-
-    make_flowchart1(fc1_targets + legacy_targets)
+    make_flowchart1(fc1_targets)
     make_flowchart2(fc2_targets)
     make_flowchart3(fc3_targets)
     print("All 3 butterpy flowcharts rendered and distributed successfully!")

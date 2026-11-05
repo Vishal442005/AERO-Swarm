@@ -226,10 +226,10 @@ def build_elsevier_cover_letter(output_path):
     
     p_date = doc.add_paragraph()
     p_date.paragraph_format.space_after = Pt(8)
-    r_date = p_date.add_run("Date: November 3, 2026\n")
+    r_date = p_date.add_run("Date: November 5, 2026\n")
     r_date.bold = True
-    p_date.add_run("To: The Editors-in-Chief and Editorial Board\n")
-    r_recip = p_date.add_run("Swarm and Evolutionary Computation / Robotics and Autonomous Systems\n")
+    p_date.add_run("To: The Editor-in-Chief and Editorial Board\n")
+    r_recip = p_date.add_run("Swarm and Evolutionary Computation\n")
     r_recip.bold = True
     r_recip.font.color.rgb = RGBColor(4, 120, 87)
     p_date.add_run("Elsevier ScienceDirect Journals")
@@ -242,7 +242,7 @@ def build_elsevier_cover_letter(output_path):
     p_subj = cell_s.paragraphs[0]
     p_subj.paragraph_format.space_before = Pt(2)
     p_subj.paragraph_format.space_after = Pt(2)
-    r_st = p_subj.add_run("SUBJECT: SUBMISSION OF ORIGINAL RESEARCH MANUSCRIPT\n")
+    r_st = p_subj.add_run("SUBJECT: REVISED SUBMISSION OF ORIGINAL RESEARCH MANUSCRIPT (SWEVO-D-26-03280)\n")
     r_st.bold = True
     r_st.font.size = Pt(9.5)
     r_st.font.color.rgb = RGBColor(5, 150, 105)
@@ -263,19 +263,14 @@ def build_elsevier_cover_letter(output_path):
     
     p_body1 = doc.add_paragraph()
     p_body1.paragraph_format.space_after = Pt(6)
-    p_body1.add_run("Dear Editors-in-Chief and Esteemed Editorial Board,\n\n")
+    p_body1.add_run("Dear Editor-in-Chief and Esteemed Editorial Board,\n\n")
     p_body1.add_run(
-        "We are pleased to submit our original research manuscript entitled above for publication in "
+        "We are pleased to submit our revised original research manuscript entitled above for publication in "
     )
     r_j = p_body1.add_run("Swarm and Evolutionary Computation")
     r_j.bold = True
     p_body1.add_run(
-        " (or "
-    )
-    r_j2 = p_body1.add_run("Robotics and Autonomous Systems")
-    r_j2.bold = True
-    p_body1.add_run(
-        "). In this paper, we present AERO-Swarm (Adaptive Edge-Resilient Optimization for Heterogeneous Swarms), a novel decentralized coordination, task allocation, and safety-critical flight framework designed specifically for heterogeneous aerial swarms operating in non-permissive, GPS-denied theaters."
+        ". In this paper, we present AERO-Swarm (Adaptive Edge-Resilient Optimization for Heterogeneous Swarms), a novel decentralized coordination, task allocation, and safety-critical flight framework designed specifically for heterogeneous aerial swarms operating in non-permissive, GPS-denied theaters."
     )
     
     p_body2 = doc.add_paragraph()
@@ -317,10 +312,10 @@ def build_elsevier_cover_letter(output_path):
     p_align = doc.add_paragraph()
     p_align.paragraph_format.space_before = Pt(4)
     p_align.paragraph_format.space_after = Pt(6)
-    r_ah = p_align.add_run("Relevance to Swarm and Evolutionary Computation & Robotics and Autonomous Systems: ")
+    r_ah = p_align.add_run("Relevance to Swarm and Evolutionary Computation: ")
     r_ah.bold = True
     p_align.add_run(
-        "This article intersects the central remits of both journals by uniting decentralized swarm intelligence and auction optimization with real-time ROS 2 robotics deployment. Our benchmarks directly cite and compare with recent articles in SWEVO (e.g., GPU-native parallel optimization 2606.26164, divergence-driven stabilization 2506.23734, routing sampling 2512.19321) and RAS (e.g., UAV formation control 2304.03057, vibration swarm flocking 2610.35582, exploration mapping 2407.07409, multi-robot task allocation 2209.10513)."
+        "This article intersects the central remits of Swarm and Evolutionary Computation by uniting decentralized swarm intelligence, cellular sheaf consensus, and distributed auction optimization with real-time ROS 2 flight control. Our benchmarks rigorously validate task allocation resilience and algebraic connectivity under severe RF jamming and physical attrition."
     )
     
     p_decl = doc.add_paragraph()
@@ -328,8 +323,8 @@ def build_elsevier_cover_letter(output_path):
     r_dh = p_decl.add_run("Declarations of Interest and Data Availability:\n")
     r_dh.bold = True
     p_decl.add_run("1. Originality: The paper is original, has not been published previously, and is not under consideration elsewhere.\n")
-    p_decl.add_run("2. Co-Author Approval: All authors have confirmed participation and approved the final manuscript.\n")
-    p_decl.add_run("3. Competing Interests: The authors have no competing financial or commercial conflicts of interest.\n")
+    p_decl.add_run("2. Author Approval: The author has reviewed and approved the revised manuscript.\n")
+    p_decl.add_run("3. Competing Interests: The author declares no competing financial or personal relationships.\n")
     p_decl.add_run("4. Code & Reproducibility: All algorithms, simulation scripts, and ROS 2 packages are fully open-source at: ")
     r_gh = p_decl.add_run("https://github.com/Vishal442005/AERO-Swarm")
     r_gh.bold = True
@@ -343,7 +338,7 @@ def build_elsevier_cover_letter(output_path):
     r_sig = p_close.add_run("Warm regards,\n\n")
     r_sig.font.italic = True
     
-    r_team = p_close.add_run("Autonomous Robotics Swarm Research Consortium\n")
+    r_team = p_close.add_run("Vishal Chandel\n")
     r_team.bold = True
     p_close.add_run("Division of Robotics and Autonomous Systems\nAutonomous Multi-Agent Robotics Laboratory\nEmail: research@autonomous-swarms.org")
     
@@ -351,7 +346,9 @@ def build_elsevier_cover_letter(output_path):
     print(f"Elsevier Cover Letter saved to {output_path}")
 
 if __name__ == "__main__":
-    p_ieee = "/media/jarvis/01DB55B559EC9500/Robotics Swarm/submission_ieee_(T-Cyb)/COVER_LETTER_IEEE_TCYB.docx"
-    p_elsevier = "/media/jarvis/01DB55B559EC9500/Robotics Swarm/submission_elseiver_(SWEVO)_RAS/COVER_LETTER_ELSEVIER_SWEVO_RAS.docx"
-    build_ieee_cover_letter(p_ieee)
+    workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    p_ieee = os.path.join(workspace_root, "submission_ieee_(T-Cyb)", "COVER_LETTER_IEEE_TCYB.docx")
+    p_elsevier = os.path.join(workspace_root, "submission_elseiver_(SWEVO)_RAS", "COVER_LETTER_ELSEVIER_SWEVO_RAS.docx")
+    if os.path.exists(os.path.dirname(p_ieee)):
+        build_ieee_cover_letter(p_ieee)
     build_elsevier_cover_letter(p_elsevier)
