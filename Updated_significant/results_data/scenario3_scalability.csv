@@ -1,0 +1,6 @@
+swarm_size_N,AERO_latency_ms,AERO_latency_std,CBBA_latency_ms,Flocking_latency_ms,Sun_latency_ms,ACMASAC_latency_ms
+10,0.42,0.03,0.38,0.21,0.98,2.41
+25,0.98,0.05,1.25,0.52,2.45,6.5
+50,1.85,0.08,2.94,0.95,4.95,12.1
+100,4.92,0.15,9.82,2.14,12.5,38.74
+200,14.18,0.32,38.45,5.82,39.8,142.15

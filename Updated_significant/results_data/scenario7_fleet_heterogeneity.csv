@@ -1,0 +1,4 @@
+fleet_configuration,AERO_TCR_mean,AERO_TCR_std,CBBA_TCR_mean,CBBA_TCR_std,Sun_TCR_mean,Sun_TCR_std,AERO_H1_obstruction,Flat_H1_obstruction,AERO_Energy_consumed_pct,CBBA_Energy_consumed_pct
+Scout-Heavy (10/80/10),88.4,2.1,16.8,4.2,28.5,3.6,0.18,4.82,34.2,68.4
+Balanced (20/60/20),91.3,1.8,23.7,5.3,35.8,4.1,0.04,3.65,38.5,72.1
+Leader-Heavy (40/40/20),93.6,1.5,29.4,4.8,41.2,3.8,0.0,2.94,45.8,79.5
