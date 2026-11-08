@@ -12,13 +12,13 @@ import numpy as np
 
 
 class SHATAAuctionNode(Node):
-    def __init__(self):
-        super().__init__('shata_auction_node')
+    def __init__(self, drone_id: int = 0, drone_type: int = 0):
+        super().__init__(f'shata_auction_node_{drone_id}')
         
-        self.declare_parameter('drone_id', 0)
-        self.declare_parameter('drone_type', 0)
-        self.drone_id = self.get_parameter('drone_id').value
-        self.drone_type = self.get_parameter('drone_type').value
+        self.declare_parameter('drone_id', drone_id)
+        self.declare_parameter('drone_type', drone_type)
+        self.drone_id = drone_id
+        self.drone_type = drone_type
         
         self.assigned_tasks = []
         

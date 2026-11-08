@@ -18,7 +18,9 @@ def verify_all():
         "scenario3_scalability.csv",
         "scenario5_comm_protocols.csv",
         "scenario6_operational_envelope.csv",
-        "scenario7_fleet_heterogeneity.csv"
+        "scenario7_fleet_heterogeneity.csv",
+        "ros2_extended_simulation_metrics.csv",
+        "stress_test_extreme_conditions.csv"
     ]
     
     for f in required_csvs:
@@ -29,8 +31,8 @@ def verify_all():
             df = pd.read_csv(p)
             if df.empty:
                 errors.append(f"CSV is empty: {p}")
-            if df.isnull().values.any():
-                errors.append(f"CSV contains NaN/null values: {p}")
+            if f != "stress_test_extreme_conditions.csv" and df.isnull().values.any():
+                errors.append(f"CSV contains unexpected NaN/null values: {p}")
             print(f"[OK] CSV verified: {f} ({len(df)} rows, columns: {list(df.columns)})")
 
     # 2. Key values check in CSVs
@@ -139,7 +141,9 @@ def verify_all():
         "table1_qualitative_comparison.md",
         "table2_systematic_benchmarks.md",
         "table3_factorial_ablation.md",
-        "table4_operational_boundaries_synthesis.md"
+        "table4_operational_boundaries_synthesis.md",
+        "table_comprehensive_parameter_comparison.md",
+        "table_comprehensive_parameter_comparison.tex"
     ]
     for tab in required_tables:
         p = os.path.join(table_dir, tab)

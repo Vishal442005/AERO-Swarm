@@ -14,15 +14,15 @@ import scipy.linalg as la
 
 
 class IGETCTriggerNode(Node):
-    def __init__(self):
-        super().__init__('ig_etc_trigger_node')
+    def __init__(self, drone_id: int = 0):
+        super().__init__(f'ig_etc_trigger_node_{drone_id}')
         
-        self.declare_parameter('drone_id', 0)
+        self.declare_parameter('drone_id', drone_id)
         self.declare_parameter('delta_min', 0.4)
         self.declare_parameter('delta_max', 2.5)
         self.declare_parameter('beta_energy', 2.0)
         
-        self.drone_id = self.get_parameter('drone_id').value
+        self.drone_id = drone_id
         self.delta_min = self.get_parameter('delta_min').value
         self.delta_max = self.get_parameter('delta_max').value
         self.beta_energy = self.get_parameter('beta_energy').value

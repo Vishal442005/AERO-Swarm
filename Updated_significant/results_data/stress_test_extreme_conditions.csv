@@ -1,0 +1,4 @@
+test_name,unfiltered_collision_pct,aero_swarm_collision_pct,safety_interventions,peak_solve_latency_ms,flat_graph_sri,cellular_sheaf_sri,resilience_gain_factor,sheaf_dim_post_failure,laplacian_symmetric,laplacian_psd,min_eigenvalue
+Cauchy_Wind_Turbulence,100.0,0.0,960.0,3.0102,,,,,,,
+Targeted_Bridge_Destruction,,,,,0.063,0.706,11.21,,,,
+Stalk_Sensor_Degradation,,,,,,,,244.0,True,True,-0.0
