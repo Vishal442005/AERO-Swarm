@@ -28,6 +28,7 @@ setup(
             'ig_etc_trigger_node = aero_swarm_ros2.ig_etc_trigger_node:main',
             'rta_safety_simplex_node = aero_swarm_ros2.rta_safety_simplex_node:main',
             'shata_auction_node = aero_swarm_ros2.shata_auction_node:main',
+            'aero_formation_controller = aero_swarm_ros2.aero_formation_controller_node:main',
             'rf_jammer_node = aero_swarm_ros2.rf_jammer_node:main',
             'swarm_world_sim_node = aero_swarm_ros2.swarm_world_sim_node:main',
         ],

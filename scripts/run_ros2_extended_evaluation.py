@@ -17,6 +17,17 @@ import time
 import numpy as np
 import pandas as pd
 
+# Path setup for cross-platform execution (Windows & Ubuntu)
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+ros2_pkg = os.path.join(repo_root, 'ros2_ws', 'src', 'aero_swarm_ros2')
+src_dir = os.path.join(repo_root, 'src')
+if ros2_pkg not in sys.path:
+    sys.path.insert(0, ros2_pkg)
+if src_dir not in sys.path:
+    sys.path.insert(0, src_dir)
+
+import aero_swarm_ros2
+
 # ROS 2 Python client library
 import rclpy
 from rclpy.executors import MultiThreadedExecutor, SingleThreadedExecutor
