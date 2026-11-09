@@ -1,0 +1,302 @@
+[
+  {
+    "journal": "SWEVO",
+    "journal_name": "Swarm and Evolutionary Computation",
+    "openalex_id": "W7223990492",
+    "title": "Non-linear search-space transformations break scale invariance in bounded particle swarm optimization",
+    "authors": [
+      "Jörg Kunkelmoor",
+      "Paolo Mercorelli"
+    ],
+    "first_author": "Jörg Kunkelmoor",
+    "doi": "https://doi.org/10.1016/j.swevo.2026.102579",
+    "pub_date": "2026-10-27",
+    "abstract": "Normalizing the search space is standard practice in PSO implementations, and it is usually justified by the claim that the algorithm is invariant under coordinate transformation. That claim holds for affine maps only. We show that non-linear maps change convergence behavior under an unchanged objective, and we trace the effect to the resolution geometry of a transformation: the local derivative d T / d ξ , which sets where in the bounded domain a swarm can resolve fine detail. A transformation should therefore favor optima that lie where it concentrates resolution, and fail where it coarsens it. We test this on a constructed mirror pair, two Sphere landscapes that differ only in the position of the global optimum. Under absorbing boundary handling, one transformation reaches machine precision on the first landscape and misses the second by five orders of magnitude. The asymmetry survives a control for initialization density. A full-factorial study of four transformations, two boundary handling strategies (clamping, rebound) and three reseeding strategies (none, soft, hard) over 12 benchmark functions, 5 dimensionalities and 50 independent runs each, 72,000 runs in total, shows that the three factors are not separable. Rebound handling recovers every transformation that clamping causes to fail, so bound-handling results obtained under linear scaling do not carry over to transformed spaces. Soft reseeding degrades performance on all but one function. Since the optimum location is unknown in practice, we recommend norm01+rebound+hard as a default.",
+    "is_oa": true,
+    "oa_status": "hybrid",
+    "landing_url": "https://doi.org/10.1016/j.swevo.2026.102579",
+    "pdf_candidates": [
+      "https://doi.org/10.1016/j.swevo.2026.102579"
+    ],
+    "relevance_score": 16,
+    "pdf_downloaded": false,
+    "pdf_local_path": null,
+    "txt_local_path": "papers\\swevo_ras_recent\\SWEVO_2026_Non-linear_search-space_transformations_break_scale_invarian.txt"
+  },
+  {
+    "journal": "SWEVO",
+    "journal_name": "Swarm and Evolutionary Computation",
+    "openalex_id": "W7225340895",
+    "title": "Soft actor-critic with attractor-field PSO parameter adaptation for UAV path planning",
+    "authors": [
+      "Viet-Anh Ngo",
+      "Thanh-Hung Nguyen",
+      "Duc‐Toan Nguyen"
+    ],
+    "first_author": "Viet-Anh Ngo",
+    "doi": "https://doi.org/10.1016/j.swevo.2026.102599",
+    "pub_date": "2026-11-05",
+    "abstract": "",
+    "is_oa": false,
+    "oa_status": "closed",
+    "landing_url": "https://doi.org/10.1016/j.swevo.2026.102599",
+    "pdf_candidates": [],
+    "relevance_score": 9,
+    "pdf_downloaded": false,
+    "pdf_local_path": null,
+    "txt_local_path": "papers\\swevo_ras_recent\\SWEVO_2026_Soft_actor-critic_with_attractor-field_PSO_parameter_adaptat.txt"
+  },
+  {
+    "journal": "SWEVO",
+    "journal_name": "Swarm and Evolutionary Computation",
+    "openalex_id": "W7223468635",
+    "title": "Timebox-enhanced evolutionary algorithm for electric vehicle–drone routing problem with drone stations and time windows",
+    "authors": [
+      "Setyo Tri Windras Mara",
+      "Ruhul Amin Sarker",
+      "Saber Mohammed Elsayed",
+      "Daryl Essam",
+      "Carlos Coello Coello"
+    ],
+    "first_author": "Setyo Tri Windras Mara",
+    "doi": "https://doi.org/10.1016/j.swevo.2026.102580",
+    "pub_date": "2026-10-24",
+    "abstract": "This paper presents a futuristic logistics system where a combination of electric vehicle–drone tandems and drone stations are employed to serve customers within their specified time windows. Integrating time windows constraints represents a forward step in devising a routing model that resembles a real-world practice. However, the addition of time windows into a system with multiple transportation modes yields a challenging optimization problem with immense computational complexity and a tight feasible region. Existing approaches generally start by creating a random population or a dedicated solution that neglects the time windows, leading to a weak starting point that deteriorates the algorithms’ performance. To address this problem, we propose a timebox-enhanced adaptive memetic algorithm. In this algorithm, we introduce a timebox classification technique to classify customers based on their service deadlines. This technique is then utilized to create a feasible initial solution in the presence of time windows constraints and speed up the algorithm’s convergence. Then, the algorithm iteratively improves the initial population by decomposing the model into location-routing and scheduling subproblems and respectively solves them with a Q-learning-based adaptive memetic algorithm and a job stacking heuristic. Our experimental study demonstrates that the proposed approach can enhance both operational efficiency and energy efficiency, yielding 13%–37% improvement over alternative approaches in terms of the solution’s quality. Furthermore, the inclusion of the specialized initialization technique leads to a 21% improvement in the algorithm’s performance.",
+    "is_oa": true,
+    "oa_status": "hybrid",
+    "landing_url": "https://doi.org/10.1016/j.swevo.2026.102580",
+    "pdf_candidates": [
+      "https://www.sciencedirect.com/science/article/pii/S2210650226003007/pdf",
+      "https://www.sciencedirect.com/science/article/pii/S2210650226003007/pdf"
+    ],
+    "relevance_score": 9,
+    "pdf_downloaded": false,
+    "pdf_local_path": null,
+    "txt_local_path": "papers\\swevo_ras_recent\\SWEVO_2026_Timebox-enhanced_evolutionary_algorithm_for_electric_vehicle.txt"
+  },
+  {
+    "journal": "SWEVO",
+    "journal_name": "Swarm and Evolutionary Computation",
+    "openalex_id": "W7221514930",
+    "title": "Taxiway path planning in airports based on Elite-guided Dynamic Lévy-flight Particle Swarm Optimization",
+    "authors": [
+      "Xujie Lv",
+      "Lirong Zhang",
+      "Yi Lin"
+    ],
+    "first_author": "Xujie Lv",
+    "doi": "https://doi.org/10.1016/j.swevo.2026.102541",
+    "pub_date": "2026-10-01",
+    "abstract": "",
+    "is_oa": false,
+    "oa_status": "closed",
+    "landing_url": "https://doi.org/10.1016/j.swevo.2026.102541",
+    "pdf_candidates": [],
+    "relevance_score": 9,
+    "pdf_downloaded": false,
+    "pdf_local_path": null,
+    "txt_local_path": "papers\\swevo_ras_recent\\SWEVO_2026_Taxiway_path_planning_in_airports_based_on_Elite-guided_Dyna.txt"
+  },
+  {
+    "journal": "SWEVO",
+    "journal_name": "Swarm and Evolutionary Computation",
+    "openalex_id": "W7214528412",
+    "title": "Evolutionary resilience in open multiagent optimization: From preset trust to emergent defense",
+    "authors": [
+      "Haoran Zhang",
+      "Lining Xing"
+    ],
+    "first_author": "Haoran Zhang",
+    "doi": "https://doi.org/10.1016/j.swevo.2026.102554",
+    "pub_date": "2026-09-27",
+    "abstract": "",
+    "is_oa": false,
+    "oa_status": "closed",
+    "landing_url": "https://doi.org/10.1016/j.swevo.2026.102554",
+    "pdf_candidates": [],
+    "relevance_score": 9,
+    "pdf_downloaded": false,
+    "pdf_local_path": null,
+    "txt_local_path": "papers\\swevo_ras_recent\\SWEVO_2026_Evolutionary_resilience_in_open_multiagent_optimization__Fro.txt"
+  },
+  {
+    "journal": "SWEVO",
+    "journal_name": "Swarm and Evolutionary Computation",
+    "openalex_id": "W7154961586",
+    "title": "Frenetic Cat-inspired particle optimization: A Markov state-switching hybrid swarm optimizer with application to cardiac digital twinning",
+    "authors": [
+      "Jorge Sánchez",
+      "Guadalupe García Isla",
+      "Sandra Perez-Herrero",
+      "Beatriz Trénor",
+      "Javier Sáiz"
+    ],
+    "first_author": "Jorge Sánchez",
+    "doi": "https://doi.org/10.1016/j.swevo.2026.102524",
+    "pub_date": "2026-09-01",
+    "abstract": "Designing optimizers that remain effective under tight evaluation budgets is critical in expensive black-box settings such as cardiac digital twinning. We propose Frenetic Cat-inspired Particle Optimization (FCPO), a hybrid swarm method that couples particle swarm optimization-like dynamics with an explicit-state Markov switching controller to schedule exploration and refinement operators online. FCPO integrates (i) state-conditioned bounded motion, (ii) an elite-difference global jump operator to escape stagnation, (iii) eigen-space guided local refinement from elite covariance, and (iv) linear population size reduction to control late-stage computational cost. We benchmark FCPO on five representative functions from the Congress on Evolutionary Computation (CEC) 2022 suite (F1, F2, F3, F6 and F10) at dimensions D ∈ { 10,20 } over 30 independent runs, comparing against PSO, CSO, CLPSO, SHADE, L-SHADE, HO and CMA-ES. FCPO achieves the lowest mean runtime across the ten benchmark cases among the full methods (average 0.181 s). HO, CMA-ES, and L-SHADE required approximately 2.33, 2.39, and 2.56 times the mean runtime of FCPO, respectively, in our Python implementation. Across the eight full methods, the aggregate rank analysis placed CMA-ES first, followed by FCPO, L-SHADE, and HO, with average ranks of 1.90, 3.40, 3.60, and 4.10, respectively. On structured landscapes (F1–F3) and on the hybrid function (F6), CMA-ES remains the most accurate method, while FCPO substantially improves over classical swarms and maintains a favorable accuracy–runtime trade-off. Finally, in a ventricular activation digital twin calibration task, FCPO reaches the target electrocardiogram (ECG) fidelity (RMSE < 0.1 mV) within ∼ 40 iterations and produces physiologically plausible activation maps with robust convergence across repeated initializations, supporting its use as a practical optimizer for expensive inverse problems.",
+    "is_oa": true,
+    "oa_status": "hybrid",
+    "landing_url": "https://doi.org/10.1016/j.swevo.2026.102524",
+    "pdf_candidates": [
+      "https://www.sciencedirect.com/science/article/pii/S2210650226002440/pdf",
+      "https://www.sciencedirect.com/science/article/pii/S2210650226002440/pdf",
+      "https://arxiv.org/pdf/2604.15761",
+      "https://arxiv.org/pdf/2604.15761.pdf"
+    ],
+    "relevance_score": 9,
+    "pdf_downloaded": true,
+    "pdf_local_path": "papers\\swevo_ras_recent\\SWEVO_2026_Frenetic_Cat-inspired_particle_optimization__A_Markov_state-.pdf",
+    "txt_local_path": "papers\\swevo_ras_recent\\SWEVO_2026_Frenetic_Cat-inspired_particle_optimization__A_Markov_state-.txt"
+  },
+  {
+    "journal": "RAS",
+    "journal_name": "Robotics and Autonomous Systems",
+    "openalex_id": "W7213418701",
+    "title": "Adaptive practical fixed-time cooperative control of UAVs under communication delays: Fully distributed observer-based approach",
+    "authors": [
+      "Masoud Hajimani",
+      "Farhad Bayat",
+      "Saleh Mobayen"
+    ],
+    "first_author": "Masoud Hajimani",
+    "doi": "https://doi.org/10.1016/j.robot.2026.105753",
+    "pub_date": "2026-09-16",
+    "abstract": "",
+    "is_oa": false,
+    "oa_status": "closed",
+    "landing_url": "https://doi.org/10.1016/j.robot.2026.105753",
+    "pdf_candidates": [],
+    "relevance_score": 18,
+    "pdf_downloaded": false,
+    "pdf_local_path": null,
+    "txt_local_path": "papers\\swevo_ras_recent\\RAS_2026_Adaptive_practical_fixed-time_cooperative_control_of_UAVs_un.txt"
+  },
+  {
+    "journal": "RAS",
+    "journal_name": "Robotics and Autonomous Systems",
+    "openalex_id": "W7225392053",
+    "title": "A novel task allocation method based on path planning in lunar surface transport using multi-robot systems",
+    "authors": [
+      "Yingbo Zhang",
+      "Zixuan Zheng",
+      "Chen Li"
+    ],
+    "first_author": "Yingbo Zhang",
+    "doi": "https://doi.org/10.1016/j.robot.2026.105831",
+    "pub_date": "2026-11-01",
+    "abstract": "",
+    "is_oa": false,
+    "oa_status": "closed",
+    "landing_url": "https://doi.org/10.1016/j.robot.2026.105831",
+    "pdf_candidates": [],
+    "relevance_score": 16,
+    "pdf_downloaded": false,
+    "pdf_local_path": null,
+    "txt_local_path": "papers\\swevo_ras_recent\\RAS_2026_A_novel_task_allocation_method_based_on_path_planning_in_lun.txt"
+  },
+  {
+    "journal": "RAS",
+    "journal_name": "Robotics and Autonomous Systems",
+    "openalex_id": "W4362706882",
+    "title": "Distributed UAV formation control robust to relative pose measurement noise",
+    "authors": [
+      "Viktor Walter",
+      "Matouš Vrba",
+      "Daniel Bonilla Licea",
+      "Matej Hilmer",
+      "Martin Saska"
+    ],
+    "first_author": "Viktor Walter",
+    "doi": "https://doi.org/10.1016/j.robot.2026.105458",
+    "pub_date": "2026-03-28",
+    "abstract": "",
+    "is_oa": true,
+    "oa_status": "green",
+    "landing_url": "http://arxiv.org/abs/2304.03057",
+    "pdf_candidates": [
+      "https://arxiv.org/pdf/2304.03057",
+      "https://arxiv.org/pdf/2304.03057",
+      "https://arxiv.org/pdf/2304.03057.pdf"
+    ],
+    "relevance_score": 16,
+    "pdf_downloaded": true,
+    "pdf_local_path": "papers\\swevo_ras_recent\\RAS_2026_Distributed_UAV_formation_control_robust_to_relative_pose_me.pdf",
+    "txt_local_path": "papers\\swevo_ras_recent\\RAS_2026_Distributed_UAV_formation_control_robust_to_relative_pose_me.txt"
+  },
+  {
+    "journal": "RAS",
+    "journal_name": "Robotics and Autonomous Systems",
+    "openalex_id": "W7210274855",
+    "title": "Cooperative Multi-UAV search for dynamic targets: A hybrid PPO-GA optimization strategy",
+    "authors": [
+      "Xue Fu",
+      "Lanyong Zhang",
+      "Liang Xu",
+      "Hongjun Yu",
+      "Yifan Tan",
+      "Jiacheng Chang"
+    ],
+    "first_author": "Xue Fu",
+    "doi": "https://doi.org/10.1016/j.robot.2026.105719",
+    "pub_date": "2026-09-06",
+    "abstract": "",
+    "is_oa": false,
+    "oa_status": "closed",
+    "landing_url": "https://doi.org/10.1016/j.robot.2026.105719",
+    "pdf_candidates": [],
+    "relevance_score": 14,
+    "pdf_downloaded": false,
+    "pdf_local_path": null,
+    "txt_local_path": "papers\\swevo_ras_recent\\RAS_2026_Cooperative_Multi-UAV_search_for_dynamic_targets__A_hybrid_P.txt"
+  },
+  {
+    "journal": "RAS",
+    "journal_name": "Robotics and Autonomous Systems",
+    "openalex_id": "W4410856804",
+    "title": "Integrated dynamic task allocation via event-triggered for tracking ground moving targets by UAVs in urban",
+    "authors": [
+      "Chaofang Hu",
+      "Yuan Li",
+      "Ge Qu"
+    ],
+    "first_author": "Chaofang Hu",
+    "doi": "https://doi.org/10.1016/j.robot.2025.105061",
+    "pub_date": "2025-05-29",
+    "abstract": "",
+    "is_oa": false,
+    "oa_status": "closed",
+    "landing_url": "https://doi.org/10.1016/j.robot.2025.105061",
+    "pdf_candidates": [],
+    "relevance_score": 14,
+    "pdf_downloaded": false,
+    "pdf_local_path": null,
+    "txt_local_path": "papers\\swevo_ras_recent\\RAS_2025_Integrated_dynamic_task_allocation_via_event-triggered_for_t.txt"
+  },
+  {
+    "journal": "RAS",
+    "journal_name": "Robotics and Autonomous Systems",
+    "openalex_id": "W7225194390",
+    "title": "Evaluating reinforcement learning approaches for leaderless UAV swarms in obstacle-laden environment",
+    "authors": [
+      "Mirza Aqib Ali",
+      "Adnan M. Maqsood",
+      "Usama Athar",
+      "Sara Ali"
+    ],
+    "first_author": "Mirza Aqib Ali",
+    "doi": "https://doi.org/10.1016/j.robot.2026.105840",
+    "pub_date": "2026-11-01",
+    "abstract": "Unmanned Aerial Vehicle (UAV) swarms provide huge potential for complex missions, yet coordinating large-scale collectives in obstacle-laden environments without a single global leader remains a significant challenge. While Multi-Agent Reinforcement Learning (MARL) has become a dominant paradigm for such coordination, systematic comparisons of how different training architectures perform within hierarchical manager-worker swarm topologies that deliberately eliminate the top-level aggregator remain absent from the literature. This study compares centralized (CTDE), decentralized (DTDE), and federated (FTDE) training approaches, all with decentralized execution, for a leaderless hierarchical UAV swarm of 18 agents organized into three manager-worker clusters. All paradigms are implemented using Asynchronous Proximal Policy Optimization (APPO) and evaluated over a fixed ten-session training budget. Centralized learning achieves the highest final reward, while federated learning attains the highest cumulative reward over the training budget by avoiding a mid-training performance drop observed in the centralized approach. Federated learning is also the only approach whose reward stays within a stability band through the end of the training budget, reaches a final collision rate comparable to that of centralized learning, and reduces inter-cluster training communication by approximately 80% relative to centralized learning. Under simulated manager failure, decentralized and federated learning each retain over 94% of nominal performance, compared to 63.9% for centralized learning. A theoretical analysis shows that the inter-cluster communication cost of the federated approach is independent of the number of workers per cluster when the number of manager clusters is fixed, although it grows with the number of clusters. Validation with an alternative algorithm (MAPPO) preserves the ordering of the three approaches on both final and cumulative reward, and an obstacle-density study preserves the final-reward ordering. These results indicate that peer-to-peer federated learning provides a balanced trade-off between learning performance, communication overhead, fault tolerance, and scalability for hierarchical UAV swarms.",
+    "is_oa": true,
+    "oa_status": "hybrid",
+    "landing_url": "https://doi.org/10.1016/j.robot.2026.105840",
+    "pdf_candidates": [
+      "https://doi.org/10.1016/j.robot.2026.105840"
+    ],
+    "relevance_score": 13,
+    "pdf_downloaded": false,
+    "pdf_local_path": null,
+    "txt_local_path": "papers\\swevo_ras_recent\\RAS_2026_Evaluating_reinforcement_learning_approaches_for_leaderless.txt"
+  }
+]

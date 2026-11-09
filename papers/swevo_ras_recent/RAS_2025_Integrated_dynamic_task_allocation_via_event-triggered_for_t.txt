@@ -1,0 +1,11 @@
+Title: Integrated dynamic task allocation via event-triggered for tracking ground moving targets by UAVs in urban
+Journal: Robotics and Autonomous Systems (RAS)
+Published Date: 2025-05-29
+Authors: Chaofang Hu, Yuan Li, Ge Qu
+DOI: https://doi.org/10.1016/j.robot.2025.105061
+OpenAlex ID: W4410856804
+Open Access: False (closed)
+URL: https://doi.org/10.1016/j.robot.2025.105061
+
+--- ABSTRACT ---
+

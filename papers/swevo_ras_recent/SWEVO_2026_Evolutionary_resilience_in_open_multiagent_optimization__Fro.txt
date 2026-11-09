@@ -1,0 +1,11 @@
+Title: Evolutionary resilience in open multiagent optimization: From preset trust to emergent defense
+Journal: Swarm and Evolutionary Computation (SWEVO)
+Published Date: 2026-09-27
+Authors: Haoran Zhang, Lining Xing
+DOI: https://doi.org/10.1016/j.swevo.2026.102554
+OpenAlex ID: W7214528412
+Open Access: False (closed)
+URL: https://doi.org/10.1016/j.swevo.2026.102554
+
+--- ABSTRACT ---
+

@@ -1,0 +1,11 @@
+Title: Soft actor-critic with attractor-field PSO parameter adaptation for UAV path planning
+Journal: Swarm and Evolutionary Computation (SWEVO)
+Published Date: 2026-11-05
+Authors: Viet-Anh Ngo, Thanh-Hung Nguyen, Duc‐Toan Nguyen
+DOI: https://doi.org/10.1016/j.swevo.2026.102599
+OpenAlex ID: W7225340895
+Open Access: False (closed)
+URL: https://doi.org/10.1016/j.swevo.2026.102599
+
+--- ABSTRACT ---
+

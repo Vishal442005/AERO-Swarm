@@ -1,0 +1,11 @@
+Title: Non-linear search-space transformations break scale invariance in bounded particle swarm optimization
+Journal: Swarm and Evolutionary Computation (SWEVO)
+Published Date: 2026-10-27
+Authors: Jörg Kunkelmoor, Paolo Mercorelli
+DOI: https://doi.org/10.1016/j.swevo.2026.102579
+OpenAlex ID: W7223990492
+Open Access: True (hybrid)
+URL: https://doi.org/10.1016/j.swevo.2026.102579
+
+--- ABSTRACT ---
+Normalizing the search space is standard practice in PSO implementations, and it is usually justified by the claim that the algorithm is invariant under coordinate transformation. That claim holds for affine maps only. We show that non-linear maps change convergence behavior under an unchanged objective, and we trace the effect to the resolution geometry of a transformation: the local derivative d T / d ξ , which sets where in the bounded domain a swarm can resolve fine detail. A transformation should therefore favor optima that lie where it concentrates resolution, and fail where it coarsens it. We test this on a constructed mirror pair, two Sphere landscapes that differ only in the position of the global optimum. Under absorbing boundary handling, one transformation reaches machine precision on the first landscape and misses the second by five orders of magnitude. The asymmetry survives a control for initialization density. A full-factorial study of four transformations, two boundary handling strategies (clamping, rebound) and three reseeding strategies (none, soft, hard) over 12 benchmark functions, 5 dimensionalities and 50 independent runs each, 72,000 runs in total, shows that the three factors are not separable. Rebound handling recovers every transformation that clamping causes to fail, so bound-handling results obtained under linear scaling do not carry over to transformed spaces. Soft reseeding degrades performance on all but one function. Since the optimum location is unknown in practice, we recommend norm01+rebound+hard as a default.

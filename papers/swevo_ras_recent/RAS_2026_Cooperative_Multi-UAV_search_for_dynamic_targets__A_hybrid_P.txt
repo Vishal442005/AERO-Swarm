@@ -1,0 +1,11 @@
+Title: Cooperative Multi-UAV search for dynamic targets: A hybrid PPO-GA optimization strategy
+Journal: Robotics and Autonomous Systems (RAS)
+Published Date: 2026-09-06
+Authors: Xue Fu, Lanyong Zhang, Liang Xu, Hongjun Yu, Yifan Tan, Jiacheng Chang
+DOI: https://doi.org/10.1016/j.robot.2026.105719
+OpenAlex ID: W7210274855
+Open Access: False (closed)
+URL: https://doi.org/10.1016/j.robot.2026.105719
+
+--- ABSTRACT ---
+

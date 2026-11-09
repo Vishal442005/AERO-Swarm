@@ -1,0 +1,11 @@
+Title: A novel task allocation method based on path planning in lunar surface transport using multi-robot systems
+Journal: Robotics and Autonomous Systems (RAS)
+Published Date: 2026-11-01
+Authors: Yingbo Zhang, Zixuan Zheng, Chen Li
+DOI: https://doi.org/10.1016/j.robot.2026.105831
+OpenAlex ID: W7225392053
+Open Access: False (closed)
+URL: https://doi.org/10.1016/j.robot.2026.105831
+
+--- ABSTRACT ---
+

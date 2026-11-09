@@ -1,0 +1,11 @@
+Title: Adaptive practical fixed-time cooperative control of UAVs under communication delays: Fully distributed observer-based approach
+Journal: Robotics and Autonomous Systems (RAS)
+Published Date: 2026-09-16
+Authors: Masoud Hajimani, Farhad Bayat, Saleh Mobayen
+DOI: https://doi.org/10.1016/j.robot.2026.105753
+OpenAlex ID: W7213418701
+Open Access: False (closed)
+URL: https://doi.org/10.1016/j.robot.2026.105753
+
+--- ABSTRACT ---
+

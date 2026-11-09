@@ -1,0 +1,11 @@
+Title: Distributed UAV formation control robust to relative pose measurement noise
+Journal: Robotics and Autonomous Systems (RAS)
+Published Date: 2026-03-28
+Authors: Viktor Walter, Matouš Vrba, Daniel Bonilla Licea, Matej Hilmer, Martin Saska
+DOI: https://doi.org/10.1016/j.robot.2026.105458
+OpenAlex ID: W4362706882
+Open Access: True (green)
+URL: http://arxiv.org/abs/2304.03057
+
+--- ABSTRACT ---
+

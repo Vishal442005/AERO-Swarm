@@ -1,0 +1,11 @@
+Title: Timebox-enhanced evolutionary algorithm for electric vehicle–drone routing problem with drone stations and time windows
+Journal: Swarm and Evolutionary Computation (SWEVO)
+Published Date: 2026-10-24
+Authors: Setyo Tri Windras Mara, Ruhul Amin Sarker, Saber Mohammed Elsayed, Daryl Essam, Carlos Coello Coello
+DOI: https://doi.org/10.1016/j.swevo.2026.102580
+OpenAlex ID: W7223468635
+Open Access: True (hybrid)
+URL: https://doi.org/10.1016/j.swevo.2026.102580
+
+--- ABSTRACT ---
+This paper presents a futuristic logistics system where a combination of electric vehicle–drone tandems and drone stations are employed to serve customers within their specified time windows. Integrating time windows constraints represents a forward step in devising a routing model that resembles a real-world practice. However, the addition of time windows into a system with multiple transportation modes yields a challenging optimization problem with immense computational complexity and a tight feasible region. Existing approaches generally start by creating a random population or a dedicated solution that neglects the time windows, leading to a weak starting point that deteriorates the algorithms’ performance. To address this problem, we propose a timebox-enhanced adaptive memetic algorithm. In this algorithm, we introduce a timebox classification technique to classify customers based on their service deadlines. This technique is then utilized to create a feasible initial solution in the presence of time windows constraints and speed up the algorithm’s convergence. Then, the algorithm iteratively improves the initial population by decomposing the model into location-routing and scheduling subproblems and respectively solves them with a Q-learning-based adaptive memetic algorithm and a job stacking heuristic. Our experimental study demonstrates that the proposed approach can enhance both operational efficiency and energy efficiency, yielding 13%–37% improvement over alternative approaches in terms of the solution’s quality. Furthermore, the inclusion of the specialized initialization technique leads to a 21% improvement in the algorithm’s performance.

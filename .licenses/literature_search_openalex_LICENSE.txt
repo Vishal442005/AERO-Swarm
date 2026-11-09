@@ -1,0 +1,4 @@
+OpenAlex Terms and License Notification
+Timestamp: 2026-11-09T21:45:00+05:30
+Terms: https://help.openalex.org/
+Notice: Always check the license of the papers retrieved by the skill for any restrictions. OpenAlex metadata is CC0. Full text PDFs and content must be used in accordance with their respective publisher and open-access licenses.

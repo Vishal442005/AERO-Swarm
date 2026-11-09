@@ -1,0 +1,11 @@
+Title: Taxiway path planning in airports based on Elite-guided Dynamic Lévy-flight Particle Swarm Optimization
+Journal: Swarm and Evolutionary Computation (SWEVO)
+Published Date: 2026-10-01
+Authors: Xujie Lv, Lirong Zhang, Yi Lin
+DOI: https://doi.org/10.1016/j.swevo.2026.102541
+OpenAlex ID: W7221514930
+Open Access: False (closed)
+URL: https://doi.org/10.1016/j.swevo.2026.102541
+
+--- ABSTRACT ---
+
