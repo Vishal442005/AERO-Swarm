@@ -13,6 +13,10 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.patches import FancyBboxPatch, Circle, Polygon
 
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
+plt.rcParams['font.family'] = 'DejaVu Sans'
+
 def generate_teaser_4panel(dest_paths):
     fig, axes = plt.subplots(2, 2, figsize=(10.5, 6.2), dpi=300)
     plt.subplots_adjust(wspace=0.18, hspace=0.25)
@@ -109,7 +113,7 @@ def generate_teaser_4panel(dest_paths):
 
     # Central Edge Stalk
     b_edge = dict(boxstyle='round,pad=0.4', facecolor='#f8f8f8', edgecolor='black', lw=1.4)
-    ax.text(5.0, 5.4, 'Edge Stalk: $\\mathcal{F}_e = \\mathbb{R}^6$\nShared 3D Pos + 3D Vel\nCoboundary: $(\\delta x)_e = \\rho_v x_v - \\rho_u x_u$', 
+    ax.text(5.0, 5.4, 'Edge Stalk: $\\mathcal{F}_e = \\mathbb{R}^6$\nShared 3D Pos + 3D Vel\nCoboundary: $(\\delta x)_e = \\rho_{v \\trianglelefteq e} x_v - \\rho_{u \\trianglelefteq e} x_u$', 
             ha='center', va='center', bbox=b_edge, fontsize=7.5, fontweight='bold')
 
     # Arrows with restriction maps
@@ -265,11 +269,13 @@ if __name__ == '__main__':
     
     teaser_targets = [
         os.path.join(workspace_root, "results", "plots", "fig_teaser_sheaf_concept.png"),
-        os.path.join(workspace_root, "submission_elseiver_(SWEVO)_RAS", "figures", "fig_teaser_sheaf_concept.png")
+        os.path.join(workspace_root, "submission_elseiver_(SWEVO)_RAS", "figures", "fig_teaser_sheaf_concept.png"),
+        os.path.join(workspace_root, "Updated_significant", "figures", "fig_teaser_sheaf_concept.png")
     ]
     ros2_targets = [
         os.path.join(workspace_root, "results", "plots", "fig_ros2_architecture.png"),
-        os.path.join(workspace_root, "submission_elseiver_(SWEVO)_RAS", "figures", "fig_ros2_architecture.png")
+        os.path.join(workspace_root, "submission_elseiver_(SWEVO)_RAS", "figures", "fig_ros2_architecture.png"),
+        os.path.join(workspace_root, "Updated_significant", "figures", "fig_ros2_architecture.png")
     ]
 
     generate_teaser_4panel(teaser_targets)

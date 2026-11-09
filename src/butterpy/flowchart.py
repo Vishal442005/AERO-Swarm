@@ -50,10 +50,14 @@ class Node:
 
 
 class ButterFlowchart:
-    def __init__(self, title=None, width=8.5, height=10.0):
+    def __init__(self, title=None, width=8.5, height=10.0,
+                 node_fontsize=13.0, subtitle_fontsize=10.5, label_fontsize=10.5):
         self.title = title
         self.width = float(width)
         self.height = float(height)
+        self.node_fontsize = float(node_fontsize)
+        self.subtitle_fontsize = float(subtitle_fontsize)
+        self.label_fontsize = float(label_fontsize)
         self.fig, self.ax = plt.subplots(figsize=(width, height), dpi=300)
         self.ax.set_xlim(0, width)
         self.ax.set_ylim(0, height)
@@ -139,12 +143,12 @@ class ButterFlowchart:
 
         # Draw pure black text
         if node.subtitle:
-            self.ax.text(text_x, y + 0.12, node.text, fontsize=9.0, fontweight="bold", 
+            self.ax.text(text_x, y + 0.14, node.text, fontsize=self.node_fontsize, fontweight="bold", 
                          color="black", ha="center", va="center", zorder=5)
-            self.ax.text(text_x, y - 0.16, node.subtitle, fontsize=7.8, 
+            self.ax.text(text_x, y - 0.16, node.subtitle, fontsize=self.subtitle_fontsize, 
                          color="black", ha="center", va="center", zorder=5)
         else:
-            self.ax.text(text_x, y, node.text, fontsize=9.0, fontweight="bold", 
+            self.ax.text(text_x, y, node.text, fontsize=self.node_fontsize, fontweight="bold", 
                          color="black", ha="center", va="center", zorder=5)
 
     def draw_connections(self):
@@ -188,7 +192,7 @@ class ButterFlowchart:
             if conn.get("label"):
                 lx = mid_x + conn["label_offset"][0]
                 ly = mid_y + conn["label_offset"][1]
-                self.ax.text(lx, ly, conn["label"], fontsize=8.0, fontweight="bold",
+                self.ax.text(lx, ly, conn["label"], fontsize=self.label_fontsize, fontweight="bold",
                              color="black", ha="center", va="center",
                              bbox=dict(boxstyle="square,pad=0.2", facecolor="white", edgecolor="black", lw=0.8),
                              zorder=6)

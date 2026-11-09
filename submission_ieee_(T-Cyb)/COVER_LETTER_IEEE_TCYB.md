@@ -35,7 +35,8 @@ This manuscript directly builds upon and advances recent theoretical milestones 
 Thank you very much for your time, consideration, and handling of our submission.
 
 Sincerely,  
-**Autonomous Robotics Swarm Research Consortium**  
-Division of Robotics and Autonomous Systems  
-Autonomous Multi-Agent Robotics Laboratory  
-Contact Email: `research@autonomous-swarms.org`
+**Vishal Chandel**  
+Department of Electronics and Communication Engineering  
+Jawaharlal Nehru Government Engineering College (JNGEC), Sundernagar  
+Mandi, Himachal Pradesh 175018, India  
+Contact Email: `chandelvishal445@gmail.com`

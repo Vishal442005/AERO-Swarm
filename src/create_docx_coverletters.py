@@ -53,14 +53,14 @@ def build_ieee_cover_letter(output_path):
     # Header / Letterhead
     p_head = doc.add_paragraph()
     p_head.paragraph_format.space_after = Pt(2)
-    run_org = p_head.add_run("AUTONOMOUS MULTI-AGENT ROBOTICS & AEROSPACE SYSTEMS LABORATORY")
+    run_org = p_head.add_run("DEPARTMENT OF ELECTRONICS AND COMMUNICATION ENGINEERING")
     run_org.bold = True
     run_org.font.size = Pt(12)
     run_org.font.color.rgb = RGBColor(15, 23, 42)
     
     p_sub = doc.add_paragraph()
     p_sub.paragraph_format.space_after = Pt(4)
-    run_sub = p_sub.add_run("Division of Robotics and Autonomous Systems • Aerospace Engineering Consortium\nUniversity of Cambridge • Cambridge CB2 1PZ, United Kingdom • Email: research@autonomous-swarms.org")
+    run_sub = p_sub.add_run("Jawaharlal Nehru Government Engineering College (JNGEC)\nSundernagar, Mandi, Himachal Pradesh 175018, India • Email: chandelvishal445@gmail.com")
     run_sub.font.size = Pt(8.5)
     run_sub.font.color.rgb = RGBColor(100, 116, 139)
     
@@ -188,9 +188,9 @@ def build_ieee_cover_letter(output_path):
     r_sig = p_close.add_run("Sincerely yours,\n\n")
     r_sig.font.italic = True
     
-    r_team = p_close.add_run("Autonomous Robotics Swarm Research Consortium\n")
+    r_team = p_close.add_run("Vishal Chandel\n")
     r_team.bold = True
-    p_close.add_run("Division of Robotics and Autonomous Systems\nAutonomous Multi-Agent Robotics Laboratory\nEmail: research@autonomous-swarms.org")
+    p_close.add_run("Department of Electronics and Communication Engineering\nJawaharlal Nehru Government Engineering College (JNGEC), Sundernagar, Mandi, HP, India\nEmail: chandelvishal445@gmail.com")
     
     doc.save(output_path)
     print(f"IEEE T-Cyb Cover Letter saved to {output_path}")
@@ -211,14 +211,14 @@ def build_elsevier_cover_letter(output_path):
     
     p_head = doc.add_paragraph()
     p_head.paragraph_format.space_after = Pt(2)
-    run_org = p_head.add_run("AUTONOMOUS MULTI-AGENT ROBOTICS & AEROSPACE SYSTEMS LABORATORY")
+    run_org = p_head.add_run("DEPARTMENT OF ELECTRONICS AND COMMUNICATION ENGINEERING")
     run_org.bold = True
     run_org.font.size = Pt(12)
     run_org.font.color.rgb = RGBColor(15, 23, 42)
     
     p_sub = doc.add_paragraph()
     p_sub.paragraph_format.space_after = Pt(4)
-    run_sub = p_sub.add_run("Division of Robotics and Autonomous Systems • Swarm Intelligence & Control Section\nUniversity of Cambridge • Cambridge CB2 1PZ, United Kingdom • Email: research@autonomous-swarms.org")
+    run_sub = p_sub.add_run("Jawaharlal Nehru Government Engineering College (JNGEC)\nSundernagar, Mandi, Himachal Pradesh 175018, India • Email: chandelvishal445@gmail.com")
     run_sub.font.size = Pt(8.5)
     run_sub.font.color.rgb = RGBColor(100, 116, 139)
     
@@ -340,7 +340,7 @@ def build_elsevier_cover_letter(output_path):
     
     r_team = p_close.add_run("Vishal Chandel\n")
     r_team.bold = True
-    p_close.add_run("Division of Robotics and Autonomous Systems\nAutonomous Multi-Agent Robotics Laboratory\nEmail: research@autonomous-swarms.org")
+    p_close.add_run("Department of Electronics and Communication Engineering\nJawaharlal Nehru Government Engineering College (JNGEC), Sundernagar, Mandi, HP, India\nEmail: chandelvishal445@gmail.com")
     
     doc.save(output_path)
     print(f"Elsevier Cover Letter saved to {output_path}")

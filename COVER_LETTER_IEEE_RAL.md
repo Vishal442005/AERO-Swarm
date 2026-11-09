@@ -10,10 +10,11 @@ IEEE Robotics and Automation Society (RAS)
 **Manuscript Title:**  
 *AERO-Swarm: A Decentralized Sheaf-Theoretic and Information-Geometric Multi-Agent Framework for Resilient Heterogeneous Drone Swarms in Adversarial Environments*  
 
-**Authors:**  
-Autonomous Robotics Swarm Research Group  
-Autonomous Systems and Multi-Agent Robotics Laboratory  
-Contact E-mail: `research@autonomous-swarms.org`  
+**Author:**  
+Vishal Chandel  
+Department of Electronics and Communication Engineering  
+Jawaharlal Nehru Government Engineering College (JNGEC), Sundernagar, Mandi, Himachal Pradesh 175018, India  
+Contact E-mail: `chandelvishal445@gmail.com`  
 
 ---
 
@@ -58,7 +59,8 @@ We believe this letter bridges the longstanding gap between pure algebraic topol
 
 Sincerely,
 
-**Autonomous Robotics Swarm Research Group**  
-Autonomous Systems and Multi-Agent Robotics Laboratory  
-E-mail: `research@autonomous-swarms.org`  
-GitHub: `https://github.com/autonomous-swarms/aero-swarm`
+**Vishal Chandel**  
+Department of Electronics and Communication Engineering  
+Jawaharlal Nehru Government Engineering College (JNGEC), Sundernagar, Mandi, Himachal Pradesh 175018, India  
+E-mail: `chandelvishal445@gmail.com`  
+GitHub: `https://github.com/Vishal442005/AERO-Swarm`

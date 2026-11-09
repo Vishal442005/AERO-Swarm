@@ -39,7 +39,7 @@ Thank you for your consideration of our work.
 
 Sincerely yours,  
 **Vishal Chandel**  
-Autonomous Multi-Agent Robotics Laboratory  
-Division of Robotics and Autonomous Systems  
-Cambridge CB2 1PZ, United Kingdom  
-Email: `research@autonomous-swarms.org`
+Department of Electronics and Communication Engineering  
+Jawaharlal Nehru Government Engineering College (JNGEC), Sundernagar  
+Mandi, Himachal Pradesh 175018, India  
+Email: `chandelvishal445@gmail.com`

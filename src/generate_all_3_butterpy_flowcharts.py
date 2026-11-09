@@ -278,19 +278,25 @@ if __name__ == "__main__":
     fc1_targets = [
         os.path.join(workspace_root, "results", "plots", "fig_flowchart1_sheaf_coordination.png"),
         os.path.join(workspace_root, "submission_elseiver_(SWEVO)_RAS", "figures", "fig_flowchart1_sheaf_coordination.png"),
-        os.path.join(workspace_root, "results", "fig_flowchart1_sheaf_coordination.png")
+        os.path.join(workspace_root, "results", "fig_flowchart1_sheaf_coordination.png"),
+        os.path.join(workspace_root, "Updated_significant", "figures", "fig_flowchart1_sheaf_coordination.png"),
+        os.path.join(workspace_root, "Updated_significant", "manuscript", "figures", "fig_flowchart1_sheaf_coordination.png")
     ]
 
     fc2_targets = [
         os.path.join(workspace_root, "results", "plots", "fig_flowchart2_ig_etc.png"),
         os.path.join(workspace_root, "submission_elseiver_(SWEVO)_RAS", "figures", "fig_flowchart2_ig_etc.png"),
-        os.path.join(workspace_root, "results", "fig_flowchart2_ig_etc.png")
+        os.path.join(workspace_root, "results", "fig_flowchart2_ig_etc.png"),
+        os.path.join(workspace_root, "Updated_significant", "figures", "fig_flowchart2_ig_etc.png"),
+        os.path.join(workspace_root, "Updated_significant", "manuscript", "figures", "fig_flowchart2_ig_etc.png")
     ]
 
     fc3_targets = [
         os.path.join(workspace_root, "results", "plots", "fig_flowchart3_shata_auction.png"),
         os.path.join(workspace_root, "submission_elseiver_(SWEVO)_RAS", "figures", "fig_flowchart3_shata_auction.png"),
-        os.path.join(workspace_root, "results", "fig_flowchart3_shata_auction.png")
+        os.path.join(workspace_root, "results", "fig_flowchart3_shata_auction.png"),
+        os.path.join(workspace_root, "Updated_significant", "figures", "fig_flowchart3_shata_auction.png"),
+        os.path.join(workspace_root, "Updated_significant", "manuscript", "figures", "fig_flowchart3_shata_auction.png")
     ]
 
     make_flowchart1(fc1_targets)
