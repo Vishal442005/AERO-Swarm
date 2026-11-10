@@ -222,40 +222,41 @@ def build_elsevier_cover_letter(output_path):
     run_sub.font.size = Pt(8.5)
     run_sub.font.color.rgb = RGBColor(100, 116, 139)
     
-    add_horizontal_rule(doc, color_hex="059669", size_pt=2.0)
+    add_horizontal_rule(doc, color_hex="0F766E", size_pt=2.0)
     
     p_date = doc.add_paragraph()
-    p_date.paragraph_format.space_after = Pt(8)
-    r_date = p_date.add_run("Date: November 5, 2026\n")
+    p_date.paragraph_format.space_after = Pt(6)
+    r_date = p_date.add_run("Date: November 10, 2026\n")
     r_date.bold = True
-    p_date.add_run("To: The Editor-in-Chief and Editorial Board\n")
-    r_recip = p_date.add_run("Swarm and Evolutionary Computation\n")
+    p_date.add_run("To: Prof. Dr. Karsten Berns, Prof. Maria Gini, and Prof. Jun Ota\n")
+    p_date.add_run("Editors-in-Chief and Editorial Board\n")
+    r_recip = p_date.add_run("Robotics and Autonomous Systems\n")
     r_recip.bold = True
-    r_recip.font.color.rgb = RGBColor(4, 120, 87)
+    r_recip.font.color.rgb = RGBColor(15, 118, 110)
     p_date.add_run("Elsevier ScienceDirect Journals")
     
     table_subj = doc.add_table(rows=1, cols=1)
     table_subj.alignment = WD_TABLE_ALIGNMENT.CENTER
     cell_s = table_subj.cell(0, 0)
-    set_cell_background(cell_s, "ECFDF5")
+    set_cell_background(cell_s, "F0FDFA")
     set_cell_margins(cell_s, top=140, bottom=140, left=200, right=200)
     p_subj = cell_s.paragraphs[0]
     p_subj.paragraph_format.space_before = Pt(2)
     p_subj.paragraph_format.space_after = Pt(2)
-    r_st = p_subj.add_run("SUBJECT: REVISED SUBMISSION OF ORIGINAL RESEARCH MANUSCRIPT (SWEVO-D-26-03280)\n")
+    r_st = p_subj.add_run("SUBJECT: SUBMISSION OF ORIGINAL REGULAR RESEARCH MANUSCRIPT\n")
     r_st.bold = True
     r_st.font.size = Pt(9.5)
-    r_st.font.color.rgb = RGBColor(5, 150, 105)
+    r_st.font.color.rgb = RGBColor(13, 148, 136)
     
     r_title = p_subj.add_run("Title: ")
     r_title.bold = True
-    r_title.font.size = Pt(10.5)
+    r_title.font.size = Pt(10.0)
     r_title_txt = p_subj.add_run("“AERO-Swarm: Cellular Sheaf Theoretic Coordination and Resilient Distributed Auction for Large-Scale Heterogeneous Drone Swarms in Contested Environments”\n")
     r_title_txt.bold = True
-    r_title_txt.font.size = Pt(10.5)
+    r_title_txt.font.size = Pt(10.0)
     r_title_txt.font.color.rgb = RGBColor(15, 23, 42)
     
-    r_meta = p_subj.add_run("Manuscript Type: Full Length Article (14 pages, elsarticle 3p twocolumn) • Category: Multi-Robot Swarm Intelligence")
+    r_meta = p_subj.add_run("Manuscript Type: Original Full-Length Research Article (22 pages, Elsevier elsarticle format) • Field: Autonomous Multi-Robot Systems")
     r_meta.font.size = Pt(8.5)
     r_meta.font.italic = True
     
@@ -263,14 +264,14 @@ def build_elsevier_cover_letter(output_path):
     
     p_body1 = doc.add_paragraph()
     p_body1.paragraph_format.space_after = Pt(6)
-    p_body1.add_run("Dear Editor-in-Chief and Esteemed Editorial Board,\n\n")
+    p_body1.add_run("Dear Editors-in-Chief Prof. Berns, Prof. Gini, Prof. Ota, and Esteemed Editorial Board,\n\n")
     p_body1.add_run(
-        "We are pleased to submit our revised original research manuscript entitled above for publication in "
+        "We are pleased to submit our original research manuscript entitled above for publication as a Full-Length Research Article in "
     )
-    r_j = p_body1.add_run("Swarm and Evolutionary Computation")
+    r_j = p_body1.add_run("Robotics and Autonomous Systems")
     r_j.bold = True
     p_body1.add_run(
-        ". In this paper, we present AERO-Swarm (Adaptive Edge-Resilient Optimization for Heterogeneous Swarms), a novel decentralized coordination, task allocation, and safety-critical flight framework designed specifically for heterogeneous aerial swarms operating in non-permissive, GPS-denied theaters."
+        ". In this work, we present AERO-Swarm (Adaptive Edge-Resilient Optimization for Heterogeneous Swarms), a novel decentralized coordination, task allocation, and provably safe control framework engineered for heterogeneous aerial robot fleets operating in contested, GPS-denied environments."
     )
     
     p_body2 = doc.add_paragraph()
@@ -312,35 +313,45 @@ def build_elsevier_cover_letter(output_path):
     p_align = doc.add_paragraph()
     p_align.paragraph_format.space_before = Pt(4)
     p_align.paragraph_format.space_after = Pt(6)
-    r_ah = p_align.add_run("Relevance to Swarm and Evolutionary Computation: ")
+    r_ah = p_align.add_run("Direct Alignment with Robotics and Autonomous Systems: ")
     r_ah.bold = True
     p_align.add_run(
-        "This article intersects the central remits of Swarm and Evolutionary Computation by uniting decentralized swarm intelligence, cellular sheaf consensus, and distributed auction optimization with real-time ROS 2 flight control. Our benchmarks rigorously validate task allocation resilience and algebraic connectivity under severe RF jamming and physical attrition."
+        "This manuscript directly addresses core topics of Robotics and Autonomous Systems, including autonomous multi-robot coordination, heterogeneous aerial swarms, safety-critical control barrier functions, distributed task allocation, and real-time ROS 2 software architectures. The blend of rigorous mathematical topology and field-ready robotic implementation makes this paper an ideal fit for the readership of RAS."
     )
+    
+    p_rev = doc.add_paragraph()
+    p_rev.paragraph_format.space_after = Pt(4)
+    r_rh = p_rev.add_run("Suggested Expert Reviewers:\n")
+    r_rh.bold = True
+    p_rev.add_run("1. Prof. Vijay Kumar (University of Pennsylvania, USA) — kumar@seas.upenn.edu (Multi-robot aerial swarms, autonomy)\n")
+    p_rev.add_run("2. Prof. Magnus Egerstedt (University of California, Irvine, USA) — magnus@uci.edu (Control Barrier Functions, multi-agent safety)\n")
+    p_rev.add_run("3. Prof. Michael Schwager (Stanford University, USA) — schwager@stanford.edu (Distributed multi-robot task allocation)\n")
+    p_rev.add_run("4. Prof. Florian Bullo (University of California, Santa Barbara, USA) — bullo@engineering.ucsb.edu (Networked robotic systems, consensus)\n")
+    p_rev.add_run("5. Prof. Pietro Liò (University of Cambridge, UK) — pl219@cam.ac.uk (Cellular sheaf Laplacians, topological learning)")
     
     p_decl = doc.add_paragraph()
     p_decl.paragraph_format.space_after = Pt(6)
-    r_dh = p_decl.add_run("Declarations of Interest and Data Availability:\n")
+    r_dh = p_decl.add_run("Declarations and Open-Science Reproducibility:\n")
     r_dh.bold = True
     p_decl.add_run("1. Originality: The paper is original, has not been published previously, and is not under consideration elsewhere.\n")
-    p_decl.add_run("2. Author Approval: The author has reviewed and approved the revised manuscript.\n")
-    p_decl.add_run("3. Competing Interests: The author declares no competing financial or personal relationships.\n")
-    p_decl.add_run("4. Code & Reproducibility: All algorithms, simulation scripts, and ROS 2 packages are fully open-source at: ")
+    p_decl.add_run("2. Author Approval: The author has reviewed, verified, and approved the submitted manuscript in its entirety.\n")
+    p_decl.add_run("3. Competing Interests: The author declares no competing financial, commercial, or personal interests.\n")
+    p_decl.add_run("4. Code & Artifact Availability: The complete codebase—including ROS 2 Humble packages, micro-XRCE-DDS bridge configurations, evaluation scripts, and benchmark telemetry—is publicly available at: ")
     r_gh = p_decl.add_run("https://github.com/Vishal442005/AERO-Swarm")
     r_gh.bold = True
-    r_gh.font.color.rgb = RGBColor(5, 150, 105)
+    r_gh.font.color.rgb = RGBColor(13, 148, 136)
     p_decl.add_run(" (Release v1.0.0).")
     
     p_close = doc.add_paragraph()
-    p_close.paragraph_format.space_before = Pt(6)
-    p_close.paragraph_format.space_after = Pt(16)
-    p_close.add_run("Thank you for your consideration of our work.\n\n")
-    r_sig = p_close.add_run("Warm regards,\n\n")
+    p_close.paragraph_format.space_before = Pt(4)
+    p_close.paragraph_format.space_after = Pt(12)
+    p_close.add_run("Thank you very much for considering our manuscript for publication in Robotics and Autonomous Systems.\n\n")
+    r_sig = p_close.add_run("Sincerely yours,\n\n")
     r_sig.font.italic = True
     
     r_team = p_close.add_run("Vishal Chandel\n")
     r_team.bold = True
-    p_close.add_run("Department of Electronics and Communication Engineering\nJawaharlal Nehru Government Engineering College (JNGEC), Sundernagar, Mandi, HP, India\nEmail: chandelvishal445@gmail.com")
+    p_close.add_run("Department of Electronics and Communication Engineering\nJawaharlal Nehru Government Engineering College (JNGEC), Sundernagar\nMandi, Himachal Pradesh 175018, India\nEmail: chandelvishal445@gmail.com")
     
     doc.save(output_path)
     print(f"Elsevier Cover Letter saved to {output_path}")
