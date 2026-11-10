@@ -50,6 +50,10 @@ def test_cbf_qp_solve_latency_benchmark():
     positions = np.random.uniform(-20, 20, size=(50, 3))
     cmd = np.array([1.0, 1.0, 0.0])
     
+    # Warmup
+    for _ in range(10):
+        cbf.filter_control_action(drone_idx=0, cmd_vel=cmd, all_positions=positions, obstacles=[])
+
     latencies = []
     for _ in range(100):
         t0 = time.perf_counter()
