@@ -688,28 +688,29 @@ def build_final_ras_manuscript_docx():
         assert len(hl) <= 85, f"Highlight exceeds 85 chars: {hl} ({len(hl)} chars)"
     builder.add_highlights_box(highlights)
 
-    # 5. Abstract
+    # 5. Abstract (Strictly under 250 words for Elsevier RAS)
     abstract_text = [
-        "Deploying autonomous multi-robot swarms in contested, GPS-denied, and communication-degraded environments poses acute resilience challenges. "
-        "Standard multi-agent coordination frameworks rely on flat graph Laplacians that assume homogeneous state spaces and symmetric communication channels. "
-        "Under directed radio-frequency (RF) jamming, localized node attrition, and severe sensor occlusion, flat graph topologies undergo catastrophic percolation phase transitions "
-        "at critical link removal fractions ($f_{\\mathrm{crit}} \\approx 0.35$), resulting in network fragmentation, consensus divergence, and mission failure. "
-        "To resolve these fundamental limitations, this paper introduces **AERO-Swarm** (Adaptive Edge-Resilient Optimization for Heterogeneous Swarms), "
-        "an integrated algebraic-topological, information-geometric, and safety-critical coordination framework.",
-        "AERO-Swarm structures inter-robot interactions over **cellular sheaves**, associating heterogeneous vector spaces (stalks $\\mathcal{F}(v)$) "
-        "to distinct drone roles (e.g., $12$-dimensional scout observation stalks, $24$-dimensional leader tactical stalks, and $8$-dimensional relay routing stalks) "
-        "connected by dynamic linear restriction maps. We rigorously prove that the Sheaf Laplacian spectrum eliminates percolation collapse, "
-        "guaranteeing strictly linear resilience degradation under up to $80\\%$ communication link failure. To minimize RF exposure and prevent channel saturation, "
-        "we formulate an **Information-Geometric Event-Triggered Communication (IG-ETC)** mechanism based on the Fisher-Rao Riemannian metric on the manifold of symmetric positive definite belief covariances $\\mathcal{P}_+^6$, "
-        "suppressing inter-agent communication overhead by an exact $79.6\\%$. For multi-robot task allocation, we develop the **Sheaf Heterogeneous Auction for Task Allocation (SHATA)**, "
-        "which incorporates localized sheaf curvature discounts and provably deconflicts spatial assignment deadlocks in finite time via first cohomology group harmonic projection "
-        "with local computational complexity $\\mathcal{O}(|\\mathcal{N}_i| \\cdot d_v^2 + M)$.",
-        "Extensive dual-tier validations—comprising 12-vCPU parallelized Monte Carlo sweeps across $N \\in [10, 200]$ drones substantiated by non-parametric Wilcoxon signed-rank tests ($p < 0.001$) "
-        "and physical software-in-the-loop (SITL) multi-quadrotor simulations in **ROS 2 Humble** over CycloneDDS—demonstrate that AERO-Swarm achieves a $91.3\\%$ task completion rate "
-        "under $60\\%$ adversarial RF jamming, compared to $23.7\\%$ for classical CBBA and $18.5\\%$ for standard distributed flocking. "
-        "Furthermore, hardware-isolated Run-Time Assurance (RTA) Safety Simplex barrier monitors enforce deterministic Quadratic Program solve latencies of $44.8\\,\\mu\\mathrm{s}$ (P99), "
-        "comfortably exceeding the $1.5\\,\\mathrm{ms}$ SAE ARP4754B avionics deadline while strictly guaranteeing zero safety violations across all operational scenarios."
+        "Deploying autonomous swarms in contested, GPS-denied environments poses acute resilience challenges. "
+        "Conventional coordination frameworks model topologies as flat graphs that assume homogeneous state spaces and symmetric links. "
+        "Under directed radio-frequency (RF) jamming and physical node attrition, flat graphs undergo catastrophic percolation phase transitions "
+        "at critical link removal fractions ($f_{\\mathrm{crit}} \\approx 0.35$), causing consensus divergence and mission failure. "
+        "To resolve this vulnerability, we propose **AERO-Swarm** (Adaptive Edge-Resilient Optimization for Heterogeneous Swarms), "
+        "an integrated algebraic-topological, information-geometric, and safety-critical framework.",
+        "AERO-Swarm structures inter-robot interactions over **cellular sheaves**, associating heterogeneous vector stalks to distinct drone roles "
+        "(scouts, leaders, relays) connected by dynamic restriction maps. We prove that the Sheaf Laplacian spectrum eliminates percolation collapse, "
+        "maintaining linear resilience decay under up to $80\\%$ communication degradation. To minimize RF exposure, an **Information-Geometric "
+        "Event-Triggered Communication (IG-ETC)** protocol on covariance manifolds $\\mathcal{P}_+^6$ reduces wireless packet volume by an exact $79.6\\%$. "
+        "For decentralized coordination, the **Sheaf Heterogeneous Auction for Task Allocation (SHATA)** provably resolves bidding deadlocks "
+        "via first cohomology group harmonic projection.",
+        "Parallelized Monte Carlo sweeps across $N \\in [10, 200]$ drones validated by Wilcoxon signed-rank tests ($p < 0.001$) "
+        "demonstrate a $91.3\\%$ task completion rate under $60\\%$ RF jamming, outperforming classical baselines by $3.8\\times$. "
+        "Furthermore, physical software-in-the-loop evaluations in **ROS 2 Humble** verify that hardware-isolated Control Barrier Functions "
+        "guarantee zero collisions with a deterministic $44.8\\,\\mu\\mathrm{s}$ P99 solve latency, operating $33.5\\times$ beneath the "
+        "$1.5\\,\\mathrm{ms}$ SAE ARP4754B avionics safety ceiling."
     ]
+    # Enforce word limit strictly
+    total_words = sum(len(p.split()) for p in abstract_text)
+    assert total_words < 250, f"Abstract exceeds 250 words: {total_words} words"
     keywords = "Cellular Sheaves; Heterogeneous Robot Swarms; Information Geometry; Event-Triggered Consensus; Run-Time Assurance; Control Barrier Functions; Electronic Warfare; ROS 2 Humble."
     builder.add_abstract_box(abstract_text, keywords)
 

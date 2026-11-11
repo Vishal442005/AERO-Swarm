@@ -63,8 +63,8 @@ def verify_all():
     words = abstract_text.split()
     print(f"\n[2/7] Abstract Word Count Check:")
     print(f"  Total words in Abstract: {len(words)}")
-    assert 150 <= len(words) <= 350, f"Abstract word count ({len(words)}) outside expected range [150, 350]"
-    print(f"  --> [PASS] Abstract is well-balanced ({len(words)} words) for Elsevier RAS.")
+    assert 150 <= len(words) < 250, f"Abstract word count ({len(words)}) must be strictly under 250 words!"
+    print(f"  --> [PASS] Abstract is strictly under 250 words ({len(words)} words) for Elsevier RAS.")
 
     # ----------------------------------------------------
     # 3. Figure 1 Placement Verification
