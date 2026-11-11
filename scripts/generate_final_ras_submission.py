@@ -349,11 +349,30 @@ class RASManuscriptBuilder:
         tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
         tbl.autofit = False
 
-        tbl.columns[0].width = Inches(5.7)
-        tbl.columns[1].width = Inches(0.8)
+        # Set Table Width explicitly: 9360 dxa (6.5 inches)
+        tblPr = tbl._tbl.tblPr
+        tblW = parse_xml(f'<w:tblW {nsdecls("w")} w:type="dxa" w:w="9360"/>')
+        tblPr.append(tblW)
 
-        for cell in tbl.rows[0].cells:
-            tcPr = cell._tc.get_or_add_tcPr()
+        # Explicit Table Grid: 8496 dxa (5.9 inches) and 864 dxa (0.6 inches)
+        tblGrid = tbl._tbl.tblGrid
+        for gc in tblGrid.findall(qn('w:gridCol')):
+            tblGrid.remove(gc)
+        tblGrid.append(parse_xml(f'<w:gridCol {nsdecls("w")} w:w="8496"/>'))
+        tblGrid.append(parse_xml(f'<w:gridCol {nsdecls("w")} w:w="864"/>'))
+
+        c0 = tbl.cell(0, 0)
+        c1 = tbl.cell(0, 1)
+
+        c0.width = Inches(5.9)
+        c1.width = Inches(0.6)
+
+        # Set explicit cell width and borderless styling in XML
+        for c, width_dxa in [(c0, "8496"), (c1, "864")]:
+            tcPr = c._tc.get_or_add_tcPr()
+            for old_w in tcPr.findall(qn('w:tcW')):
+                tcPr.remove(old_w)
+            tcPr.append(parse_xml(f'<w:tcW {nsdecls("w")} w:type="dxa" w:w="{width_dxa}"/>'))
             tcBorders = parse_xml(
                 f'<w:tcBorders {nsdecls("w")}>'
                 '<w:top w:val="none"/><w:left w:val="none"/>'
