@@ -28,3 +28,6 @@ log/
 .DS_Store
 *.swp
 *~
+
+# Microsoft Office lock files
+~$*

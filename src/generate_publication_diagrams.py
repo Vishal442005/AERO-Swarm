@@ -118,14 +118,15 @@ def generate_teaser_4panel(dest_paths):
 
     # Arrows with restriction maps
     arr = dict(facecolor='black', edgecolor='black', width=1.3, headwidth=5.5, headlength=6, shrink=0.02)
+    b_txt = dict(boxstyle='square,pad=0.12', facecolor='white', edgecolor='none', alpha=0.95)
     ax.annotate('', xy=(3.6, 5.8), xytext=(2.6, 7.0), arrowprops=arr)
-    ax.text(3.35, 6.4, '$\\rho_{u \\to e} \\in \\mathbb{R}^{6 \\times 24}$', fontsize=7.5, fontweight='bold', color='black')
+    ax.text(3.35, 6.4, '$\\rho_{u \\to e} \\in \\mathbb{R}^{6 \\times 24}$', fontsize=7.5, fontweight='bold', color='black', bbox=b_txt)
 
     ax.annotate('', xy=(6.4, 5.8), xytext=(7.4, 7.0), arrowprops=arr)
-    ax.text(7.4, 6.4, '$\\rho_{v \\to e} \\in \\mathbb{R}^{6 \\times 12}$', fontsize=7.5, fontweight='bold', color='black')
+    ax.text(7.4, 6.4, '$\\rho_{v \\to e} \\in \\mathbb{R}^{6 \\times 12}$', fontsize=7.5, fontweight='bold', color='black', bbox=b_txt)
 
     ax.annotate('', xy=(5.0, 4.3), xytext=(5.0, 2.9), arrowprops=arr)
-    ax.text(5.6, 3.4, '$\\rho_{r \\to e} \\in \\mathbb{R}^{6 \\times 8}$', fontsize=7.5, fontweight='bold', color='black')
+    ax.text(5.6, 3.4, '$\\rho_{r \\to e} \\in \\mathbb{R}^{6 \\times 8}$', fontsize=7.5, fontweight='bold', color='black', bbox=b_txt)
 
     ax.text(0.2, 9.6, '(c)', fontsize=11, fontweight='bold', bbox=dict(boxstyle='square,pad=0.2', facecolor='white', edgecolor='black', lw=1.0))
     ax.set_title('(c) Proposed Cellular Sheaf Paradigm $\\mathcal{F}$', fontsize=9.5, fontweight='bold', y=-0.12)

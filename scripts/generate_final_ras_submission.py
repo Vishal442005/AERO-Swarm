@@ -675,23 +675,20 @@ def build_final_ras_manuscript_docx():
         github_url="https://github.com/Vishal442005/AERO-Swarm"
     )
 
-    # 4. Research Highlights (Elsevier Mandatory)
+    # 4. Research Highlights (Elsevier Mandatory: 3-5 bullets, <= 85 chars each)
     highlights = [
-        "First cellular sheaf-theoretic distributed coordination architecture for multi-robot swarms resolving heterogeneous observation spaces across Scouts, Leaders, and Relays.",
-        "Mathematical proof and empirical demonstration that Sheaf Laplacians eliminate catastrophic percolation phase transitions, ensuring strictly linear resilience decay under 80% RF jamming.",
-        "Information-Geometric Event-Triggered Communication (IG-ETC) operating on the manifold of symmetric positive definite covariance matrices, slashing wireless packet volume by 79.6%.",
-        "Sheaf Heterogeneous Auction for Task Allocation (SHATA) provably deconflicting bidding deadlocks in finite time via first cohomology group harmonic projection with O(dv^2 + M) local complexity.",
-        "Comprehensive ROS 2 Humble CycloneDDS evaluation across 30 distributed runs: deterministic 44.8 microseconds P99 CBF QP latency, 33.5x margin beneath SAE ARP4754B safety limits, and zero collisions."
+        "Cellular sheaves resolve dimensional mismatches across heterogeneous swarms.",
+        "Sheaf Laplacians eliminate percolation collapse under 80% RF jamming.",
+        "Information-geometric event triggering cuts wireless packet volume by 79.6%.",
+        "SHATA deconflicts multi-robot bidding deadlocks via cohomology projection.",
+        "ROS 2 Humble RTA Simplex ensures zero collisions with 44.8 us CBF solve time."
     ]
+    # Assert character limit strictly
+    for hl in highlights:
+        assert len(hl) <= 85, f"Highlight exceeds 85 chars: {hl} ({len(hl)} chars)"
     builder.add_highlights_box(highlights)
 
-    # 5. Teaser Architectural Overview (Figure 1)
-    builder.add_figure(
-        img_path="Updated_significant/figures/fig_teaser_sheaf_concept.png",
-        caption_text="**Figure 1.** High-level architectural overview of the proposed AERO-Swarm framework: (a) Multi-role heterogeneous drone swarm operating in contested electronic warfare canyons; (b) Comparison between flat graph percolation collapse and cellular sheaf cochain preservation; (c) Cellular sheaf structure associating vector stalks $\\mathcal{F}(v)$ and dynamic restriction maps $\\rho_{v \\trianglelefteq e}$; (d) Bochner-Weitzenböck curvature-based bottleneck identification and proactive rerouting."
-    )
-
-    # 6. Abstract
+    # 5. Abstract
     abstract_text = [
         "Deploying autonomous multi-robot swarms in contested, GPS-denied, and communication-degraded environments poses acute resilience challenges. "
         "Standard multi-agent coordination frameworks rely on flat graph Laplacians that assume homogeneous state spaces and symmetric communication channels. "
@@ -745,8 +742,16 @@ def build_final_ras_manuscript_docx():
     builder.add_paragraph_with_math(
         "To overcome these limitations, this paper proposes **AERO-Swarm** (Adaptive Edge-Resilient Optimization for Heterogeneous Swarms), a mathematically unified framework "
         "combining cellular sheaf theory, information-geometric event triggering, and provably certified safety monitors. By associating heterogeneous vector stalks and dynamic "
-        "restriction maps to communication edges, AERO-Swarm preserves higher-order algebraic topology across the swarm, guaranteeing linear resilience decay without percolation collapse."
+        "restriction maps to communication edges, AERO-Swarm preserves higher-order algebraic topology across the swarm, guaranteeing linear resilience decay without percolation collapse. "
+        "The overall system concept and architectural workflow are illustrated in Figure 1."
     )
+
+    # Architectural Overview (Figure 1)
+    builder.add_figure(
+        img_path="Updated_significant/figures/fig_teaser_sheaf_concept.png",
+        caption_text="**Figure 1.** High-level architectural overview of the proposed AERO-Swarm framework: (a) Multi-role heterogeneous drone swarm operating in contested electronic warfare canyons; (b) Comparison between flat graph percolation collapse and cellular sheaf cochain preservation; (c) Cellular sheaf structure associating vector stalks $\\mathcal{F}(v)$ and dynamic restriction maps $\\rho_{v \\trianglelefteq e}$; (d) Bochner-Weitzenböck curvature-based bottleneck identification and proactive rerouting."
+    )
+
     builder.add_paragraph_with_math(
         "**Key Technical Contributions:**\n"
         "• **Cellular Sheaf Coordination:** We formulate multi-robot consensus over cellular sheaves $\\mathcal{F}$, assigning heterogeneous vector stalks $d_v \\in \\{8, 12, 24\\}$ "
@@ -1440,8 +1445,11 @@ def build_final_ras_manuscript_docx():
     for tp in target_paths:
         os.makedirs(os.path.dirname(tp), exist_ok=True)
         import shutil
-        shutil.copyfile(primary_output, tp)
-        print(f"[SYNC] Copied manuscript -> {tp}")
+        try:
+            shutil.copyfile(primary_output, tp)
+            print(f"[SYNC] Copied manuscript -> {tp}")
+        except PermissionError:
+            print(f"[WARNING] Could not overwrite {tp} because it is currently open in Microsoft Word. Close Word to update this copy.")
 
 
 if __name__ == "__main__":
