@@ -859,7 +859,7 @@ def build_final_ras_manuscript_docx():
     builder.add_paragraph_with_math(
         "The space of 0-cochains $C^0(\\mathcal{G}; \\mathcal{F}) = \\bigoplus_{v \\in \\mathcal{V}} \\mathcal{F}(v)$ represents the concatenated global state vector "
         "$\\mathbf{x} = [\\mathbf{x}_1^\\top, \\dots, \\mathbf{x}_N^\\top]^\\top \\in \\mathbb{R}^D$, where $D = \\sum_{v} d_v$. The coboundary operator "
-        "$\\delta^0: C^0(\\mathcal{G}; \\mathcal{F}) \\to C^1(\\mathcal{G}; \\mathcal{F})$ evaluates the edge cochain disagreement across incident stalks:"
+        "$\\delta^0: C^0(\\mathcal{G}; \\mathcal{F}) \\to C^1(\\mathcal{G}; \\mathcal{F})$ evaluates the edge cochain disagreement across incident stalks via Eq. (1):"
     )
     builder.add_equation(
         latex_str=r"(\delta^0 \mathbf{x})(e) = \rho_{v \trianglelefteq e} \mathbf{x}_v - \rho_{u \trianglelefteq e} \mathbf{x}_u, \quad \forall e = (u,v) \in \mathcal{E}",
@@ -867,7 +867,7 @@ def build_final_ras_manuscript_docx():
     )
     builder.add_paragraph_with_math(
         "The **Cellular Sheaf Laplacian** $\\mathbf{L}_\\mathcal{F}: C^0(\\mathcal{G}; \\mathcal{F}) \\to C^0(\\mathcal{G}; \\mathcal{F})$ is defined as the self-adjoint composition "
-        "$\\mathbf{L}_\\mathcal{F} = (\\delta^0)^\\top \\delta^0$. Its block matrix entries are given explicitly by:"
+        "$\\mathbf{L}_\\mathcal{F} = (\\delta^0)^\\top \\delta^0$. Its block matrix entries are given explicitly by Eq. (2):"
     )
     builder.add_equation(
         latex_str=r"[\mathbf{L}_\mathcal{F}]_{uv} = \begin{cases} \sum_{e \triangleright u} \rho_{u \trianglelefteq e}^\top \rho_{u \trianglelefteq e}, & u = v \\ -\rho_{u \trianglelefteq e}^\top \rho_{v \trianglelefteq e}, & (u,v) \in \mathcal{E} \\ \mathbf{0}, & \text{otherwise} \end{cases}",
@@ -877,7 +877,7 @@ def build_final_ras_manuscript_docx():
     builder.add_heading_2("3.2. Bochner-Weitzenböck Curvature Decomposition")
     builder.add_paragraph_with_math(
         "To dynamically detect information bottlenecks and edge vulnerabilities under directional jamming, we formulate the Bochner-Weitzenböck decomposition "
-        "for cellular sheaves [13]. The sheaf 1-Laplacian $\\mathbf{L}_1 = \\delta^0 (\\delta^0)^\\top$ decomposes into a connection Laplacian and a directional curvature term:"
+        "for cellular sheaves [13]. The sheaf 1-Laplacian $\\mathbf{L}_1 = \\delta^0 (\\delta^0)^\\top$ decomposes into a connection Laplacian and a directional curvature term via Eq. (3):"
     )
     builder.add_equation(
         latex_str=r"\mathbf{L}_1 = \nabla^\top \nabla + \operatorname{Ric}_\mathcal{F}",
@@ -894,7 +894,7 @@ def build_final_ras_manuscript_docx():
     builder.add_heading_1("4. Adaptive Edge-Resilient Optimization (AERO-Swarm)")
     builder.add_paragraph_with_math(
         "The primary coordination objective is to achieve distributed state agreement across heterogeneous observation stalks despite adversarial EW link drops. "
-        "The continuous-time consensus dynamics over the cellular sheaf evolve according to the gradient flow of the sheaf Dirichlet energy $\\mathcal{E}_\\mathcal{F}(\\mathbf{x}) = \\frac{1}{2} \\mathbf{x}^\\top \\mathbf{L}_\\mathcal{F} \\mathbf{x}$:"
+        "The continuous-time consensus dynamics over the cellular sheaf evolve according to the gradient flow in Eq. (4) from the sheaf Dirichlet energy $\\mathcal{E}_\\mathcal{F}(\\mathbf{x}) = \\frac{1}{2} \\mathbf{x}^\\top \\mathbf{L}_\\mathcal{F} \\mathbf{x}$:"
     )
     builder.add_equation(
         latex_str=r"\dot{\mathbf{x}}_i(t) = -\sum_{j \in \mathcal{N}_i} \rho_{i \trianglelefteq e}^\top \left( \rho_{i \trianglelefteq e} \mathbf{x}_i(t) - \rho_{j \trianglelefteq e} \mathbf{x}_j(t) \right)",
@@ -940,7 +940,7 @@ def build_final_ras_manuscript_docx():
     builder.add_paragraph_with_math(
         "**Theorem 1 (Linear Resilience of Cellular Sheaves):** Let $\\mathcal{G} = (\\mathcal{V}, \\mathcal{E})$ be a communication graph equipped with cellular sheaf $\\mathcal{F}$ "
         "having stalk dimensions $d_v \\ge 2$. Under progressive link removal where edges fail independently with probability $f_{\\mathrm{jam}} \\in [0, 1)$, the Swarm Resilience Index "
-        "$\\mathrm{SRI}(f_{\\mathrm{jam}}) = \\frac{\\lambda_2(\\mathbf{L}_\\mathcal{F}(f_{\\mathrm{jam}}))}{\\lambda_2(\\mathbf{L}_\\mathcal{F}(0))}$ satisfies:"
+        "$\\mathrm{SRI}(f_{\\mathrm{jam}}) = \\frac{\\lambda_2(\\mathbf{L}_\\mathcal{F}(f_{\\mathrm{jam}}))}{\\lambda_2(\\mathbf{L}_\\mathcal{F}(0))}$ satisfies the linear resilience bound in Eq. (5):"
     )
     builder.add_equation(
         latex_str=r"\mathrm{SRI}(f_{\mathrm{jam}}) \ge 1 - c_\mathcal{F} \cdot f_{\mathrm{jam}}, \quad \forall f_{\mathrm{jam}} \le 1 - \frac{1}{\min_{v} d_v}",
@@ -951,7 +951,7 @@ def build_final_ras_manuscript_docx():
         "no critical percolation discontinuity ($f_{\\mathrm{crit}} = \\emptyset$), decaying strictly linearly across $f_{\\mathrm{jam}} \\in [0.0, 0.80]$."
     )
     builder.add_paragraph_with_math(
-        "*Proof:* Consider the Courant-Fischer variational characterization of the sheaf spectral gap:"
+        "*Proof:* Consider the Courant-Fischer variational characterization of the sheaf spectral gap in Eq. (6):"
     )
     builder.add_equation(
         latex_str=r"\lambda_2(\mathbf{L}_\mathcal{F}) = \min_{\mathbf{x} \perp \ker(\mathbf{L}_\mathcal{F}), \|\mathbf{x}\|=1} \sum_{e = (u,v) \in \mathcal{E}} \|\rho_{v \trianglelefteq e} \mathbf{x}_v - \rho_{u \trianglelefteq e} \mathbf{x}_u\|^2",
@@ -961,7 +961,7 @@ def build_final_ras_manuscript_docx():
         "In a standard scalar graph ($d_v = 1$), removal of an edge $e$ completely eliminates the constraint between $u$ and $v$. If $e$ is a cut-edge, $\\ker(\\mathbf{L})$ dimension "
         "increases by 1, instantly driving $\\lambda_2 = 0$. For a cellular sheaf with stalk dimension $d_v \\ge 2$, the edge cochain constraint occupies a $d_e$-dimensional subspace. "
         "Link failure removes at most $d_e$ algebraic constraints from the global coboundary operator $\\delta^0$. By Cauchy's interlace theorem for block-partitioned symmetric matrices, "
-        "the eigenvalues of $\\mathbf{L}_\\mathcal{F} - \\delta_e^\\top \\delta_e$ interlace those of $\\mathbf{L}_\\mathcal{F}$. Averaging over independent edge failures with probability $f_{\\mathrm{jam}}$:"
+        "the eigenvalues of $\\mathbf{L}_\\mathcal{F} - \\delta_e^\\top \\delta_e$ interlace those of $\\mathbf{L}_\\mathcal{F}$. Averaging over independent edge failures with probability $f_{\\mathrm{jam}}$ yields the expected Sheaf Laplacian in Eq. (7):"
     )
     builder.add_equation(
         latex_str=r"\mathbb{E}[\mathbf{L}_\mathcal{F}(f_{\mathrm{jam}})] = (1 - f_{\mathrm{jam}}) \mathbf{L}_\mathcal{F}(0)",
@@ -995,14 +995,14 @@ def build_final_ras_manuscript_docx():
         "The belief covariance space forms a Riemannian manifold of symmetric positive definite matrices $\\mathcal{P}_+^6 = \\{ \\mathbf{P} \\in \\mathbb{R}^{6 \\times 6} : \\mathbf{P} = \\mathbf{P}^\\top, \\mathbf{P} \\succ 0 \\}$."
     )
     builder.add_paragraph_with_math(
-        "The affine-invariant **Fisher-Rao Riemannian distance** between the current belief covariance $\\mathbf{P}_i(t)$ and the last transmitted covariance $\\mathbf{P}_i(t_k)$ is given by [10]:"
+        "The affine-invariant **Fisher-Rao Riemannian distance** between the current belief covariance $\\mathbf{P}_i(t)$ and the last transmitted covariance $\\mathbf{P}_i(t_k)$ is given by Eq. (8) [10]:"
     )
     builder.add_equation(
         latex_str=r"d_{\mathrm{FR}}(\mathbf{P}_i(t), \mathbf{P}_i(t_k)) = \left( \sum_{m=1}^6 \ln^2 \lambda_m(\mathbf{P}_i(t)^{-1} \mathbf{P}_i(t_k)) \right)^{1/2}",
         eq_num=8
     )
     builder.add_paragraph_with_math(
-        "where $\\lambda_m(\\mathbf{A})$ denotes the $m$-th generalized eigenvalue. Agent $i$ broadcasts an updated cochain packet if and only if:"
+        "where $\\lambda_m(\\mathbf{A})$ denotes the $m$-th generalized eigenvalue. Agent $i$ broadcasts an updated cochain packet if and only if the event condition in Eq. (9) is satisfied:"
     )
     builder.add_equation(
         latex_str=r"d_{\mathrm{FR}}(\mathbf{P}_i(t), \mathbf{P}_i(t_k)) \ge \gamma_i(t) = \gamma_0 \exp(-\alpha_E E_i(t)) + \beta_\sigma \operatorname{Tr}(\mathbf{P}_i(t))",
@@ -1084,7 +1084,7 @@ def build_final_ras_manuscript_docx():
     )
     builder.add_paragraph_with_math(
         "*Proof:* Bidding conflicts between agents form a 1-cocycle $\\boldsymbol{\\omega} \\in C^1(\\mathcal{G}; \\mathcal{F})$, where $\\boldsymbol{\\omega}(e) = \\mathbf{y}_u - \\mathbf{y}_v$. "
-        "By the discrete Hodge-Helmholtz theorem for cellular sheaves [12]:"
+        "By the discrete Hodge-Helmholtz decomposition theorem for cellular sheaves [12] expressed in Eq. (11):"
     )
     builder.add_equation(
         latex_str=r"C^1(\mathcal{G}; \mathcal{F}) = \operatorname{im}(\delta^0) \oplus \ker((\delta^0)^\top) \cap \ker(\delta^1) \oplus \operatorname{im}((\delta^1)^\top)",
@@ -1109,7 +1109,7 @@ def build_final_ras_manuscript_docx():
     builder.add_heading_1("7. Stochastic Differential Game Formulation and Sheaf MARL")
     builder.add_paragraph_with_math(
         "We model the swarm interaction under adversarial electronic warfare as a stochastic differential game. "
-        "The state of each drone evolves according to controlled Langevin dynamics with Brownian jamming perturbations:"
+        "The state of each drone evolves according to controlled Langevin dynamics with Brownian jamming perturbations in Eq. (13):"
     )
     builder.add_equation(
         latex_str=r"\mathrm{d}\mathbf{x}_i(t) = \left[ f_i(\mathbf{x}_i) + g_i(\mathbf{x}_i)\mathbf{u}_i(t) - (\mathbf{L}_\mathcal{F} \mathbf{x})_i \right] \mathrm{d}t + \boldsymbol{\sigma}_i(\mathbf{x}_i, \mathbf{w}_j) \mathrm{d}\mathbf{W}_i(t)",
@@ -1138,7 +1138,7 @@ def build_final_ras_manuscript_docx():
     )
 
     builder.add_paragraph_with_math(
-        "To guarantee physical safety, each drone executes a hardware-isolated RTA Simplex monitor enforcing high-order Control Barrier Functions (CBFs):"
+        "To guarantee physical safety, each drone executes a hardware-isolated RTA Simplex monitor enforcing high-order Control Barrier Functions (CBFs) in Eq. (14):"
     )
     builder.add_equation(
         latex_str=r"h_{ij}(\mathbf{x}) = \|\mathbf{p}_i - \mathbf{p}_j\|^2 - d_{\mathrm{safe}}^2 \ge 0",
