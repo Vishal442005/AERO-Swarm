@@ -119,7 +119,7 @@ def generate_teaser_4panel(dest_paths):
     # Arrows with restriction maps
     arr = dict(facecolor='black', edgecolor='black', width=1.3, headwidth=5.5, headlength=6, shrink=0.02)
     ax.annotate('', xy=(3.6, 5.8), xytext=(2.6, 7.0), arrowprops=arr)
-    ax.text(2.6, 6.4, '$\\rho_{u \\to e} \\in \\mathbb{R}^{6 \\times 24}$', fontsize=7.5, fontweight='bold', color='black')
+    ax.text(3.35, 6.4, '$\\rho_{u \\to e} \\in \\mathbb{R}^{6 \\times 24}$', fontsize=7.5, fontweight='bold', color='black')
 
     ax.annotate('', xy=(6.4, 5.8), xytext=(7.4, 7.0), arrowprops=arr)
     ax.text(7.4, 6.4, '$\\rho_{v \\to e} \\in \\mathbb{R}^{6 \\times 12}$', fontsize=7.5, fontweight='bold', color='black')
