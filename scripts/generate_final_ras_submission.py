@@ -901,6 +901,11 @@ def build_final_ras_manuscript_docx():
         eq_num=4
     )
 
+    builder.add_paragraph_with_math(
+        "The end-to-end distributed execution pipeline for local stalk projection, cochain exchange, and curvature evaluation "
+        "is illustrated in Figure 2 and formally specified step-by-step in Algorithm 1."
+    )
+
     # Figure 2: Cellular Sheaf Consensus Coordination Flowchart
     builder.add_figure(
         img_path="Updated_significant/figures/fig_flowchart1_sheaf_coordination.png",
@@ -1014,6 +1019,11 @@ def build_final_ras_manuscript_docx():
         "rigorously preventing Zeno chattering behavior."
     )
 
+    builder.add_paragraph_with_math(
+        "The complete IG-ETC operational logic—spanning continuous belief covariance updating, Fisher-Rao geodesic divergence "
+        "evaluation on $\\mathcal{P}_+^6$, and adaptive energy-annealed threshold gating—is depicted in Figure 3."
+    )
+
     # Figure 3: Information-Geometric Event-Triggered Communication Flowchart
     builder.add_figure(
         img_path="Updated_significant/figures/fig_flowchart2_ig_etc.png",
@@ -1035,6 +1045,11 @@ def build_final_ras_manuscript_docx():
     )
     builder.add_paragraph_with_math(
         "where $\\mathbf{q}_j$ is task position, $\\operatorname{Ric}_\\mathcal{F}(e_i)$ is edge curvature, and $\\mathbb{1}(\\Gamma_{ji} \\ge \\Gamma_{\\min})$ enforces RF decodability."
+    )
+
+    builder.add_paragraph_with_math(
+        "The complete SHATA pipeline—integrating capability bundling, curvature-discounted bidding, SINR decodability gating, "
+        "and finite-time first-cohomology deadlock resolution—is illustrated in Figure 4 and formalized in Algorithm 2."
     )
 
     # Figure 4: Sheaf-Augmented Heterogeneous Auction Flowchart
@@ -1131,6 +1146,10 @@ def build_final_ras_manuscript_docx():
         "communicating over CycloneDDS middleware."
     )
 
+    builder.add_paragraph_with_math(
+        "The modular node topology and hardware-isolated Run-Time Assurance (RTA) Simplex multiplexer layout are depicted in Figure 5."
+    )
+
     # Figure 5: ROS 2 Architecture
     builder.add_figure(
         img_path="Updated_significant/figures/fig_ros2_architecture.png",
@@ -1206,6 +1225,12 @@ def build_final_ras_manuscript_docx():
     )
 
     # Figures 7 to 11
+    builder.add_paragraph_with_math(
+        "Figure 7 characterizes mission resilience across an adversarial radio-frequency jamming sweep $f_{\\mathrm{jam}} \\in [0.0, 0.80]$. Flat-graph consensus and auction baselines undergo percolation phase collapse near $f_{\\mathrm{jam}} \\approx 0.35$, whereas AERO-Swarm sustains $91.3\\%$ Task Completion Rate (TCR) at $f_{\\mathrm{jam}} = 0.60$ by transporting task potentials through unjammed higher-order sheaf stalks. Similarly, Figure 8 evaluates structural persistence under kinetic fleet attrition from $0\\%$ to $50\\%$ node destruction: while standard graph Laplacians collapse to $\\mathrm{SRI} = 0.082$ at $40\\%$ attrition, the cellular sheaf Laplacian preserves $\\mathrm{SRI} = 0.718$ through dimensional cushioning across surviving heterogeneous agents."
+    )
+    builder.add_paragraph_with_math(
+        "Communication overhead, computational scalability, and physical obstacle avoidance are further quantified in Figures 9–11. Figure 9 tracks cumulative packet transmissions over a $100\\,\\mathrm{s}$ mission, demonstrating that the Fisher-Rao IG-ETC mechanism eliminates $79.6\\%$ of redundant radio traffic relative to periodic broadcasting ($38.4 \\times 10^3$ versus $188.2 \\times 10^3$ packets). Figure 10 confirms real-time scalability across fleet sizes $N \\in [10, 200]$: sparse star-neighborhood block-Cholesky updates require $1.85\\,\\mathrm{ms}$ at $N=50$, $4.92\\,\\mathrm{ms}$ at $N=100$, and $14.18\\,\\mathrm{ms}$ at $N=200$, maintaining comfortable margin below the $20\\,\\mathrm{ms}$ ($50\\,\\mathrm{Hz}$) autopilot deadline. In physical 3D urban canyon navigation, Figure 11 visualizes agent trajectory velocity ribbons ($0$ to $6\\,\\mathrm{m/s}$), confirming that second-order Control Barrier Functions smoothly decelerate heterogeneous UAVs along obstacle boundaries $\\partial \\mathcal{C}$ with zero safety violations ($N_{\\mathrm{viol}} = 0$)."
+    )
     builder.add_figure(
         img_path="Updated_significant/figures/fig1_tcr_vs_jamming.png",
         caption_text="**Figure 7.** Systematic evaluation of Task Completion Rate (TCR) across radio-frequency jamming sweeps $f_{\\mathrm{jam}} \\in [0.0, 0.80]$. Flat graph baselines undergo percolation phase collapse at $f_{\\mathrm{jam}} \\approx 0.35$, while AERO-Swarm maintains $91.3\\%$ TCR at $f_{\\mathrm{jam}} = 0.60$."
@@ -1269,6 +1294,9 @@ def build_final_ras_manuscript_docx():
     )
 
     # Table 3: Multi-Parameter Architectural Comparison
+    builder.add_paragraph_with_math(
+        "To consolidate the theoretical and empirical comparisons across architectural axes, Table 3 contrasts AERO-Swarm against all eight baseline algorithms across 18 structural, resilience, safety, and computational dimensions. Across extreme jamming ($f_{\\mathrm{jam}} = 0.8$), AERO-Swarm preserves $85.2\\% \\pm 2.3\\%$ TCR compared to $21.0\\% \\pm 4.8\\%$ for Phy-GAIL and $11.2\\% \\pm 5.8\\%$ for CBBA, while extending the structural percolation threshold beyond $a_{\\mathrm{crit}} > 0.60$ versus $a_{\\mathrm{crit}} \\approx 0.28\\text{--}0.38$ for flat-graph and learning-based methods. Simultaneously, the SAE ARP4754B-aligned RTA Simplex reduces rubble collision rates to $0.00\\%$ (versus $3.1\\%\\text{--}14.8\\%$ across baselines) while holding $N=200$ control-loop latency at $14.18\\,\\mathrm{ms}$ in distributed ROS 2 Humble execution."
+    )
     t3_param_headers = ["Parameter / Dimension", "CBBA", "Flocking", "MADDPG", "MAPPO", "QMIX", "Resilient Cons.", "Euc-ETC", "Phy-GAIL", "AERO-Swarm (Ours)"]
     t3_param_rows = [
         ["Topology Abstraction", "Flat Graph", "Flat Graph G(V,E)", "Complete Mesh", "Flat Graph", "Monotonic Graph", "Metric Graph", "Flat Graph", "Barrier Graph", "**Cellular Sheaf F**"],
@@ -1298,6 +1326,9 @@ def build_final_ras_manuscript_docx():
     )
 
     # Table 4: Factorial Ablation Analysis
+    builder.add_paragraph_with_math(
+        "To isolate the marginal contribution of each mathematical module under $N=100$ heterogeneous UAV deployments at $60\\%$ RF jamming (50 Monte Carlo trials), Table 4 reports a factorial ablation study. While the complete AERO-Swarm stack achieves $91.3\\% \\pm 1.8\\%$ TCR, $\\mathrm{SRI} = 0.718 \\pm 0.03$, $-79.6\\%$ bandwidth reduction, $4.92 \\pm 0.15\\,\\mathrm{ms}$ loop latency, and zero safety violations, removing cellular sheaf restrictions ('w/o Cellular Sheaf') precipitates collapse to $34.6\\% \\pm 4.5\\%$ TCR, $\\mathrm{SRI} = 0.112 \\pm 0.04$, and $2.4 \\pm 0.8$ safety violations. Disabling Bochner SCVI curvature rerouting reduces TCR to $74.2\\% \\pm 3.1\\%$ ($\\mathrm{SRI} = 0.620 \\pm 0.04$). Replacing the Fisher-Rao IG-ETC manifold trigger with either periodic $20\\,\\mathrm{Hz}$ broadcast ($81.5\\% \\pm 2.4\\%$ TCR, $0\\%$ bandwidth savings, $5.85 \\pm 0.18\\,\\mathrm{ms}$ latency) or a Euclidean norm threshold ($78.9\\% \\pm 2.8\\%$ TCR, $-45.6\\%$ bandwidth reduction) severely erodes channel economy, whereas disabling the RTA Safety Simplex produces $16.8 \\pm 3.2$ safety violations per mission."
+    )
     t4_ablation_headers = ["Ablation Configuration", "TCR (%)", "SRI at 40% Attrition", "Bandwidth Cut (%)", "Loop Latency (ms)", "Safety Violations"]
     t4_ablation_rows = [
         ["**(1) Full AERO-Swarm (Proposed)**", "**91.3% ± 1.8%**", "**0.718 ± 0.03**", "**-79.6%**", "4.92 ± 0.15", "**0**"],
@@ -1325,6 +1356,9 @@ def build_final_ras_manuscript_docx():
     )
 
     # Figures 14 and 15
+    builder.add_paragraph_with_math(
+        "Figure 14 quantifies operational generality across these three theaters and delineates the 2D advantage-margin contour map separating the Superiority Zone, Parity Zone, and Physical Breakdown Boundary ($f_{\\mathrm{jam}} > 0.85$). Complementing the theater analysis, Figure 15 examines fleet composition sensitivity across Scout-Heavy, Balanced, and Leader-Heavy deployments alongside the finite-time decay of the first sheaf cohomology rank $\\dim H^1(\\mathcal{F}; \\mathbb{R}^d) \\to 0$ that eliminates heterogeneous bidding deadlocks."
+    )
     builder.add_figure(
         img_path="Updated_significant/figures/fig5_operational_envelope.png",
         caption_text="**Figure 14.** Generality and Operational Envelope Evaluation: (a) Multi-theater task completion rate (TCR) across Urban SAR Canyon, Maritime Logistics, and Subterranean Rubble; (b) 2D advantage margin contour map depicting the Superiority Zone, Parity Zone, and Physical Breakdown Boundary ($f_{\\mathrm{jam}} > 0.85$)."
@@ -1336,6 +1370,9 @@ def build_final_ras_manuscript_docx():
     )
 
     # Table 5: Operational Boundaries
+    builder.add_paragraph_with_math(
+        "Finally, Table 5 formalizes the five-zone operational failure envelope synthesized from non-parametric Wilcoxon statistical testing. In Zone I (Superiority Domain, $f_{\\mathrm{jam}} \\in [0.4, 0.8]$, $k \\approx 6\\text{--}15$), AERO-Swarm attains $85.2\\%\\text{--}93.4\\%$ TCR versus $< 24\\%$ for classical baselines ($p < 10^{-9}$, $d = 3.42$). In Zone II (Parity Domain, $f_{\\mathrm{jam}} \\in [0.0, 0.2]$, $k > 15$), performance converges statistically with lighter classical baselines ($95.8\\%\\text{--}98.2\\%$ TCR, $p = 0.082$, $d = 0.22$), whereas Zone III (High Scalability, $N \\in [50, 200+]$) preserves $1.85\\text{--}14.18\\,\\mathrm{ms}$ control latency against $>140\\,\\mathrm{ms}$ centralized MARL bottlenecks ($p < 10^{-7}$, $d = 2.95$). Beyond these bounds, Zone IV ($f_{\\mathrm{jam}} > 0.85$, $k < 1$) represents the physical thermal-noise floor ($<35\\%$ TCR, $p = 0.124$, triggering RTA failsafe RTL), while Zone V ($>90\\%$ Scouts in occluded canyons) identifies sensor starvation ($48\\%$ TCR, $p < 10^{-4}$, $d = 2.15$) remediated by maintaining at least $15\\%$ Leader/Relay anchors."
+    )
     t5_boundary_headers = ["Operational Regime", "Jamming (f_jam)", "Fleet Topology / Density", "AERO-Swarm Performance", "Baseline Behavior", "Wilcoxon Significance (p / d)", "Deployment Recommendation"]
     t5_boundary_rows = [
         ["**Zone I: Superiority Domain**\n(Contested / Adversarial)", "Severe:\nf_jam in [0.4, 0.8]", "Clustered dynamic mesh\n(k ≈ 6 - 15)\nStalks dv in {8, 12, 24}", "**TCR: 85.2% - 93.4%**\nSheaf cochains bypass cuts;\n79.6% RF cut", "Classical CBBA / Flocking\nsuffer percolation collapse\n(TCR < 24%)", "**p < 10^-9, d = 3.42**\n(Statistically Superior,\n95% CI: [89.8, 92.8]%)", "**Highly Recommended:**\nCore design target for contested defense and urban SAR."],
