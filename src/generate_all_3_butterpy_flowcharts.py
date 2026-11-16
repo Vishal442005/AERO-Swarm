@@ -57,12 +57,12 @@ def make_flowchart1(out_paths):
 
     # 5a. Reweighting Box (Left branch)
     fc.add_node("reweight", "Topological Reweighting", shape_type="box",
-                x=1.8, y=4.4, width=3.0, height=0.75, icon="jammer",
+                x=1.8, y=4.4, width=3.2, height=0.75, icon="jammer",
                 subtitle="Attenuate Jammed Edges")
 
     # 5b. Nominal Box (Right branch)
     fc.add_node("nominal", "Nominal Diffusion", shape_type="box",
-                x=6.2, y=4.4, width=3.0, height=0.75, icon="sheaf",
+                x=6.2, y=4.4, width=3.2, height=0.75, icon="sheaf",
                 subtitle="Standard Harmonic Flow")
 
     # 6. Consensus Box
@@ -125,21 +125,21 @@ def make_flowchart2(out_paths):
     # 3. Dynamic Threshold Box
     fc.add_node("thresh", "Evaluate Dynamic Threshold", shape_type="box",
                 x=4.0, y=7.4, width=4.6, height=0.75, icon="shield",
-                subtitle="δ_i(t) = δ_0 exp(β_E(1-E_i(t)))(1+β_γ(1-γ_i(t)))")
+                subtitle=r"$\gamma_i(t) = \gamma_0 \exp(-\alpha_E E_i(t)) + \beta_\sigma \mathrm{Tr}(\mathbf{P}_i(t))$")
 
     # 4. Trigger Decision Diamond
-    fc.add_node("trig_dec", "Trigger Condition Met?\nd_FR(p_i, p_last) ≥ δ_i(t)", shape_type="diamond",
+    fc.add_node("trig_dec", "Trigger Condition Met?\n$d_{\\mathrm{FR}}(\\mathbf{P}_i(t), \\mathbf{P}_i(t_k)) \\geq \\gamma_i(t)$", shape_type="diamond",
                 x=4.0, y=5.8, width=4.2, height=1.1, icon="decision")
 
     # 5a. Broadcast Box (Left branch - Triggered)
     fc.add_node("broadcast", "RF Packet Broadcast", shape_type="box",
-                x=1.8, y=4.4, width=3.0, height=0.75, icon="drone",
+                x=1.8, y=4.4, width=3.2, height=0.75, icon="drone",
                 subtitle="Transmit State & Reset t_last = t")
 
     # 5b. Silent Box (Right branch - Suppressed)
     fc.add_node("silence", "Radio Silence Mode", shape_type="box",
-                x=6.2, y=4.4, width=3.0, height=0.75, icon="shield",
-                subtitle="Save 79.7% Bandwidth; Dead-Reckon")
+                x=6.2, y=4.4, width=3.2, height=0.75, icon="shield",
+                subtitle="Save 79.6% Bandwidth; Dead-Reckon")
 
     # 6. Synchronization Box
     fc.add_node("sync", "Neighbor Tracking Sync", shape_type="box",
@@ -209,12 +209,12 @@ def make_flowchart3(out_paths):
 
     # 5a. Resolve Outbid Box (Left branch)
     fc.add_node("resolve", "Resolve Outbid / Rebidding", shape_type="box",
-                x=1.8, y=4.4, width=3.0, height=0.75, icon="target",
+                x=1.8, y=4.4, width=3.2, height=0.75, icon="target",
                 subtitle="Drop Outbid Tasks & Re-auction")
 
     # 5b. Confirm Box (Right branch)
     fc.add_node("confirm", "Confirm Bundle Assignment", shape_type="box",
-                x=6.2, y=4.4, width=3.0, height=0.75, icon="sheaf",
+                x=6.2, y=4.4, width=3.2, height=0.75, icon="sheaf",
                 subtitle="Assign Valid Task Path a_i*")
 
     # 6. Safety Barrier Decision Diamond
@@ -223,12 +223,12 @@ def make_flowchart3(out_paths):
 
     # 7a. Fallback Safe Controller (Left branch)
     fc.add_node("fallback", "RTA Safe QP Fallback", shape_type="box",
-                x=1.8, y=1.7, width=3.0, height=0.75, icon="shield",
+                x=1.8, y=1.7, width=3.2, height=0.75, icon="shield",
                 subtitle="Sub-1.2 ms Emergency Collision Avoidance")
 
     # 7b. Nominal Flight Controller (Right branch)
     fc.add_node("nominal_ctrl", "Nominal Flight Control", shape_type="box",
-                x=6.2, y=1.7, width=3.0, height=0.75, icon="drone",
+                x=6.2, y=1.7, width=3.2, height=0.75, icon="drone",
                 subtitle="Nominal Trajectory Tracking u_nom")
 
     # 8. End Capsule

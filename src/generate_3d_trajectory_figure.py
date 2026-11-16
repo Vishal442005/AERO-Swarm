@@ -166,21 +166,27 @@ def generate_3d_figure():
         mx, my, mz = x[mid_idx], y[mid_idx], z[mid_idx]
         if d["type"] == "Leader":
             ax.scatter([mx], [my], [mz], color='#cc0000', s=45, marker='D', edgecolors='black', zorder=6)
-        elif d["type"] == "Relay":
+        elif d["type"] == "Scout":
             ax.scatter([mx], [my], [mz], color='#008800', s=38, marker='s', edgecolors='black', zorder=6)
-        else:
+        else: # Relay
             ax.scatter([mx], [my], [mz], color='#0044cc', s=30, marker='^', edgecolors='black', zorder=6)
 
-    # Annotation Callout: Active CBF Barrier Push
+    # Active CBF Barrier Push Vector near obstacle
     ax.quiver(52.0 - 12.0, 52.0 - 4.0, 20.0, 4.5, -4.0, 1.5, color='#cc0000', lw=2.0, arrow_length_ratio=0.35)
-    ax.text(38.0, 46.0, 23.5, r"$\mathbf{u}_i = \arg\min \|\mathbf{u} - \mathbf{u}_{\mathrm{nom}}\|^2$" "\n" r"$\mathrm{s.t.} \ \dot{h}(x, \mathbf{u}) + \alpha(h(x)) \geq 0$",
-            fontsize=8.0, fontweight='bold', color='#990000',
-            bbox=dict(boxstyle='round,pad=0.3', facecolor='#fff5f5', edgecolor='#cc0000', lw=1.1))
 
-    # Annotation Callout: Cellular Sheaf Star-Neighborhood Diffusion
-    ax.text(12.0, 18.0, 28.0, "Cellular Sheaf Consensus\n" r"$\mathbf{x}_i \leftarrow \mathbf{x}_i - \epsilon \sum_{j \in \mathcal{N}_i} \rho_{i \trianglelefteq e}^\top (\rho_{i \trianglelefteq e} \mathbf{x}_i - \rho_{j \trianglelefteq e} \mathbf{x}_j)$",
-            fontsize=8.0, fontweight='bold', color='#004488',
-            bbox=dict(boxstyle='round,pad=0.3', facecolor='#f0f8ff', edgecolor='#004488', lw=1.1))
+    # Callout Box 1: Active CBF QP Safe Fallback (placed in clean top-right margin)
+    ax.text2D(0.66, 0.92,
+              r"$\mathbf{u}_i^{\mathrm{safe}} = \arg\min_{\mathbf{u}} \|\mathbf{u} - \mathbf{u}_i^{\mathrm{des}}\|^2$" "\n"
+              r"$\mathrm{s.t.} \ \mathbf{a}^\top \mathbf{u} \leq b \quad (\dot{h} + \alpha h \geq 0)$",
+              transform=ax.transAxes, fontsize=8.0, fontweight='bold', color='#990000',
+              bbox=dict(boxstyle='round,pad=0.35', facecolor='#fff5f5', edgecolor='#cc0000', lw=1.1, alpha=0.92))
+
+    # Callout Box 2: Cellular Sheaf Consensus (placed in clean upper whitespace margin)
+    ax.text2D(0.38, 0.92,
+              "Cellular Sheaf Diffusion\n"
+              r"$\mathbf{g}_i = \sum_{j \in \mathcal{N}_i} \rho_{i \trianglelefteq e}^\top (\mathbf{y}_{ie} - \mathbf{y}_{je})$",
+              transform=ax.transAxes, fontsize=8.0, fontweight='bold', color='#004488',
+              bbox=dict(boxstyle='round,pad=0.35', facecolor='#f0f8ff', edgecolor='#004488', lw=1.1, alpha=0.92))
 
     # Coordinate limits & labels
     ax.set_xlim(0, 100)
@@ -203,8 +209,8 @@ def generate_3d_figure():
     from matplotlib.lines import Line2D
     legend_elements = [
         Line2D([0], [0], marker='D', color='w', markerfacecolor='#cc0000', markeredgecolor='black', markersize=8, label='Leader UAV ($d_v=24$)'),
-        Line2D([0], [0], marker='s', color='w', markerfacecolor='#008800', markeredgecolor='black', markersize=7.5, label='Relay UAV ($d_v=12$)'),
-        Line2D([0], [0], marker='^', color='w', markerfacecolor='#0044cc', markeredgecolor='black', markersize=7, label='Scout UAV ($d_v=8$)'),
+        Line2D([0], [0], marker='s', color='w', markerfacecolor='#008800', markeredgecolor='black', markersize=7.5, label='Scout UAV ($d_v=12$)'),
+        Line2D([0], [0], marker='^', color='w', markerfacecolor='#0044cc', markeredgecolor='black', markersize=7, label='Relay UAV ($d_v=8$)'),
         Line2D([0], [0], color='#cc0000', linestyle=':', lw=1.5, label=r'CBF Safe Set Boundary $\partial \mathcal{C}$ ($r_{\mathrm{safe}}$)'),
         Line2D([0], [0], marker='o', color='w', markerfacecolor='green', markeredgecolor='black', markersize=6, label='Mission Ingress'),
         Line2D([0], [0], marker='*', color='w', markerfacecolor='red', markeredgecolor='black', markersize=9, label='Mission Target Zone'),

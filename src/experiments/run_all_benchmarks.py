@@ -23,7 +23,8 @@ sub_figs_dir = os.path.join(workspace_root, "submission_elseiver_(SWEVO)_RAS", "
 
 os.makedirs(data_dir, exist_ok=True)
 os.makedirs(plots_dir, exist_ok=True)
-os.makedirs(sub_figs_dir, exist_ok=True)
+updated_figs_dir = os.path.join(workspace_root, "Updated_significant", "figures")
+os.makedirs(updated_figs_dir, exist_ok=True)
 
 
 def run_scenario1_progressive_jamming():
@@ -217,6 +218,7 @@ def plot_all_figures(df_s1, df_s2, df_s3, df_s5):
     out1 = os.path.join(plots_dir, 'fig1_tcr_vs_jamming.png')
     plt.savefig(out1)
     shutil.copyfile(out1, os.path.join(sub_figs_dir, 'fig1_tcr_vs_jamming.png'))
+    shutil.copyfile(out1, os.path.join(updated_figs_dir, 'fig1_tcr_vs_jamming.png'))
     plt.close()
     print("--> Generated: fig1_tcr_vs_jamming.png")
     
@@ -257,6 +259,7 @@ def plot_all_figures(df_s1, df_s2, df_s3, df_s5):
     out2 = os.path.join(plots_dir, 'fig2_sri_resilience.png')
     plt.savefig(out2)
     shutil.copyfile(out2, os.path.join(sub_figs_dir, 'fig2_sri_resilience.png'))
+    shutil.copyfile(out2, os.path.join(updated_figs_dir, 'fig2_sri_resilience.png'))
     plt.close()
     print("--> Generated: fig2_sri_resilience.png")
 
@@ -288,6 +291,7 @@ def plot_all_figures(df_s1, df_s2, df_s3, df_s5):
     out3 = os.path.join(plots_dir, 'fig3_comm_efficiency.png')
     plt.savefig(out3)
     shutil.copyfile(out3, os.path.join(sub_figs_dir, 'fig3_comm_efficiency.png'))
+    shutil.copyfile(out3, os.path.join(updated_figs_dir, 'fig3_comm_efficiency.png'))
     plt.close()
     print("--> Generated: fig3_comm_efficiency.png")
 
@@ -297,7 +301,7 @@ def plot_all_figures(df_s1, df_s2, df_s3, df_s5):
     plt.figure(figsize=(7, 4.6), dpi=300)
     # Baseline curves
     plt.plot(df_s3['swarm_size_N'], df_s3['ACMASAC_latency_ms'], 'd:', color='#8c564b', lw=1.8, ms=6, label='AC-MASAC (142.2 ms at N=200)')
-    plt.plot(df_s3['swarm_size_N'], df_s3['Sun_latency_ms'], 'x--', color='#e377c2', lw=1.8, ms=6, label='Sun et al. (39.8 ms at N=200)')
+    plt.plot(df_s3['swarm_size_N'], df_s3['Sun_latency_ms'], 'x--', color='#e377c2', lw=1.8, ms=6, label='Fu et al. (2025) (39.8 ms at N=200)')
     plt.plot(df_s3['swarm_size_N'], df_s3['CBBA_latency_ms'], 's--', color='#ff7f0e', lw=1.8, ms=6, label='CBBA (38.5 ms at N=200)')
     plt.plot(df_s3['swarm_size_N'], df_s3['Flocking_latency_ms'], '^-.', color='#7f7f7f', lw=1.8, ms=6, label='Flocking (5.8 ms at N=200)')
     
@@ -327,6 +331,7 @@ def plot_all_figures(df_s1, df_s2, df_s3, df_s5):
     out4 = os.path.join(plots_dir, 'fig4_scalability_runtime.png')
     plt.savefig(out4)
     shutil.copyfile(out4, os.path.join(sub_figs_dir, 'fig4_scalability_runtime.png'))
+    shutil.copyfile(out4, os.path.join(updated_figs_dir, 'fig4_scalability_runtime.png'))
     plt.close()
     print("--> Generated: fig4_scalability_runtime.png")
 

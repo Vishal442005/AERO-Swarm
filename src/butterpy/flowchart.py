@@ -123,32 +123,42 @@ class ButterFlowchart:
 
         # Draw minimalist black outline icon if assigned
         has_icon = node.icon is not None
-        icon_x = x - w/2.0 + 0.38 if node.shape_type != "diamond" else x - w/2.0 + 0.48
-        text_x = x + 0.16 if has_icon else x
+        icon_x = x - w/2.0 + 0.28 if node.shape_type != "diamond" else x - w/2.0 + 0.40
+        text_x = x + 0.22 if has_icon else x
+
+        # Scale down font slightly for compact branch boxes (w <= 3.4) to guarantee zero text/icon overlap
+        if w <= 3.4 and node.shape_type != "diamond":
+            title_fs = self.node_fontsize * 0.82
+            sub_fs = self.subtitle_fontsize * 0.82
+            icon_scale = 0.85
+        else:
+            title_fs = self.node_fontsize
+            sub_fs = self.subtitle_fontsize
+            icon_scale = 1.0
 
         if node.icon == "drone":
-            draw_drone_icon(self.ax, icon_x, y, size=0.20)
+            draw_drone_icon(self.ax, icon_x, y, size=0.20 * icon_scale)
         elif node.icon == "sensor":
-            draw_sensor_icon(self.ax, icon_x, y, size=0.18)
+            draw_sensor_icon(self.ax, icon_x, y, size=0.18 * icon_scale)
         elif node.icon == "decision":
-            draw_decision_icon(self.ax, icon_x, y, size=0.18)
+            draw_decision_icon(self.ax, icon_x, y, size=0.18 * icon_scale)
         elif node.icon == "sheaf":
-            draw_sheaf_core_icon(self.ax, icon_x, y, size=0.20)
+            draw_sheaf_core_icon(self.ax, icon_x, y, size=0.20 * icon_scale)
         elif node.icon == "target":
-            draw_target_icon(self.ax, icon_x, y, size=0.18)
+            draw_target_icon(self.ax, icon_x, y, size=0.18 * icon_scale)
         elif node.icon == "shield":
-            draw_shield_icon(self.ax, icon_x, y, size=0.18)
+            draw_shield_icon(self.ax, icon_x, y, size=0.18 * icon_scale)
         elif node.icon == "jammer":
-            draw_jammer_tower_icon(self.ax, icon_x, y, size=0.18)
+            draw_jammer_tower_icon(self.ax, icon_x, y, size=0.18 * icon_scale)
 
         # Draw pure black text
         if node.subtitle:
-            self.ax.text(text_x, y + 0.14, node.text, fontsize=self.node_fontsize, fontweight="bold", 
+            self.ax.text(text_x, y + 0.14, node.text, fontsize=title_fs, fontweight="bold", 
                          color="black", ha="center", va="center", zorder=5)
-            self.ax.text(text_x, y - 0.16, node.subtitle, fontsize=self.subtitle_fontsize, 
+            self.ax.text(text_x, y - 0.16, node.subtitle, fontsize=sub_fs, 
                          color="black", ha="center", va="center", zorder=5)
         else:
-            self.ax.text(text_x, y, node.text, fontsize=self.node_fontsize, fontweight="bold", 
+            self.ax.text(text_x, y, node.text, fontsize=title_fs, fontweight="bold", 
                          color="black", ha="center", va="center", zorder=5)
 
     def draw_connections(self):

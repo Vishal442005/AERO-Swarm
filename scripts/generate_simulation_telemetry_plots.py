@@ -283,12 +283,12 @@ def generate_fig15_stress_test_extreme_conditions():
     bars3 = ax3.bar(categories_dim, dims, color=bar_colors3, width=0.45, edgecolor='#1E293B', lw=1.2)
     ax3.set_ylabel('Total Sheaf Vector Dimension')
     ax3.set_title('(c) Sensor Stalk Degradation')
-    ax3.set_ylim(200, 280)
+    ax3.set_ylim(200, 305)
     for bar in bars3:
         yval = bar.get_height()
         ax3.text(bar.get_x() + bar.get_width()/2.0, yval + 1.5, f"{int(yval)} Dim", ha='center', va='bottom', fontweight='bold', fontsize=9.5)
 
-    ax3.text(0.08, 0.72, "Dropped 12 Sensor Stalks\nLaplacian Symmetric: True\nPositive Semi-Definite: True\nMin Eigenvalue $\\geq 0.0$",
+    ax3.text(0.08, 0.94, "Dropped 12 Sensor Stalks\nLaplacian Symmetric: True\nPositive Semi-Definite: True\nMin Eigenvalue $\\geq 0.0$",
              transform=ax3.transAxes, fontsize=8.5, verticalalignment='top',
              bbox=dict(boxstyle='round,pad=0.4', facecolor='#F0FDF4', edgecolor='#86EFAC', lw=0.8))
 
